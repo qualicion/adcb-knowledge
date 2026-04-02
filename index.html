@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ADCB Open Finance — Knowledge Base</title>
+<link rel="stylesheet" href="assets/brand.css"/>
+<link rel="stylesheet" href="assets/layout.css"/>
+<link rel="stylesheet" href="assets/components.css"/>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <img class="sidebar-logo" src="assets/images/adcb-logo.svg" alt="ADCB"/>
+    <span class="sidebar-title">Open Finance Knowledge</span>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-group-label">TPP Project</div>
+
+    <div class="nav-item nav-parent active expanded" onclick="toggleNav('overview')" id="nav-overview">
+      <span style="display:flex;align-items:center;gap:10px;"><span class="nav-icon">&#x1F30D;</span> General Overview</span>
+      <span class="nav-chevron">&#x25B6;</span>
+    </div>
+    <div class="nav-sub open" id="sub-overview">
+      <div class="nav-item" onclick="navigate('overview','tab-players')" id="nav-players">
+        <span class="nav-icon">&#x1F465;</span> The Players
+      </div>
+      <div class="nav-item" onclick="navigate('overview','tab-data')" id="nav-data">
+        <span class="nav-icon">&#x1F4CA;</span> Data Sharing
+      </div>
+      <div class="nav-item" onclick="navigate('overview','tab-sip')" id="nav-sip">
+        <span class="nav-icon">&#x1F4B8;</span> SIP Payment
+      </div>
+      <div class="nav-item" onclick="navigate('overview','tab-compare')" id="nav-compare">
+        <span class="nav-icon">&#x2696;&#xFE0F;</span> Side by Side
+      </div>
+      <div class="nav-item" onclick="navigate('overview','tab-status')" id="nav-status">
+        <span class="nav-icon">&#x1F504;</span> Payment Status
+      </div>
+    </div>
+
+    <div class="sp8"></div>
+    <div class="nav-item nav-parent" onclick="toggleNav('consent')" id="nav-consent">
+      <span style="display:flex;align-items:center;gap:10px;"><span class="nav-icon">&#x1F512;</span> Consent &amp; Scheduler</span>
+      <span class="nav-chevron">&#x25B6;</span>
+    </div>
+    <div class="nav-sub" id="sub-consent">
+      <div class="nav-item" onclick="navigate('consent','part-system')" id="nav-system">
+        <span class="nav-icon">&#x1F5FA;&#xFE0F;</span> System Map
+      </div>
+      <div class="nav-item" onclick="navigate('consent','part-lifecycle')" id="nav-lifecycle">
+        <span class="nav-icon">&#x1F501;</span> Consent Lifecycle
+      </div>
+      <div class="nav-item" onclick="navigate('consent','part-scheduler')" id="nav-scheduler">
+        <span class="nav-icon">&#x23F0;</span> Data Scheduler
+      </div>
+      <div class="nav-item" onclick="navigate('consent','part-errors')" id="nav-errors">
+        <span class="nav-icon">&#x26A0;&#xFE0F;</span> Error Scenarios
+      </div>
+    </div>
+
+    <div class="sp16"></div>
+    <div class="nav-group-label">LFI Project</div>
+
+    <div class="nav-item nav-parent" onclick="toggleNav('lfi')" id="nav-lfi">
+      <span style="display:flex;align-items:center;gap:10px;"><span class="nav-icon">&#x1F3E6;</span> LFI Overview</span>
+      <span class="nav-chevron">&#x25B6;</span>
+    </div>
+    <div class="nav-sub" id="sub-lfi">
+      <div class="nav-item" onclick="navigate('lfi')" id="nav-lfi-home" style="opacity:.5;cursor:default;">
+        <span class="nav-icon">&#x1F6A7;</span> Coming Soon
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">CBUAE Standards v2.0</div>
+</nav>
+
+<!-- OVERLAY (mobile) -->
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <button class="mobile-toggle" onclick="toggleSidebar()">&#9776;</button>
+    <div class="breadcrumb" id="breadcrumb">
+      Open Finance <span style="opacity:.4">&#x203A;</span> TPP <span style="opacity:.4">&#x203A;</span> <span class="current" id="bc-current">General Overview</span>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 1: GENERAL OVERVIEW                 -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="section active" id="section-overview">
+
+      <div class="hero-card">
+        <div class="hero-eyebrow">UAE Open Finance · CBUAE · Al Tareq Platform</div>
+        <h1>From App to Bank and Back.<br><em>Simply Explained.</em></h1>
+        <p>Explore the sections below to understand who the players are, how Data Sharing works, how a Single Instant Payment flows, and what happens after you hit "Pay".</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="players" onclick="switchTab('players', this)">The Players</button>
+        <button class="tab-btn" data-tab="data" onclick="switchTab('data', this)">Data Sharing</button>
+        <button class="tab-btn" data-tab="sip" onclick="switchTab('sip', this)">SIP Payment</button>
+        <button class="tab-btn" data-tab="compare" onclick="switchTab('compare', this)">Side by Side</button>
+        <button class="tab-btn" data-tab="status" onclick="switchTab('status', this)">Payment Status</button>
+      </div>
+
+      <!-- TAB: PLAYERS -->
+      <div class="tab-panel active" id="panel-players">
+        <p style="color:var(--color-text-tertiary);margin-bottom:16px;">Who is involved in every Open Finance interaction? Click any card to learn more.</p>
+        <div class="players-grid">
+          <div class="player-card" id="card-user" onclick="togglePlayer('user')">
+            <span class="expand-hint" id="hint-user">tap to expand</span>
+            <span class="player-icon">&#x1F464;</span>
+            <div class="player-name">You — the Customer</div>
+            <div class="player-desc">End user with a bank account. Nothing happens without your explicit approval.</div>
+            <span class="player-tag">Gives Consent</span>
+          </div>
+          <div class="player-card" id="card-tpp" onclick="togglePlayer('tpp')">
+            <span class="expand-hint" id="hint-tpp">tap to expand</span>
+            <span class="player-icon">&#x1F4F1;</span>
+            <div class="player-name">TPP App</div>
+            <div class="player-desc">e.g. budgeting app, merchant checkout, finance aggregator. Never sees your password.</div>
+            <span class="player-tag">Calls APIs · FAPI 2.0 Certified</span>
+          </div>
+          <div class="player-detail" id="detail-user">
+            <div class="detail-head">
+              <span class="detail-icon">&#x1F464;</span>
+              <span class="detail-title">You — the Customer</span>
+              <span class="detail-close" onclick="event.stopPropagation();closePlayer('user')">&#x2715;</span>
+            </div>
+            <div class="detail-text">You are the end customer — a real person with a bank account. You use a TPP app and give consent for it to read your data or make payments on your behalf. You stay in control at all times and can revoke consent whenever you want. UAE law guarantees this right.</div>
+          </div>
+          <div class="player-detail" id="detail-tpp">
+            <div class="detail-head">
+              <span class="detail-icon">&#x1F4F1;</span>
+              <span class="detail-title">TPP — Third Party Provider</span>
+              <span class="detail-close" onclick="event.stopPropagation();closePlayer('tpp')">&#x2715;</span>
+            </div>
+            <div class="detail-text">TPP = Third Party Provider. The app you are actually using — a budgeting tool, merchant checkout, P2P app, or finance aggregator. Licensed by CBUAE (minimum AED 1M capital). It calls Open Finance APIs on your behalf but never sees your bank password. Must hold FAPI 2.0 certification.</div>
+          </div>
+          <div class="player-card span2" id="card-hub" onclick="togglePlayer('hub')">
+            <span class="expand-hint" id="hint-hub">tap to expand</span>
+            <span class="player-icon">&#x1F500;</span>
+            <div class="player-name">API Hub — Al Tareq / Nebras</div>
+            <div class="player-desc">The central platform managing security, consent, and routing between TPPs and banks.</div>
+            <span class="player-tag">Ozone-powered · Auth Server · Consent Manager · Router</span>
+          </div>
+          <div class="player-detail" id="detail-hub">
+            <div class="detail-head">
+              <span class="detail-icon">&#x1F500;</span>
+              <span class="detail-title">API Hub — Al Tareq / Nebras</span>
+              <span class="detail-close" onclick="event.stopPropagation();closePlayer('hub')">&#x2715;</span>
+            </div>
+            <div class="detail-text">The API Hub is the central nervous system of UAE Open Finance. Built on Ozone technology, operated by Nebras, branded as Al Tareq for consumers. It handles: (1) Security — OAuth 2.0, FAPI 2.0, mTLS certificates. (2) Consent management — creating, tracking, and revoking consents. (3) Routing — directing every API call between TPPs and LFIs. Think of it as air traffic control — every single interaction flows through here.</div>
+          </div>
+          <div class="player-card span2" id="card-lfi" onclick="togglePlayer('lfi')">
+            <span class="expand-hint" id="hint-lfi">tap to expand</span>
+            <span class="player-icon">&#x1F3E6;</span>
+            <div class="player-name">LFI — Your Bank (e.g. ADCB)</div>
+            <div class="player-desc">Your actual bank. Holds accounts, stores data, executes payments via the IPP rail.</div>
+            <span class="player-tag">CBUAE Regulated · Executes Payments · Owns Data</span>
+          </div>
+          <div class="player-detail" id="detail-lfi">
+            <div class="detail-head">
+              <span class="detail-icon">&#x1F3E6;</span>
+              <span class="detail-title">LFI — Your Bank (e.g. ADCB)</span>
+              <span class="detail-close" onclick="event.stopPropagation();closePlayer('lfi')">&#x2715;</span>
+            </div>
+            <div class="detail-text">LFI = Licensed Financial Institution — your actual bank (e.g. ADCB, Emirates NBD). It holds your account, stores your transaction data, and executes payments via the IPP rail. It never talks directly to the TPP — all communication goes through the API Hub via Ozone Connect. Participation is mandatory for all CBUAE-licensed banks.</div>
+          </div>
+        </div>
+        <div class="connector">
+          <div class="conn-line"></div>
+          <span class="conn-label">OAuth 2.0 · FAPI 2.0 · mTLS · SCA</span>
+          <div class="conn-line"></div>
+        </div>
+      </div>
+
+      <!-- TAB: DATA SHARING -->
+      <div class="tab-panel" id="panel-data">
+        <p style="color:var(--color-text-tertiary);margin-bottom:16px;">How your bank data reaches a TPP app — 7 steps</p>
+        <div class="step-list" id="data-steps"></div>
+      </div>
+
+      <!-- TAB: SIP PAYMENT -->
+      <div class="tab-panel" id="panel-sip">
+        <p style="color:var(--color-text-tertiary);margin-bottom:16px;">How a Single Instant Payment travels through the system — 8 steps</p>
+        <div class="step-list" id="sip-steps"></div>
+      </div>
+
+      <!-- TAB: COMPARE -->
+      <div class="tab-panel" id="panel-compare">
+        <p style="color:var(--color-text-tertiary);margin-bottom:16px;">Data sharing vs single instant payment — what is different?</p>
+        <div class="compare-grid">
+          <div class="compare-col sip">
+            <div class="compare-head">Single Instant Payment (SIP)</div>
+            <div class="compare-row"><span class="compare-icon">&#x1F3AF;</span><div class="compare-text"><strong>Goal:</strong> Move money from your account to a recipient</div></div>
+            <div class="compare-row"><span class="compare-icon">&#x1F4CB;</span><div class="compare-text"><strong>Consent type:</strong> Payment consent — single-use, expires on execution</div></div>
+            <div class="compare-row"><span class="compare-icon">&#x1F501;</span><div class="compare-text"><strong>Key API:</strong> <code>POST /domestic-payments</code> — AED only, via IPP rail</div></div>
+            <div class="compare-row"><span class="compare-icon">&#x2705;</span><div class="compare-text"><strong>Extra step:</strong> CoP (Confirmation of Payee) must run before consent creation</div></div>
+            <div class="compare-row"><span class="compare-icon">&#x23F1;</span><div class="compare-text"><strong>Duration:</strong> Single authorisation — cannot be reused</div></div>
+            <div class="compare-row"><span class="compare-icon">&#x1F4B0;</span><div class="compare-text"><strong>Hub fee:</strong> 2.5 fils per payment call (to Nebras)</div></div>
+            <div class="compare-row"><span class="compare-icon">&#x1F6E1;</span><div class="compare-text"><strong>Mandatory:</strong> Risk Information Block — Customer Present flag, channel, merchant details</div></div>
+          </div>
+          <div class="compare-col data">
+            <div class="compare-head">Data Sharing (Account Access)</div>
+            <div class="compare-row"><span class="compare-icon">&#x1F3AF;</span><div class="compare-text"><strong>Goal:</strong> Read your account, balance, or transaction history</div></div>
+            <div class="compare-row"><span class="compare-icon">&#x1F4CB;</span><div class="compare-text"><strong>Consent type:</strong> Account access consent — long-lived, up to 365 days</div></div>
+            <div class="compare-row"><span class="compare-icon">&#x1F501;</span><div class="compare-text"><strong>Key APIs:</strong> <code>GET /accounts</code>, <code>/balances</code>, <code>/transactions</code></div></div>
+            <div class="compare-row"><span class="compare-icon">&#x2705;</span><div class="compare-text"><strong>Scoping:</strong> Permissions are explicit — TPP only gets data clusters you approved</div></div>
+            <div class="compare-row"><span class="compare-icon">&#x23F1;</span><div class="compare-text"><strong>Duration:</strong> Token refreshes; revoke via <code>DELETE /account-access-consents/{id}</code></div></div>
+            <div class="compare-row"><span class="compare-icon">&#x1F4B0;</span><div class="compare-text"><strong>Hub fee:</strong> 2.5 fils per 100 lines of transaction data returned</div></div>
+            <div class="compare-row"><span class="compare-icon">&#x1F6E1;</span><div class="compare-text"><strong>Clusters:</strong> Account Details, Balances, Transactions, Beneficiaries, Standing Orders</div></div>
+          </div>
+        </div>
+        <div class="shared-row">
+          <span class="compare-icon">&#x1F512;</span>
+          <div class="compare-text"><strong>Both flows share the same foundation:</strong> FAPI 2.0 · mTLS · Strong Customer Authentication (SCA) at your bank · Full CBUAE oversight · All calls routed through the Al Tareq API Hub</div>
+        </div>
+      </div>
+
+      <!-- TAB: STATUS -->
+      <div class="tab-panel" id="panel-status">
+        <p style="color:var(--color-text-tertiary);margin-bottom:16px;">What happens to a payment after you approve it?</p>
+        <div class="status-diagram">
+          <div class="status-box sb-pending" onclick="showStatus('pending', this)">
+            <div class="status-code">PDNG</div>
+            <div class="status-label">Pending<br/>Bank received, not yet processed</div>
+          </div>
+          <div class="status-arrow">&#x2193;</div>
+          <div class="status-row">
+            <div class="status-box sb-rejected" onclick="showStatus('rejected', this)">
+              <div class="status-code">RJCT</div>
+              <div class="status-label">Rejected<br/>AML check or insufficient funds</div>
+            </div>
+            <div class="status-box sb-acsc" onclick="showStatus('acsc', this)">
+              <div class="status-code">ACSC</div>
+              <div class="status-label">Debtor settled<br/>Your account was debited</div>
+            </div>
+          </div>
+          <div class="status-split">from ACSC only &#x2193;</div>
+          <div class="status-row">
+            <div class="status-box sb-accc" onclick="showStatus('accc', this)">
+              <div class="status-code">ACCC</div>
+              <div class="status-label">Credit settled<br/>Recipient bank confirmed</div>
+            </div>
+            <div class="status-box sb-acwp" onclick="showStatus('acwp', this)">
+              <div class="status-code">ACWP</div>
+              <div class="status-label">Without posting<br/>Accepted, not yet posted</div>
+            </div>
+          </div>
+        </div>
+        <div class="status-info" id="status-info">
+          Click a status box above to understand what it means for you as a customer or developer.
+        </div>
+        <div class="status-api-note">
+          TPP polls: GET /domestic-payments/{paymentId} to track status changes in real-time via the IPP rail.
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 2: CONSENT MANAGEMENT & SCHEDULER   -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="section" id="section-consent">
+
+      <div class="hero-card">
+        <div class="hero-eyebrow">TPP Platform · The Complete Story</div>
+        <h1>The complete story of consent and data — told simply, shown clearly</h1>
+        <p>Every system, every step, every data movement — explained in plain language with the technical terms woven in, so you understand both what is happening and why it matters.</p>
+      </div>
+
+      <div class="box box-gold">
+        <h3 style="color:var(--color-text-primary);margin-bottom:8px;">The one idea that unlocks everything</h3>
+        <p>This entire system exists to answer one question: <strong>can our platform access a user's bank data — safely, legally, and without storing a password?</strong> The answer is yes, and it works like a chain of sealed envelopes and locked vaults, each one only opened by the right key. Once you see that image, every step below will click immediately.</p>
+      </div>
+
+      <!-- SYSTEM MAP -->
+      <div id="part-system"></div>
+      <div class="section-lbl">System Overview</div>
+      <h2>All the players, at a glance</h2>
+      <p>Six components work together every time we access bank data. Each one has a specific role — no component does another's job.</p>
+      <div class="sp8"></div>
+
+      <div class="diagram-card">
+        <div class="diagram-hdr">System map — all players</div>
+        <div class="diagram-body">
+          <div class="sysmap">
+            <div class="sysmap-box bx-blue"><span class="bx-title">Channel</span><span class="bx-sub">Backend</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-purple"><span class="bx-title">AWS Cognito</span><span class="bx-sub">Auth / tokens</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-red"><span class="bx-title">Kong</span><span class="bx-sub">Gateway</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-teal"><span class="bx-title">TPP</span><span class="bx-sub">Backend</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-green"><span class="bx-title">OF API Hub</span><span class="bx-sub">mTLS routing</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-amber"><span class="bx-title">LFI (Bank)</span><span class="bx-sub">Data source</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="box box-navy"><p><strong>Also in the system:</strong> DynamoDB stores consent records and encrypted tokens. Kafka carries fetched financial data downstream to analytics platforms. Neither stores raw bank data (account numbers, balances, transactions).</p></div>
+      <hr/>
+
+      <!-- CONSENT LIFECYCLE -->
+      <div id="part-lifecycle"></div>
+      <div class="part-pill">Part 1</div>
+      <div class="sp8"></div>
+      <h2>Getting permission — the consent journey</h2>
+      <p>A user has a bank account. We want to read it on their behalf. We cannot just ask for their password — that would be insecure and illegal. Instead, we go through a formal handshake involving signed letters, one-time vouchers, and encrypted vaults. Here is every step, in order.</p>
+      <div class="sp16"></div>
+
+      <!-- CONSENT LIFECYCLE DIAGRAM -->
+      <div class="diagram-card">
+        <div class="diagram-hdr">Consent lifecycle — numbered flow across all system layers</div>
+        <div class="diagram-body" style="padding:16px 12px;">
+          <table class="lanes" style="width:100%;border-collapse:separate;border-spacing:0 5px;">
+            <colgroup><col style="width:62px"/><col/></colgroup>
+            <tr>
+              <td class="lane-lbl-col">Channel</td>
+              <td style="padding:0 0 0 8px;">
+                <div class="lane-cells lane-stripe-odd" style="padding:6px;border-radius:6px;">
+                  <div class="step-box bx-blue"><span class="s-num">STEP 1</span><span class="s-title">Get token</span><span class="s-sub">App proves identity</span></div>
+                  <div class="lane-arr">&#x203A;</div>
+                  <div class="step-box bx-blue"><span class="s-num">STEP 2</span><span class="s-title">Call initiate</span><span class="s-sub">Start the request</span></div>
+                  <div class="lane-arr"></div>
+                  <div class="step-box bx-blue"><span class="s-num">STEP 6</span><span class="s-title">Get bank link</span><span class="s-sub">Redirect user</span></div>
+                  <div class="lane-arr">&#x203A;</div>
+                  <div class="step-box bx-teal"><span class="s-num">STEP 8</span><span class="s-title">Callback</span><span class="s-sub">User returns</span></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="lane-lbl-col">Kong</td>
+              <td style="padding:0 0 0 8px;">
+                <div class="lane-cells lane-stripe-even" style="padding:6px;border-radius:6px;">
+                  <div class="step-blank"></div>
+                  <div class="lane-arr"></div>
+                  <div class="step-box bx-red"><span class="s-num">STEP 3</span><span class="s-title">Check token</span><span class="s-sub">Security gate</span></div>
+                  <div class="lane-arr">&#x203A;</div>
+                  <div class="step-box bx-red"><span class="s-num">STEP 4</span><span class="s-title">Add ID label</span><span class="s-sub">Tag the request</span></div>
+                  <div class="lane-arr"></div>
+                  <div class="step-blank"></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="lane-lbl-col">TPP</td>
+              <td style="padding:0 0 0 8px;">
+                <div class="lane-cells lane-stripe-odd" style="padding:6px;border-radius:6px;">
+                  <div class="step-box bx-purple"><span class="s-num">STEP 5</span><span class="s-title">Open file</span><span class="s-sub">Create consent</span></div>
+                  <div class="lane-arr">&#x203A;</div>
+                  <div class="step-box bx-purple"><span class="s-num">STEP 7</span><span class="s-title">Sign letter</span><span class="s-sub">Bank request</span></div>
+                  <div class="lane-arr">&#x203A;</div>
+                  <div class="step-box bx-purple"><span class="s-num">STEP 9</span><span class="s-title">Check ticket</span><span class="s-sub">Verify genuine</span></div>
+                  <div class="lane-arr">&#x203A;</div>
+                  <div class="step-box bx-teal"><span class="s-num">STEP 10</span><span class="s-title">Lock vault</span><span class="s-sub">Save keys</span></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="lane-lbl-col">External</td>
+              <td style="padding:0 0 0 8px;">
+                <div class="lane-cells lane-stripe-even" style="padding:6px;border-radius:6px;">
+                  <div class="step-blank"></div>
+                  <div class="lane-arr"></div>
+                  <div class="step-box bx-gray"><span class="s-num">&nbsp;</span><span class="s-title">OF API Hub</span><span class="s-sub">Secure route</span></div>
+                  <div class="lane-arr">&#x203A;</div>
+                  <div class="step-box bx-amber"><span class="s-num">&nbsp;</span><span class="s-title">LFI (Bank)</span><span class="s-sub">Issues link</span></div>
+                  <div class="lane-arr"></div>
+                  <div class="step-blank"></div>
+                </div>
+              </td>
+            </tr>
+          </table>
+          <div class="key-row">
+            <div class="key-item" style="color:#1E40AF;"><strong>Blue</strong> = Channel (app)</div>
+            <div class="key-item" style="color:#991B1B;"><strong>Red</strong> = Kong (security)</div>
+            <div class="key-item" style="color:#5B21B6;"><strong>Purple</strong> = TPP backend</div>
+            <div class="key-item" style="color:#0F766E;"><strong>Teal</strong> = Outcome steps</div>
+            <div class="key-item" style="color:#92400E;"><strong>Amber</strong> = LFI (Bank)</div>
+          </div>
+        </div>
+      </div>
+      <div class="sp20"></div>
+
+      <!-- STEP EXPLANATIONS -->
+      <div class="section-lbl">What each step does — in plain words</div>
+      <div class="sp12"></div>
+
+      <h3>Step 1 — The ID card: Our app proves who it is</h3>
+      <div class="box box-navy" style="margin-top:6px;">
+        <p>Picture a visitor arriving at a high-security building. They go to the front desk, show their ID, and get a timed visitor badge. Our app does exactly this — it calls <strong>AWS Cognito</strong> and provides its <strong>client_id</strong> and <strong>client_secret</strong>. Cognito hands back a <strong>JWT (JSON Web Token)</strong> — a digitally sealed envelope that says "this is who I am, and here is what I am allowed to do." The envelope expires in minutes so nobody can steal and reuse it.</p>
+        <p><strong>Technical note:</strong> This is called the <strong>client_credentials grant</strong> — machine to machine, no user involved yet. The JWT contains <strong>scopes</strong> (permissions). For example, <strong>write/consents</strong> means "this app is allowed to start a consent." Without the right scope, nothing works.</p>
+      </div>
+      <div class="sp16"></div>
+
+      <h3>Steps 2, 3, 4 — The bouncer: Kong checks every request</h3>
+      <div class="box box-red" style="margin-top:6px;">
+        <p>Think of <strong>Kong Gateway</strong> as airport security. Every request must pass through it — no exceptions. Three checks in under a second:</p>
+        <ul>
+          <li><strong>Check 1 — Is the signature real?</strong> Kong verifies the JWT against a public key list called <strong>JWKS</strong>. Only Cognito's fingerprints are on the list.</li>
+          <li><strong>Check 2 — Has it expired?</strong> JWT tokens go stale fast. An old one is rejected immediately.</li>
+          <li><strong>Check 3 — Right permission?</strong> Each route needs a specific <strong>scope</strong>. No scope = no entry.</li>
+        </ul>
+        <p style="margin-top:8px;">Once all three pass, Kong strips the JWT and stamps a clean header called <strong>X-Client-Id</strong>. The TPP backend never sees a raw security token.</p>
+      </div>
+      <div class="box box-warn">
+        <p><strong>Test signal:</strong> If you ever see an Authorization header reaching the TPP backend — something is wrong with Kong. That header must be stripped every single time, without fail.</p>
+      </div>
+      <div class="sp16"></div>
+
+      <h3>Step 5 — Opening the file: TPP creates the consent record</h3>
+      <div class="box box-purple" style="margin-top:6px;">
+        <p>A detective opens a new case file and locks away the evidence. A new row is written to <strong>DynamoDB (tpp_consents table)</strong>. Status: <strong>AwaitingAuthorization</strong>. Two secret values are generated immediately:</p>
+        <ul>
+          <li><strong>PKCE verifier</strong> — a random key that proves our callback is genuine and was not tampered with. Think of it as a sealed wax stamp only we can reproduce.</li>
+          <li><strong>oauth_state</strong> — a unique ticket number that prevents anyone from forging a fake callback. This is called <strong>CSRF protection</strong>.</li>
+        </ul>
+        <p style="margin-top:8px;">Both are encrypted with <strong>AES-256-GCM</strong> before saving — not just hashed, fully encrypted. Even database access gives you nothing without the key.</p>
+      </div>
+      <div class="sp16"></div>
+
+      <h3>Steps 6, 7 — The signed letter: TPP sends a formal request to the bank</h3>
+      <div class="box box-gold" style="margin-top:6px;">
+        <p>The TPP cannot reach the user's bank directly. Every external call goes through the <strong>OF API Hub</strong> — the UAE's official Open Finance routing centre, like a certified postal service that only delivers between licensed institutions.</p>
+        <p>The letter is a <strong>JAR (JSON Authorization Request)</strong>, signed with <strong>PS256</strong> — a wax seal mathematically impossible to forge. It contains the exact permissions, packaged as a <strong>RAR (Rich Authorization Request)</strong>, and travels over <strong>mTLS</strong> — a tunnel where both sides show identity certificates. The bank replies with the <strong>authorization_url</strong> we send to the user.</p>
+      </div>
+      <div class="sp16"></div>
+
+      <h3>Steps 8, 9 — The user decides: Bank callback and verification</h3>
+      <div class="box box-teal" style="margin-top:6px;">
+        <p>The bank shows the user exactly what they are agreeing to share. The user clicks Allow. The bank sends back a <strong>one-time authorization_code</strong> (expires the moment it is used) and the <strong>state value</strong>. Our first action is to look up that state via the <strong>oauth_state-index</strong>.</p>
+      </div>
+      <div class="box box-succ">
+        <p><strong>CSRF check:</strong> If the state does not match — we stop immediately. No token exchange, no data, nothing. An attacker who tried to forge a callback would not know our state value — so they cannot get through.</p>
+      </div>
+      <div class="sp16"></div>
+
+      <h3>Step 10 — The vault: We swap the voucher for three encrypted keys</h3>
+      <div class="box box-teal" style="margin-top:6px;">
+        <p>The TPP decrypts the PKCE verifier, combines it with the authorization_code, and calls the bank's token endpoint via the OF API Hub over mTLS. The bank verifies everything matches the original signed letter, and hands back three tokens:</p>
+      </div>
+      <div class="token-grid">
+        <div class="token-card token-header"><span class="tk-name">access_token</span><span class="tk-ttl">~1 hour TTL</span></div>
+        <div class="token-card token-header"><span class="tk-name">refresh_token</span><span class="tk-ttl">Long-lived</span></div>
+        <div class="token-card token-header" style="border-right:none;"><span class="tk-name">id_token</span><span class="tk-ttl">Reference ID</span></div>
+        <div class="token-card"><p class="tk-desc">The actual key used to call the bank's API. Goes in every data request.</p></div>
+        <div class="token-card"><p class="tk-desc">When the access_token expires, we quietly use this to get a new one — no user action needed.</p></div>
+        <div class="token-card" style="border-right:none;"><p class="tk-desc">Contains the bank's own consent reference (of_consent_id). Proves which consent we are acting on.</p></div>
+      </div>
+      <div class="box box-succ">
+        <p><strong>Consent status flips:</strong> AwaitingAuthorization &#x2192; <strong>Authorized</strong>. An entry is written to <strong>tpp_audit_log</strong> — permanent, append-only. Part 1 is complete. The user did their part once. Everything from here is automatic.</p>
+      </div>
+      <hr/>
+
+      <!-- DATA FETCH SCHEDULER -->
+      <div id="part-scheduler"></div>
+      <div class="part-pill">Part 2</div>
+      <div class="sp8"></div>
+      <h2>The data fetch — the night shift that never stops</h2>
+      <p>The user gave permission once and walked away. From here, a background worker runs automatically on a schedule — silently fetching the latest financial data, checking tokens, handling failures, and shipping everything to our data platform. No human involvement. No data stored in our database.</p>
+      <div class="sp16"></div>
+
+      <div class="diagram-card">
+        <div class="diagram-hdr">Scheduler flow — from trigger to Kafka publish</div>
+        <div class="diagram-body">
+          <div class="sched-flow">
+            <div class="sched-step bx-blue"><span class="sched-num">1</span><span class="sched-title">Scheduler fires</span><span class="sched-sub">EventBridge cron</span></div>
+            <div class="sched-arr">&#x203A;</div>
+            <div class="sched-step bx-purple"><span class="sched-num">2</span><span class="sched-title">Load consents</span><span class="sched-sub">Authorized + active</span></div>
+            <div class="sched-arr">&#x203A;</div>
+            <div class="sched-step bx-red"><span class="sched-num">3</span><span class="sched-title">Check token</span><span class="sched-sub">expires_at check</span></div>
+            <div class="sched-arr">&#x203A;</div>
+            <div class="sched-step bx-amber"><span class="sched-num">4a</span><span class="sched-title">Refresh token</span><span class="sched-sub">Near expiry POST</span></div>
+            <div class="sched-arr">&#x203A;</div>
+            <div class="sched-step bx-teal"><span class="sched-num">5</span><span class="sched-title">Fetch data</span><span class="sched-sub">Accts / bal / txns</span></div>
+            <div class="sched-arr">&#x203A;</div>
+            <div class="sched-step bx-green"><span class="sched-num">6</span><span class="sched-title">Kafka + Audit</span><span class="sched-sub">Publish enriched</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="box box-navy"><p><strong>Step 4b:</strong> If the token is still valid, the refresh is skipped. The scheduler goes straight to fetch (step 5).</p></div>
+      <div class="sp20"></div>
+
+      <h3>Steps 1-2 — The night shift worker</h3>
+      <div class="box box-navy" style="margin-top:6px;">
+        <p>An <strong>EventBridge rule</strong> fires on schedule — like an alarm clock. The TPP backend wakes up and queries the <strong>tpp_consents table</strong>: "Give me every consent where status is <strong>Authorized</strong> and <strong>expiration_date</strong> has not passed." Each consent is processed independently — a problem with one does not delay the others.</p>
+      </div>
+      <div class="sp16"></div>
+
+      <h3>Steps 3-4 — Checking the key before the call</h3>
+      <div class="box box-red" style="margin-top:6px;">
+        <p>The scheduler gets the most recent token via <strong>ScanIndexForward=False, Limit=1</strong>. If it will expire within <strong>TOKEN_REFRESH_BUFFER_SECONDS</strong>, it renews it now — before the API call. The new token is encrypted and saved. The old one stays for audit purposes.</p>
+      </div>
+      <div class="box box-warn">
+        <p><strong>401 on refresh</strong> = the user revoked access at their bank. Consent is immediately marked <strong>Revoked</strong>, revoked_by = system. No retry. No exceptions.</p>
+      </div>
+      <div class="sp16"></div>
+
+      <h3>Step 5 — Three calls, one secure tunnel</h3>
+      <div class="box box-gold" style="margin-top:6px;">
+        <p>Before calling the bank, the TPP generates a fresh <strong>x-fapi-interaction-id</strong> — a unique UUID required under the <strong>FAPI standard</strong>. Three separate API calls through the OF API Hub over mTLS:</p>
+      </div>
+      <div class="diagram-card" style="margin-top:0;">
+        <div class="diagram-body" style="padding:12px;">
+          <div class="fetch-flow">
+            <div class="sysmap-box bx-teal" style="flex:1;"><span class="bx-title" style="font-size:11px;">GET /accounts</span><span class="bx-sub">Account list</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-teal" style="flex:1;"><span class="bx-title" style="font-size:11px;">GET /balances</span><span class="bx-sub">Balances</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-teal" style="flex:1;"><span class="bx-title" style="font-size:11px;">GET /transactions</span><span class="bx-sub">History</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-gray" style="flex:1;"><span class="bx-title" style="font-size:11px;">OF API Hub</span><span class="bx-sub">Routes via mTLS</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-amber" style="flex:1;"><span class="bx-title" style="font-size:11px;">LFI (Bank)</span><span class="bx-sub">Returns data</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="sp16"></div>
+
+      <h3>Step 6 — The conveyor belt: Data lands on Kafka</h3>
+      <div class="box box-succ" style="margin-top:6px;">
+        <p>The TPP enriches the data — adds <strong>consent_id</strong>, <strong>channel_id</strong>, <strong>lfi_id</strong>, and fetch timestamp — then publishes to <strong>EDP Kafka</strong>. The TPP's job ends the moment the message is on the belt.</p>
+      </div>
+      <div class="box box-succ">
+        <p><strong>Golden rule:</strong> Scan all seven DynamoDB tables after a successful fetch. You will find <strong>zero account numbers, zero balances, zero transactions</strong>. Only consent metadata, encrypted tokens, and the audit log live in DynamoDB.</p>
+      </div>
+      <hr/>
+
+      <!-- ERROR SCENARIOS -->
+      <div id="part-errors"></div>
+      <div class="section-lbl">When things go wrong — three failure types</div>
+      <div class="sp8"></div>
+      <p>The right response depends entirely on what is actually wrong — not how loud the alarm is.</p>
+      <div class="sp12"></div>
+
+      <div class="diagram-card">
+        <div class="diagram-hdr">Error scenarios — triage table</div>
+        <div class="diagram-body" style="padding:0;">
+          <table class="err-table">
+            <thead>
+              <tr><th>Scenario</th><th>Type</th><th>What we do</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="err-scenario"><strong>Bank returns 500</strong><small>Server briefly busy</small></div></td>
+                <td><span class="err-type err-temp">Temporary</span></td>
+                <td>Retry with backoff: 1s &#x2192; 2s &#x2192; 4s. Other consents are unaffected.</td>
+                <td><span class="status-ok">Stays Authorized</span></td>
+              </tr>
+              <tr>
+                <td><div class="err-scenario"><strong>Bank returns 401</strong><small>Token rejected</small></div></td>
+                <td><span class="err-type err-perm">Permanent</span></td>
+                <td>User revoked access. Consent marked Revoked immediately. revoked_by = system. No retry.</td>
+                <td><span class="status-rev">&#x2192; Revoked</span></td>
+              </tr>
+              <tr>
+                <td><div class="err-scenario"><strong>Past expiration_date</strong><small>Scheduled end</small></div></td>
+                <td><span class="err-type err-sched">Scheduled</span></td>
+                <td>Consent skipped in batch. No fetch, no Kafka message. Lifecycle naturally complete.</td>
+                <td><span class="status-done">Lifecycle complete</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="padding:14px 16px;">
+            <div class="box box-navy" style="margin:0;">
+              <p><strong>In every case — success or failure —</strong> an entry is written to <strong>tpp_audit_log</strong> with the outcome, the <strong>trace_id</strong>, and any error codes. This is the logbook that engineers, auditors, and QA testers all rely on.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:20px 0;">
+        <p style="font-size:11px;color:var(--color-text-tertiary);">ADCB Open Finance — TPP Platform: The Complete Story · DPE-143 / DPE-285 · Confidential · Internal use only</p>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 3: LFI PROJECT                      -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="section" id="section-lfi">
+      <div class="hero-card">
+        <div class="hero-eyebrow">LFI Project · Licensed Financial Institution</div>
+        <h1>LFI Integration &amp; Implementation</h1>
+        <p>Documentation for the bank-side (LFI) implementation of UAE Open Finance — the systems that hold accounts, store data, and execute payments.</p>
+      </div>
+
+      <div style="text-align:center;padding:60px 20px;">
+        <div style="font-size:48px;margin-bottom:16px;">&#x1F6A7;</div>
+        <h2 style="color:var(--color-text-tertiary);margin-bottom:8px;">Coming Soon</h2>
+        <p style="color:var(--color-text-tertiary);max-width:400px;margin:0 auto;">LFI project documentation is currently being prepared and will be available here shortly.</p>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script src="js/data.js"></script>
+<script src="js/components.js"></script>
+<script src="js/router.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

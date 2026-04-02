@@ -1,0 +1,124 @@
+/* ============================================================
+   ADCB Open Finance – Brand Design Tokens
+   Based on of-tpp-tailwind-config design tokens
+   ============================================================ */
+
+/* --- Fonts ------------------------------------------------- */
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('fonts/proximanova-light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('fonts/proximanova-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('fonts/proximanova-semibold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('fonts/proximanova-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- Color Tokens ------------------------------------------ */
+:root {
+  /* Primary */
+  --color-primary:       #E31E24;
+  --color-primary-50:    #FEF2F2;
+  --color-primary-100:   #FEE2E2;
+  --color-primary-200:   #FECACA;
+  --color-primary-300:   #FCA5A5;
+  --color-primary-400:   #F87171;
+  --color-primary-500:   #E31E24;
+  --color-primary-600:   #C41E24;
+  --color-primary-700:   #A01820;
+  --color-primary-800:   #7F121C;
+  --color-primary-900:   #5F0E17;
+  --color-primary-950:   #3F0910;
+
+  /* Backgrounds & Surfaces */
+  --color-background:         #FFFFFF;
+  --color-surface:            #FFFFFF;
+  --color-surface-secondary:  #F8FAFC;
+  --color-surface-tertiary:   #F1F5F9;
+
+  /* Text */
+  --color-text-primary:   #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-tertiary:  #94A3B8;
+  --color-text-inverse:   #FFFFFF;
+
+  /* Borders */
+  --color-border:       #E2E8F0;
+  --color-border-focus: #0D9488;
+
+  /* Semantic – Success / Warning / Error */
+  --color-success:       #22C55E;
+  --color-success-light: #F0FDF4;
+  --color-success-dark:  #15803D;
+  --color-warning:       #F59E0B;
+  --color-warning-light: #FFFBEB;
+  --color-warning-dark:  #B45309;
+  --color-error:         #EF4444;
+  --color-error-light:   #FEF2F2;
+  --color-error-dark:    #B91C1C;
+
+  /* Extended palette (from explainer pages) */
+  --navy:    #1C2B4A;
+  --teal:    #0D9488;
+  --purple:  #8B5CF6;
+  --blue:    #2563EB;
+  --amber:   #F59E0B;
+  --green:   #22C55E;
+
+  /* Status colors */
+  --status-active-bg:    #F0FDF4;
+  --status-active-text:  #15803D;
+  --status-paused-bg:    #FFFBEB;
+  --status-paused-text:  #B45309;
+  --status-suspended-bg: #FEF2F2;
+  --status-suspended-text: #B91C1C;
+  --status-awaiting-bg:  #EFF6FF;
+  --status-awaiting-text:#1D4ED8;
+  --status-consumed-bg:  #F5F3FF;
+  --status-consumed-text:#7C3AED;
+
+  /* --- Typography Tokens ----------------------------------- */
+  --font-family:      'Proxima Nova', system-ui, -apple-system, sans-serif;
+  --font-family-mono: 'JetBrains Mono', Menlo, monospace;
+  --font-h1:    700 24px/32px var(--font-family);
+  --font-h2:    600 18px/22px var(--font-family);
+  --font-h3:    500 16px/24px var(--font-family);
+  --font-body:  400 14px/20px var(--font-family);
+  --font-label: 500 12px/16px var(--font-family);
+  --font-legal: 400 12px/16px var(--font-family);
+  --font-detail:400 10px/13px var(--font-family);
+
+  /* --- Spacing Tokens -------------------------------------- */
+  --space-header:       56px;
+  --space-safe-bottom:  34px;
+  --space-card-padding: 16px;
+  --space-section-gap:  24px;
+  --space-item-gap:     12px;
+  --space-input-x:      12px;
+  --space-input-y:      10px;
+
+  /* --- Radius Tokens --------------------------------------- */
+  --radius-card:   12px;
+  --radius-button: 8px;
+  --radius-badge:  9999px;
+  --radius-input:  8px;
+}
