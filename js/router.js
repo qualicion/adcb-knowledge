@@ -8,7 +8,7 @@ var SLUG_TO_ID = {
   'the-players': 'players', 'data-sharing': 'data', 'sip-payment': 'sip',
   'side-by-side': 'compare', 'payment-status': 'status',
   'system-map': 'con-system', 'consent-lifecycle': 'con-lifecycle',
-  'data-scheduler': 'con-scheduler', 'error-scenarios': 'con-errors',
+  'data-scheduler': 'con-scheduler', 'error-scenarios': 'con-errors', 'testing': 'con-testing',
   'liability-fines': 'lfi-fines', 'how-it-works': 'lfi-how',
   'gap-analysis': 'lfi-gaps', 'test-strategy': 'lfi-tests'
 };
