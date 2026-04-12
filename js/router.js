@@ -7,8 +7,8 @@
 var SLUG_TO_ID = {
   'the-players': 'players', 'data-sharing': 'data', 'sip-payment': 'sip',
   'side-by-side': 'compare', 'payment-status': 'status',
-  'system-map': 'system', 'consent-lifecycle': 'lifecycle',
-  'data-scheduler': 'scheduler', 'error-scenarios': 'errors',
+  'system-map': 'con-system', 'consent-lifecycle': 'con-lifecycle',
+  'data-scheduler': 'con-scheduler', 'error-scenarios': 'con-errors',
   'liability-fines': 'lfi-fines', 'how-it-works': 'lfi-how',
   'gap-analysis': 'lfi-gaps', 'test-strategy': 'lfi-tests'
 };
@@ -35,12 +35,8 @@ function parseHash() {
 
   if (slug) {
     var id = SLUG_TO_ID[slug] || slug;
-    if (section === 'overview') {
+    if (section === 'overview' || section === 'consent' || section === 'lfi') {
       anchor = 'tab-' + id;
-    } else if (section === 'lfi') {
-      anchor = 'tab-' + id;
-    } else if (section === 'consent') {
-      anchor = 'part-' + id;
     }
   }
 

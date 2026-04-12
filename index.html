@@ -48,16 +48,16 @@
       <span class="nav-chevron">&#x25B6;</span>
     </div>
     <div class="nav-sub" id="sub-consent">
-      <div class="nav-item" onclick="navigate('consent','part-system')" id="nav-system">
+      <div class="nav-item" onclick="navigate('consent','tab-con-system')" id="nav-con-system">
         <span class="nav-icon">&#x1F5FA;&#xFE0F;</span> System Map
       </div>
-      <div class="nav-item" onclick="navigate('consent','part-lifecycle')" id="nav-lifecycle">
+      <div class="nav-item" onclick="navigate('consent','tab-con-lifecycle')" id="nav-con-lifecycle">
         <span class="nav-icon">&#x1F501;</span> Consent Lifecycle
       </div>
-      <div class="nav-item" onclick="navigate('consent','part-scheduler')" id="nav-scheduler">
+      <div class="nav-item" onclick="navigate('consent','tab-con-scheduler')" id="nav-con-scheduler">
         <span class="nav-icon">&#x23F0;</span> Data Scheduler
       </div>
-      <div class="nav-item" onclick="navigate('consent','part-errors')" id="nav-errors">
+      <div class="nav-item" onclick="navigate('consent','tab-con-errors')" id="nav-con-errors">
         <span class="nav-icon">&#x26A0;&#xFE0F;</span> Error Scenarios
       </div>
     </div>
@@ -293,8 +293,16 @@
         <p>This entire system exists to answer one question: <strong>can our platform access a user's bank data — safely, legally, and without storing a password?</strong> The answer is yes, and it works like a chain of sealed envelopes and locked vaults, each one only opened by the right key. Once you see that image, every step below will click immediately.</p>
       </div>
 
-      <!-- SYSTEM MAP -->
-      <div id="part-system"></div>
+      <!-- Consent Tabs -->
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="con-system" onclick="switchConsentTab('con-system', this)">System Map</button>
+        <button class="tab-btn" data-tab="con-lifecycle" onclick="switchConsentTab('con-lifecycle', this)">Consent Lifecycle</button>
+        <button class="tab-btn" data-tab="con-scheduler" onclick="switchConsentTab('con-scheduler', this)">Data Scheduler</button>
+        <button class="tab-btn" data-tab="con-errors" onclick="switchConsentTab('con-errors', this)">Error Scenarios</button>
+      </div>
+
+      <!-- TAB 1: SYSTEM MAP -->
+      <div class="tab-panel active" id="panel-con-system">
       <div class="section-lbl">System Overview</div>
       <h2>All the players, at a glance</h2>
       <p>Six components work together every time we access bank data. Each one has a specific role — no component does another's job.</p>
@@ -319,12 +327,10 @@
         </div>
       </div>
       <div class="box box-navy"><p><strong>Also in the system:</strong> DynamoDB stores consent records and encrypted tokens. Kafka carries fetched financial data downstream to analytics platforms. Neither stores raw bank data (account numbers, balances, transactions).</p></div>
-      <hr/>
+      </div><!-- /panel-con-system -->
 
-      <!-- CONSENT LIFECYCLE -->
-      <div id="part-lifecycle"></div>
-      <div class="part-pill">Part 1</div>
-      <div class="sp8"></div>
+      <!-- TAB 2: CONSENT LIFECYCLE -->
+      <div class="tab-panel" id="panel-con-lifecycle">
       <h2>Getting permission — the consent journey</h2>
       <p>A user has a bank account. We want to read it on their behalf. We cannot just ask for their password — that would be insecure and illegal. Instead, we go through a formal handshake involving signed letters, one-time vouchers, and encrypted vaults. Here is every step, in order.</p>
       <div class="sp16"></div>
@@ -471,12 +477,10 @@
       <div class="box box-succ">
         <p><strong>Consent status flips:</strong> AwaitingAuthorization &#x2192; <strong>Authorized</strong>. An entry is written to <strong>tpp_audit_log</strong> — permanent, append-only. Part 1 is complete. The user did their part once. Everything from here is automatic.</p>
       </div>
-      <hr/>
+      </div><!-- /panel-con-lifecycle -->
 
-      <!-- DATA FETCH SCHEDULER -->
-      <div id="part-scheduler"></div>
-      <div class="part-pill">Part 2</div>
-      <div class="sp8"></div>
+      <!-- TAB 3: DATA SCHEDULER -->
+      <div class="tab-panel" id="panel-con-scheduler">
       <h2>The data fetch — the night shift that never stops</h2>
       <p>The user gave permission once and walked away. From here, a background worker runs automatically on a schedule — silently fetching the latest financial data, checking tokens, handling failures, and shipping everything to our data platform. No human involvement. No data stored in our database.</p>
       <div class="sp16"></div>
@@ -545,10 +549,10 @@
       <div class="box box-succ">
         <p><strong>Golden rule:</strong> Scan all seven DynamoDB tables after a successful fetch. You will find <strong>zero account numbers, zero balances, zero transactions</strong>. Only consent metadata, encrypted tokens, and the audit log live in DynamoDB.</p>
       </div>
-      <hr/>
+      </div><!-- /panel-con-scheduler -->
 
-      <!-- ERROR SCENARIOS -->
-      <div id="part-errors"></div>
+      <!-- TAB 4: ERROR SCENARIOS -->
+      <div class="tab-panel" id="panel-con-errors">
       <div class="section-lbl">When things go wrong — three failure types</div>
       <div class="sp8"></div>
       <p>The right response depends entirely on what is actually wrong — not how loud the alarm is.</p>
@@ -589,6 +593,8 @@
           </div>
         </div>
       </div>
+
+      </div><!-- /panel-con-errors -->
 
       <div style="text-align:center;padding:20px 0;">
         <p style="font-size:11px;color:var(--color-text-tertiary);">ADCB Open Finance — TPP Platform: The Complete Story · DPE-143 / DPE-285 · Confidential · Internal use only</p>

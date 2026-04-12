@@ -66,6 +66,23 @@ function navigateToRoute(section, anchor) {
     if (panel) panel.classList.add('active');
   }
 
+  // Handle tab activation for consent
+  if (section === 'consent' && anchor) {
+    var conTabName = anchor.replace('tab-', '');
+    document.querySelectorAll('#section-consent .tab-btn').forEach(function(b) {
+      b.classList.remove('active');
+      if (b.getAttribute('data-tab') === conTabName) {
+        b.classList.add('active');
+      }
+    });
+    document.querySelectorAll('#section-consent .tab-panel').forEach(function(p){ p.classList.remove('active'); });
+    var conPanel = document.getElementById('panel-' + conTabName);
+    if (conPanel) conPanel.classList.add('active');
+
+    var conNavItem = document.getElementById('nav-' + conTabName);
+    if (conNavItem) conNavItem.classList.add('active');
+  }
+
   // Handle tab activation for LFI
   if (section === 'lfi' && anchor) {
     var lfiTabName = anchor.replace('tab-', '');
@@ -79,17 +96,8 @@ function navigateToRoute(section, anchor) {
     var lfiPanel = document.getElementById('panel-' + lfiTabName);
     if (lfiPanel) lfiPanel.classList.add('active');
 
-    // Highlight sidebar sub-item
-    var navItem = document.getElementById('nav-' + lfiTabName);
-    if (navItem) navItem.classList.add('active');
-  }
-
-  // Handle anchors for consent section
-  if (section === 'consent' && anchor) {
-    setTimeout(function() {
-      var el = document.getElementById(anchor);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
+    var lfiNavItem = document.getElementById('nav-' + lfiTabName);
+    if (lfiNavItem) lfiNavItem.classList.add('active');
   }
 
   closeSidebar();

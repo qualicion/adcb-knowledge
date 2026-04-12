@@ -34,6 +34,10 @@ function switchTab(name, btn) {
   navigate('overview', 'tab-' + name);
 }
 
+function switchConsentTab(name, btn) {
+  navigate('consent', 'tab-' + name);
+}
+
 function switchLfiTab(name, btn) {
   navigate('lfi', 'tab-' + name);
 }
