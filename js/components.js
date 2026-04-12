@@ -29,6 +29,14 @@ function toggleStep(head) {
   head.parentElement.classList.toggle('open');
 }
 
+function toggleExclusive(head) {
+  var item = head.parentElement;
+  var list = item.parentElement;
+  var isOpen = item.classList.contains('open');
+  list.querySelectorAll(':scope > .step-item').forEach(function(s) { s.classList.remove('open'); });
+  if (!isOpen) item.classList.add('open');
+}
+
 /* ── TAB SWITCHING ── */
 function switchTab(name, btn) {
   navigate('overview', 'tab-' + name);
