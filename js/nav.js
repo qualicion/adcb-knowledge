@@ -48,7 +48,7 @@ function navigateToRoute(section, anchor) {
   }
 
   // Update breadcrumb
-  var names = { overview: 'General Overview', consent: 'Consent & Scheduler', lfi: 'LFI Overview' };
+  var names = { overview: 'General Overview', consent: 'Consent & Scheduler', lfi: 'LFI Liability Validations' };
   document.getElementById('bc-current').textContent = names[section] || section;
 
   // Handle tab activation for overview
@@ -66,8 +66,8 @@ function navigateToRoute(section, anchor) {
     if (panel) panel.classList.add('active');
   }
 
-  // Handle anchors for consent section
-  if (section === 'consent' && anchor) {
+  // Handle anchors for consent and lfi sections
+  if ((section === 'consent' || section === 'lfi') && anchor) {
     setTimeout(function() {
       var el = document.getElementById(anchor);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });

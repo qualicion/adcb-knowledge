@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADCB LFI Liability Framework - RST Test Strategy & Cases</title>
+<style>
+  :root {
+    --brand: #1a3a5c;
+    --brand-light: #2b5a8c;
+    --accent: #e8a838;
+    --danger: #c0392b;
+    --success: #27ae60;
+    --warning: #f39c12;
+    --info: #2980b9;
+    --bg: #f5f7fa;
+    --card: #ffffff;
+    --text: #2c3e50;
+    --muted: #7f8c8d;
+    --border: #dce1e8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height:1.6; }
+
+  /* Header */
+  .header { background: linear-gradient(135deg, var(--brand) 0%, var(--brand-light) 100%); color:#fff; padding:32px 40px; }
+  .header h1 { font-size:28px; font-weight:700; margin-bottom:4px; }
+  .header p { opacity:0.85; font-size:14px; }
+  .header .meta { display:flex; gap:24px; margin-top:12px; font-size:13px; opacity:0.75; }
+
+  /* Tabs */
+  .tab-bar { display:flex; background:#fff; border-bottom:2px solid var(--border); padding:0 24px; position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+  .tab-btn { padding:14px 22px; border:none; background:none; font-size:14px; font-weight:600; color:var(--muted); cursor:pointer; border-bottom:3px solid transparent; transition:all 0.2s; }
+  .tab-btn:hover { color:var(--brand); }
+  .tab-btn.active { color:var(--brand); border-bottom-color:var(--accent); }
+
+  /* Content */
+  .tab-content { display:none; padding:28px 32px; max-width:1400px; margin:0 auto; }
+  .tab-content.active { display:block; }
+
+  /* Cards */
+  .card { background:var(--card); border-radius:10px; padding:24px; margin-bottom:20px; border:1px solid var(--border); box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+  .card h3 { font-size:18px; margin-bottom:12px; color:var(--brand); }
+  .card h4 { font-size:15px; margin:16px 0 8px; color:var(--brand-light); }
+
+  /* Tables */
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:13px; }
+  th { background:var(--brand); color:#fff; padding:10px 14px; text-align:left; font-weight:600; }
+  td { padding:10px 14px; border-bottom:1px solid var(--border); vertical-align:top; }
+  tr:nth-child(even) { background:#f8f9fb; }
+  tr:hover { background:#eef3f9; }
+
+  /* Badges */
+  .badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .badge-critical { background:#fde8e8; color:var(--danger); }
+  .badge-high { background:#fff3cd; color:#856404; }
+  .badge-medium { background:#d1ecf1; color:#0c5460; }
+  .badge-low { background:#d4edda; color:#155724; }
+  .badge-gap { background:#f8d7da; color:#721c24; }
+  .badge-partial { background:#fff3cd; color:#856404; }
+  .badge-covered { background:#d4edda; color:#155724; }
+
+  /* SFDPOT */
+  .sfdpot-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:16px; }
+  .sfdpot-card { border-left:4px solid var(--brand); padding:16px; background:#fff; border-radius:0 8px 8px 0; }
+  .sfdpot-card.structure { border-left-color:#e74c3c; }
+  .sfdpot-card.function { border-left-color:#3498db; }
+  .sfdpot-card.data { border-left-color:#2ecc71; }
+  .sfdpot-card.platform { border-left-color:#f39c12; }
+  .sfdpot-card.operations { border-left-color:#9b59b6; }
+  .sfdpot-card.time { border-left-color:#1abc9c; }
+  .sfdpot-card h4 { margin:0 0 8px; font-size:14px; }
+  .sfdpot-card ul { padding-left:18px; font-size:13px; }
+  .sfdpot-card li { margin-bottom:4px; }
+
+  /* Heuristic Oracle Cards */
+  .oracle-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:14px; margin:16px 0; }
+  .oracle-chip { padding:12px 16px; border-radius:8px; font-size:13px; font-weight:600; text-align:center; }
+  .oracle-chip.consistency { background:#ebf5fb; color:#1a5276; border:1px solid #aed6f1; }
+  .oracle-chip.history { background:#fdf2e9; color:#784212; border:1px solid #f5cba7; }
+  .oracle-chip.image { background:#e8f8f5; color:#0e6655; border:1px solid #a2d9ce; }
+  .oracle-chip.comparable { background:#f4ecf7; color:#6c3483; border:1px solid #d2b4de; }
+  .oracle-chip.claims { background:#fdedec; color:#922b21; border:1px solid #f5b7b1; }
+  .oracle-chip.reference { background:#eafaf1; color:#1e8449; border:1px solid #a9dfbf; }
+
+  /* Risk Matrix */
+  .risk-matrix { display:grid; grid-template-columns:repeat(4, 1fr); gap:2px; margin:16px 0; }
+  .risk-cell { padding:12px; text-align:center; font-size:12px; font-weight:600; border-radius:4px; }
+  .risk-critical { background:#e74c3c; color:#fff; }
+  .risk-high { background:#e67e22; color:#fff; }
+  .risk-medium { background:#f1c40f; color:#333; }
+  .risk-low { background:#2ecc71; color:#fff; }
+
+  /* Liability Exposure */
+  .liability-bar { display:flex; align-items:center; margin:8px 0; }
+  .liability-bar .label { width:220px; font-size:13px; font-weight:600; }
+  .liability-bar .bar-track { flex:1; height:24px; background:#ecf0f1; border-radius:12px; overflow:hidden; position:relative; }
+  .liability-bar .bar-fill { height:100%; border-radius:12px; display:flex; align-items:center; justify-content:flex-end; padding-right:8px; font-size:11px; color:#fff; font-weight:700; transition:width 0.5s; }
+  .bar-critical { background: linear-gradient(90deg, #e74c3c, #c0392b); }
+  .bar-high { background: linear-gradient(90deg, #e67e22, #d35400); }
+  .bar-medium { background: linear-gradient(90deg, #f1c40f, #f39c12); }
+  .bar-low { background: linear-gradient(90deg, #2ecc71, #27ae60); }
+
+  /* Accordion */
+  .accordion { border:1px solid var(--border); border-radius:8px; margin:8px 0; overflow:hidden; }
+  .accordion-header { padding:14px 18px; background:#f8f9fb; cursor:pointer; font-weight:600; font-size:14px; display:flex; justify-content:space-between; align-items:center; }
+  .accordion-header:hover { background:#eef3f9; }
+  .accordion-header::after { content:'\25BC'; font-size:11px; transition:transform 0.2s; }
+  .accordion-header.open::after { transform:rotate(180deg); }
+  .accordion-body { display:none; padding:16px 18px; font-size:13px; }
+  .accordion-body.open { display:block; }
+
+  /* Stats Row */
+  .stats-row { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:16px; margin:20px 0; }
+  .stat-card { background:#fff; border:1px solid var(--border); border-radius:10px; padding:20px; text-align:center; }
+  .stat-card .stat-val { font-size:32px; font-weight:800; color:var(--brand); }
+  .stat-card .stat-label { font-size:12px; color:var(--muted); margin-top:4px; text-transform:uppercase; letter-spacing:1px; }
+
+  /* Print */
+  @media print {
+    .tab-bar { display:none; }
+    .tab-content { display:block !important; page-break-before:always; }
+    .header { background:var(--brand) !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  }
+
+  /* Download btn */
+  .dl-btn { position:fixed; bottom:24px; right:24px; background:var(--brand); color:#fff; border:none; padding:14px 24px; border-radius:50px; font-size:14px; font-weight:600; cursor:pointer; box-shadow:0 4px 16px rgba(0,0,0,0.2); z-index:200; transition:transform 0.2s; }
+  .dl-btn:hover { transform:scale(1.05); background:var(--brand-light); }
+
+  .section-label { font-size:12px; text-transform:uppercase; letter-spacing:2px; color:var(--muted); margin-bottom:16px; font-weight:700; }
+  .test-id { font-family:'Courier New', monospace; font-size:12px; color:var(--brand-light); font-weight:700; }
+  .gap-tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; margin:2px; }
+  .gap-missing { background:#fde8e8; color:#c0392b; }
+  .gap-weak { background:#fff3cd; color:#856404; }
+  .gap-mock { background:#e8daef; color:#6c3483; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>ADCB LFI Liability Framework - Test Strategy & Analysis</h1>
+  <p>Rapid Software Testing (RST) approach by James Bach - SFDPOT heuristics, Consistency Oracles, and Risk-Based Test Design</p>
+  <div class="meta">
+    <span>Project: da-of-api (LFI Open Finance)</span>
+    <span>Date: 9 April 2026</span>
+    <span>Framework: RST / Heuristic Test Strategy Model</span>
+    <span>Scope: LFI + TPP Liabilities</span>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="openTab(event,'strategy')">Test Strategy</button>
+  <button class="tab-btn" onclick="openTab(event,'sfdpot')">SFDPOT Analysis</button>
+  <button class="tab-btn" onclick="openTab(event,'cases')">Test Cases</button>
+  <button class="tab-btn" onclick="openTab(event,'gaps')">Gap Analysis</button>
+  <button class="tab-btn" onclick="openTab(event,'risk')">Risk Heatmap</button>
+  <button class="tab-btn" onclick="openTab(event,'liability')">Liability Matrix</button>
+  <button class="tab-btn" onclick="openTab(event,'automation')" style="color:var(--accent);">Automation Strategy</button>
+</div>
+
+<!-- TAB 1: STRATEGY -->
+<div id="strategy" class="tab-content active">
+  <div class="section-label">RST Test Strategy - Heuristic Test Strategy Model</div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val">156</div><div class="stat-label">Test Cases</div></div>
+    <div class="stat-card"><div class="stat-val">7</div><div class="stat-label">Risk Categories</div></div>
+    <div class="stat-card"><div class="stat-val">23</div><div class="stat-label">Gaps Found</div></div>
+    <div class="stat-card"><div class="stat-val">AED 18K+</div><div class="stat-label">Max Exposure</div></div>
+    <div class="stat-card"><div class="stat-val">6</div><div class="stat-label">SFDPOT Dimensions</div></div>
+    <div class="stat-card"><div class="stat-val">6</div><div class="stat-label">Oracles Applied</div></div>
+  </div>
+
+  <div class="card">
+    <h3>1. Mission & Scope</h3>
+    <p>Verify that the ADCB LFI (Licensed Financial Institution) da-of-api codebase adequately protects against Open Finance liabilities as defined by CBUAE regulations. The system handles:</p>
+    <ul style="padding-left:20px; margin-top:8px;">
+      <li><strong>Data Sharing</strong> - Accounts, transactions, balances, beneficiaries, customer data, standing orders, direct debits</li>
+      <li><strong>Payment Processing</strong> - Payment Hub integration, PII decryption (JWE/JWT), creditor/debtor mapping, refund handling</li>
+      <li><strong>Authorization</strong> - Cognito authentication, JWE decoding, session management, OIDC flows</li>
+      <li><strong>Consent Management</strong> - Dynamic scope validation, boundary enforcement, usage limits</li>
+      <li><strong>Security</strong> - Ecosystem boundary validation, fraud detection (anomaly + VRP/SCA), data leak prevention</li>
+      <li><strong>Liability Mitigation</strong> - Transaction frequency/amount checks, geographic restrictions, data transmission controls</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>2. RST Oracles Applied (How We Judge Results)</h3>
+    <div class="oracle-grid">
+      <div class="oracle-chip consistency"><strong>Consistency Oracle</strong><br>Does behavior match CBUAE OF specs, Ozone API contract, and ADCB business rules?</div>
+      <div class="oracle-chip history"><strong>History Oracle</strong><br>Does the current version behave consistently with prior releases? Are regressions caught?</div>
+      <div class="oracle-chip image"><strong>Image Oracle</strong><br>Does the system project the trustworthiness expected of a regulated bank (ADCB)?</div>
+      <div class="oracle-chip comparable"><strong>Comparable Product Oracle</strong><br>How does it compare with UK Open Banking (OBIE) and EU PSD2 standards?</div>
+      <div class="oracle-chip claims"><strong>Claims Oracle</strong><br>Does the codebase deliver what IMPLEMENTATION_GUIDE.md claims?</div>
+      <div class="oracle-chip reference"><strong>Reference Oracle</strong><br>Does it comply with CBUAE OF Framework penalties, ISO 27001, and GDPR-equivalent requirements?</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>3. Test Approach Pillars</h3>
+    <table>
+      <tr><th style="width:200px;">Pillar</th><th>Approach</th><th style="width:100px;">Priority</th></tr>
+      <tr><td><strong>Liability-Driven Testing</strong></td><td>Each liability (AED fine) becomes a test charter. Higher fines = more test depth. Focus on AED 5,000 (data mapping / deprecation) and AED 1,000 (consumer protection / categorization).</td><td><span class="badge badge-critical">Critical</span></td></tr>
+      <tr><td><strong>SFDPOT Exploration</strong></td><td>Structure, Function, Data, Platform, Operations, Time - systematic exploration across all 6 quality dimensions to find gaps in coverage.</td><td><span class="badge badge-high">High</span></td></tr>
+      <tr><td><strong>Risk-Based Prioritization</strong></td><td>Combine likelihood x impact using liability AED amounts as impact proxy. Fraud Prevention gaps (currently "Missing Controls") get highest priority.</td><td><span class="badge badge-critical">Critical</span></td></tr>
+      <tr><td><strong>Boundary Value Testing</strong></td><td>Test at consent expiry boundaries, transaction amount thresholds (AED 50K), rate limits (10 req/min), data size limits (10MB), geographic boundaries.</td><td><span class="badge badge-high">High</span></td></tr>
+      <tr><td><strong>Integration Seam Testing</strong></td><td>Test seams between Payment Hub, Ozone proxy, CRM, CDP, DynamoDB, Secrets Manager, and the new fraud/consent/boundary modules.</td><td><span class="badge badge-high">High</span></td></tr>
+      <tr><td><strong>Mock Dependency Analysis</strong></td><td>Audit all mock/stub implementations in new compliance code. Every <code>_get_consent_data()</code> that returns hardcoded data is a gap.</td><td><span class="badge badge-critical">Critical</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- TAB 2: SFDPOT -->
+<div id="sfdpot" class="tab-content">
+  <div class="section-label">SFDPOT Heuristic Decomposition</div>
+
+  <div class="card">
+    <h3>James Bach's SFDPOT Quality Criteria Applied to LFI</h3>
+    <p style="margin-bottom:16px;">Each dimension surfaces unique test ideas that pure requirements-based testing would miss.</p>
+  </div>
+
+  <div class="sfdpot-grid">
+    <div class="sfdpot-card structure">
+      <h4>S - Structure (What the product IS)</h4>
+      <ul>
+        <li><strong>Code modules:</strong> 3 Lambda functions (authorizer, data_sharing, payment) - but consent & security modules are not wired into Lambda handlers</li>
+        <li><strong>Architecture:</strong> AWS Lambda + API Gateway + DynamoDB + Secrets Manager</li>
+        <li><strong>Dependencies:</strong> jwt, jwcrypto, requests, shortuuid, aws-lambda-powertools - no dependency pinning in fraud modules</li>
+        <li><strong>File layout gap:</strong> src/security/fraud/ directory doesn't exist despite IMPLEMENTATION_GUIDE.md references</li>
+        <li><strong>Test coverage:</strong> 80+ unit tests exist for data_sharing/authorizer/payment - 0 tests for consent/ and security/ modules</li>
+        <li><strong>Data mapping:</strong> 12 mapping modules (accounts, balances, transactions, etc.) - all need schema validation tests</li>
+      </ul>
+    </div>
+
+    <div class="sfdpot-card function">
+      <h4>F - Function (What the product DOES)</h4>
+      <ul>
+        <li><strong>Payment flow:</strong> PII decryption - payload mapping - Payment Hub POST - response mapping - Ozone format. Test each transformation.</li>
+        <li><strong>Data sharing:</strong> Account/balance/transaction retrieval from CDP/CRM sources with field mapping. Validate mapping accuracy.</li>
+        <li><strong>Authorization:</strong> Cognito auth - JWE decode - Procash/Ozone proxy validation - session management. Test token expiry edge cases.</li>
+        <li><strong>Consent validation:</strong> Scope checking, expiry, usage limits, geographic/IP/device restrictions. All use mock data - untestable in production.</li>
+        <li><strong>Boundary enforcement:</strong> Account-level, field-level, quota-level checks with audit trails. Logic exists but no integration points.</li>
+        <li><strong>Fraud detection:</strong> Frequency, amount, timing anomaly detection. Referenced but not implemented in codebase.</li>
+      </ul>
+    </div>
+
+    <div class="sfdpot-card data">
+      <h4>D - Data (What the product PROCESSES)</h4>
+      <ul>
+        <li><strong>PII data:</strong> JWE-encrypted personal info (creditor names, IBANs). Test with Arabic/bilingual names, special characters.</li>
+        <li><strong>Payment amounts:</strong> AED currency with decimal precision. Test boundary at AED 50,000 threshold.</li>
+        <li><strong>Account IDs:</strong> Surrogate keys mapping to real accounts. Test surrogate-to-real mapping integrity.</li>
+        <li><strong>Transaction history:</strong> Up to 365 days. Test at 90-day and 365-day boundaries.</li>
+        <li><strong>Consent scopes:</strong> accounts, transactions, balances, beneficiaries, customer, products, standing_orders, direct_debits, scheduled_payments.</li>
+        <li><strong>Response mapping:</strong> PaymentHub PascalCase to Ozone camelCase. Test key conversion edge cases.</li>
+        <li><strong>Charge bearer values:</strong> BorneByCreditor to DEBT, BorneByDebtor to CRDT, FollowingServiceLevel to SLEV, Shared to SHAR. Test unknown values (returns None).</li>
+      </ul>
+    </div>
+
+    <div class="sfdpot-card platform">
+      <h4>P - Platform (What the product DEPENDS ON)</h4>
+      <ul>
+        <li><strong>AWS Lambda:</strong> Cold start latency vs 30-second Payment Hub timeout. Test timeout cascade.</li>
+        <li><strong>Payment Hub:</strong> External API with Basic Auth. Test when credentials rotate, SSL cert changes, 5xx responses.</li>
+        <li><strong>DynamoDB:</strong> Consent storage, fraud monitoring tables. Test eventual consistency race conditions.</li>
+        <li><strong>Secrets Manager:</strong> Payment Hub credentials, JWK keys. Test rotation and cache invalidation.</li>
+        <li><strong>API Gateway:</strong> Request routing, throttling, WAF. Test request size limits vs data transmission limits.</li>
+        <li><strong>Network:</strong> root_ca_bundle_path for SSL verification. Test with expired/invalid CA bundles.</li>
+        <li><strong>JWK cache:</strong> lru_cache(maxsize=None) for JWKS clients - unbounded cache is a memory leak risk.</li>
+      </ul>
+    </div>
+
+    <div class="sfdpot-card operations">
+      <h4>O - Operations (HOW it will be used)</h4>
+      <ul>
+        <li><strong>TPP integration:</strong> Multiple TPPs hitting APIs concurrently. Test concurrent consent validations.</li>
+        <li><strong>Monitoring:</strong> CloudWatch metrics referenced but not implemented. No fraud alerts in production.</li>
+        <li><strong>Incident response:</strong> What happens when fraud is detected? No escalation workflow exists.</li>
+        <li><strong>Deployment:</strong> Canary deployment mentioned but no feature flags in codebase.</li>
+        <li><strong>Error handling:</strong> Payment Hub errors map to generic error codes. Test error code differentiation.</li>
+        <li><strong>Audit trail:</strong> Boundary violations logged to in-memory list (self.violation_log). Lost on Lambda cold start.</li>
+        <li><strong>Configuration:</strong> Risk thresholds hardcoded. No environment variable override mechanism.</li>
+      </ul>
+    </div>
+
+    <div class="sfdpot-card time">
+      <h4>T - Time (WHEN things happen)</h4>
+      <ul>
+        <li><strong>Consent expiry:</strong> 90-day default. Test at expiry boundary (second before/after). Test timezone handling (UTC only).</li>
+        <li><strong>Token lifecycle:</strong> JWT leeway of 10 seconds. Test with tokens at exactly 10s past expiry.</li>
+        <li><strong>Rate limiting:</strong> 5 concurrent requests/hour for consent, 60 API calls/minute. Test at exact threshold.</li>
+        <li><strong>Restricted hours:</strong> 22:00-06:00 UTC for sensitive scopes. Test at boundary (21:59, 22:00, 06:00, 06:01).</li>
+        <li><strong>Transaction frequency:</strong> 50/day limit. Test at 49, 50, 51 transactions.</li>
+        <li><strong>Daily transmission reset:</strong> Uses UTC date string. Test around midnight UTC.</li>
+        <li><strong>Payment Hub timeout:</strong> 30 seconds. Test at 29s, 30s, 31s response times.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: TEST CASES -->
+<div id="cases" class="tab-content">
+  <div class="section-label">Test Cases - Realistic Scenarios with Impact Analysis</div>
+
+  <!-- CONSENT -->
+  <div class="card">
+    <h3>A. Consent Management (LFI: AED 350-5,000 | TPP: AED 350-1,000)</h3>
+    <table>
+      <tr><th style="width:70px;">ID</th><th style="width:260px;">Realistic Scenario</th><th style="width:60px;">Priority</th><th>Expected Result</th><th style="width:280px;">Impact (if fails)</th></tr>
+      <tr><td class="test-id">CON-01</td><td>A TPP like Tabby calls GET /accounts with a valid 60-day-old consent that grants accounts+balances.</td><td><span class="badge badge-high">High</span></td><td>VALID status, risk_score &le; 0.3, data returned</td><td>TPP app shows empty accounts page. Customer thinks their bank is broken.</td></tr>
+      <tr><td class="test-id">CON-02</td><td>Same TPP tries GET /customer but their consent only grants accounts+balances.</td><td><span class="badge badge-critical">Crit</span></td><td>INSUFFICIENT_SCOPE, 403 returned</td><td>AED 5,000 if customer PII leaks beyond consent scope. Data protection violation.</td></tr>
+      <tr><td class="test-id">CON-03</td><td>Customer gave 90-day consent on Jan 1. Today is April 2 (day 92). TPP makes a request at 00:00:01 UTC - 1 second past expiry.</td><td><span class="badge badge-critical">Crit</span></td><td>EXPIRED status, all access denied</td><td>AED 350 "activity without valid consent". CBUAE flags ADCB in next audit.</td></tr>
+      <tr><td class="test-id">CON-13</td><td>Customer revokes consent via ADCB mobile banking at 14:00. At 14:01, the TPP makes a scheduled API call.</td><td><span class="badge badge-critical">Crit</span></td><td>REVOKED status, all access denied</td><td>AED 350 "failure to revoke consent". Customer explicitly withdrew permission.</td></tr>
+      <tr><td class="test-id">CON-18</td><td>In production, call validate_consent_scope() for a consent ID that was revoked 2 hours ago. The mock _get_consent_data() still returns valid data.</td><td><span class="badge badge-critical">Crit</span></td><td><span class="gap-tag gap-mock">MOCK GAP</span> Returns valid - revoked consent invisible</td><td>Consent revocation does nothing. AED 350-5,000 every time a revoked consent is honoured.</td></tr>
+      <tr><td class="test-id">CON-19</td><td>A rogue TPP sends 500 requests per minute. _get_recent_request_count() always returns 2.</td><td><span class="badge badge-critical">Crit</span></td><td><span class="gap-tag gap-mock">MOCK GAP</span> Rate limiting is fiction</td><td>API flooded, other customers affected. SLA violations cascade. Infrastructure costs spike.</td></tr>
+    </table>
+  </div>
+
+  <!-- PAYMENTS -->
+  <div class="card">
+    <h3>D. Payment Processing (LFI: AED 350 | TPP: AED 350-500)</h3>
+    <table>
+      <tr><th style="width:70px;">ID</th><th style="width:260px;">Realistic Scenario</th><th style="width:60px;">Priority</th><th>Expected Result</th><th style="width:280px;">Impact (if fails)</th></tr>
+      <tr><td class="test-id">PAY-01</td><td>Customer uses Tabby app to pay AED 2,500 rent. All fields present, valid consent.</td><td><span class="badge badge-critical">Crit</span></td><td>201, correct Ozone response with payment ID</td><td>Payment fails = customer can't pay rent. "Open Finance doesn't work" narrative.</td></tr>
+      <tr><td class="test-id">PAY-04</td><td>Payment Hub returns HTTP 201 but TransactionStatus = "RJCT". Status check is commented out in code.</td><td><span class="badge badge-critical">Crit</span></td><td><span class="gap-tag gap-weak">REGRESSION</span> Currently passes as success</td><td>Customer sees "Payment Successful" but money never arrives. AED 350 per occurrence.</td></tr>
+      <tr><td class="test-id">PAY-12</td><td>Customer requests refund status. Payment Hub is down. get_refund_detail_response() has no try/except.</td><td><span class="badge badge-critical">Crit</span></td><td><span class="gap-tag gap-missing">CRASH</span> Unhandled exception kills Lambda</td><td>Refund status unavailable. Customer sees 502 error. AED 350 SLA violation.</td></tr>
+      <tr><td class="test-id">PAY-13</td><td>Every payment has x-customer-user-agent: "test" in production headers.</td><td><span class="badge badge-high">High</span></td><td><span class="gap-tag gap-weak">HARDCODED</span> Should pass actual TPP identifier</td><td>Audit trail incomplete. Can't trace which TPP sent a suspicious payment.</td></tr>
+    </table>
+  </div>
+
+  <!-- SECURITY -->
+  <div class="card">
+    <h3>E. Security & Authentication (LFI: AED 500-750 | TPP: AED 500-750)</h3>
+    <table>
+      <tr><th style="width:70px;">ID</th><th style="width:260px;">Realistic Scenario</th><th style="width:60px;">Priority</th><th>Expected Result</th><th style="width:280px;">Impact (if fails)</th></tr>
+      <tr><td class="test-id">SEC-01</td><td>Attacker modifies customer_id claim in JWT, re-signs with random key.</td><td><span class="badge badge-critical">Crit</span></td><td>PS256 signature verification fails, 401</td><td>AED 500 fraudulent authentication. Account takeover.</td></tr>
+      <tr><td class="test-id">SEC-09</td><td>TPP accesses beneficiaries without any MFA challenge.</td><td><span class="badge badge-critical">Crit</span></td><td><span class="gap-tag gap-missing">GAP</span> No MFA enforcement exists</td><td>AED 750 per incident. CBUAE audit will flag as critical finding.</td></tr>
+    </table>
+  </div>
+
+  <!-- FRAUD -->
+  <div class="card">
+    <h3>F. Fraud Prevention (LFI: AED 250 | TPP: AED 500)</h3>
+    <table>
+      <tr><th style="width:70px;">ID</th><th style="width:260px;">Realistic Scenario</th><th style="width:60px;">Priority</th><th>Expected Result</th><th style="width:280px;">Impact (if fails)</th></tr>
+      <tr><td class="test-id">FRD-01</td><td>Compromised TPP sends 51 small payments (AED 100 each) in 24 hours. AED 5,100 drained.</td><td><span class="badge badge-critical">Crit</span></td><td>51st transaction blocked, customer alerted</td><td>AED 5,100 stolen. "Open Finance enabled fraud" destroys public trust.</td></tr>
+      <tr><td class="test-id">FRD-04</td><td>Merchant charges VRP 12 times in one day against "max AED 1,000/month" consent.</td><td><span class="badge badge-critical">Crit</span></td><td><span class="gap-tag gap-missing">NOT IMPLEMENTED</span> All 12 charges go through</td><td>Customer loses AED 11,400. VRP was supposed to be safe.</td></tr>
+      <tr><td class="test-id">FRD-07</td><td>Fraudster sends 10 payments, Lambda cold-starts, sends 10 more. In-memory counter resets.</td><td><span class="badge badge-critical">Crit</span></td><td><span class="gap-tag gap-weak">IN-MEMORY ONLY</span> Fraud counter resets</td><td>Frequency-based detection unreliable. Fraudsters can time attacks around scaling events.</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- TAB 4: GAPS -->
+<div id="gaps" class="tab-content">
+  <div class="section-label">Gap Analysis - Claims Oracle vs Codebase Reality</div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" style="color:#c0392b;">8</div><div class="stat-label">Critical Gaps</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#e67e22;">7</div><div class="stat-label">High Gaps</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#f39c12;">5</div><div class="stat-label">Medium Gaps</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#2980b9;">3</div><div class="stat-label">Mock/Stub Gaps</div></div>
+  </div>
+
+  <div class="card">
+    <h3>Critical Gaps (Compliance Blockers)</h3>
+    <table>
+      <tr><th style="width:50px;">#</th><th style="width:250px;">Gap</th><th>Files Affected</th><th>Liability</th><th>Status</th></tr>
+      <tr><td>1</td><td><strong>Fraud detection modules don't exist</strong></td><td>src/security/fraud/ (empty)</td><td>AED 250-500</td><td><span class="badge badge-gap">NOT BUILT</span></td></tr>
+      <tr><td>2</td><td><strong>All consent data retrieval is mocked</strong></td><td>dynamic_scope_validator.py, scope_boundary_enforcer.py, boundary_validator.py, minimal_liability_mitigation.py</td><td>AED 350-5,000</td><td><span class="badge badge-gap">MOCK ONLY</span></td></tr>
+      <tr><td>3</td><td><strong>Rate limiting is non-functional</strong></td><td>dynamic_scope_validator.py:383-389</td><td>AED 200-350</td><td><span class="badge badge-gap">MOCK ONLY</span></td></tr>
+      <tr><td>4</td><td><strong>Payment status check commented out</strong></td><td>post_payments.py:657-664</td><td>AED 350</td><td><span class="badge badge-gap">REGRESSION</span></td></tr>
+      <tr><td>5</td><td><strong>No MFA enforcement</strong></td><td>Entire codebase</td><td>AED 750</td><td><span class="badge badge-gap">NOT BUILT</span></td></tr>
+      <tr><td>6</td><td><strong>Compliance modules not integrated</strong></td><td>src/consent/*.py, src/security/*.py</td><td>AED 250-5,000</td><td><span class="badge badge-gap">NOT WIRED</span></td></tr>
+      <tr><td>7</td><td><strong>No deprecation/versioning system</strong></td><td>Entire codebase</td><td>AED 5,000</td><td><span class="badge badge-gap">NOT BUILT</span></td></tr>
+      <tr><td>8</td><td><strong>Refund endpoint has no error handling</strong></td><td>post_payments.py:810-855</td><td>AED 350</td><td><span class="badge badge-gap">MISSING</span></td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>High Gaps (Significant Risk)</h3>
+    <table>
+      <tr><th style="width:50px;">#</th><th style="width:250px;">Gap</th><th>Liability</th><th>Status</th><th>Detail</th></tr>
+      <tr><td>9</td><td><strong>In-memory state lost on Lambda restart</strong></td><td>AED 250</td><td><span class="badge badge-partial">WEAK</span></td><td>customer_activity (fraud), violation_log (boundary), transmission_log (ecosystem) - all in-memory. Cold starts reset everything.</td></tr>
+      <tr><td>10</td><td><strong>Unbounded JWK cache (memory leak)</strong></td><td>AED 500</td><td><span class="badge badge-partial">WEAK</span></td><td>@functools.lru_cache(maxsize=None) for JWK clients. Cache grows indefinitely.</td></tr>
+      <tr><td>11</td><td><strong>Simplified CIDR validation</strong></td><td>AED 750</td><td><span class="badge badge-partial">WEAK</span></td><td>IP whitelist uses string prefix matching instead of proper CIDR range calculation.</td></tr>
+      <tr><td>12</td><td><strong>Hardcoded "test" user-agent</strong></td><td>AED 350</td><td><span class="badge badge-partial">WEAK</span></td><td>x-customer-user-agent: "test" in all production Payment Hub requests.</td></tr>
+      <tr><td>13</td><td><strong>Unsafe chained .get() in response mapping</strong></td><td>AED 350</td><td><span class="badge badge-partial">WEAK</span></td><td>currencyRequest block uses chained .get() without null safety.</td></tr>
+      <tr><td>14</td><td><strong>No notification service</strong></td><td>AED 150</td><td><span class="badge badge-gap">NOT BUILT</span></td><td>No email, webhook, or event system for TPP notifications.</td></tr>
+      <tr><td>15</td><td><strong>Zero tests for consent/security modules</strong></td><td>All</td><td><span class="badge badge-gap">UNTESTED</span></td><td>80+ tests for data_sharing/payment/authorizer. 0 tests for consent/ and security/ directories.</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- TAB 5: RISK HEATMAP -->
+<div id="risk" class="tab-content">
+  <div class="section-label">Risk Heatmap - Likelihood vs Impact (AED Liability)</div>
+
+  <div class="card">
+    <h3>Risk Matrix: Current Codebase State</h3>
+    <table>
+      <tr>
+        <th style="width:120px;">Likelihood / Impact</th>
+        <th style="background:#2ecc71;">Low (AED &lt;250)</th>
+        <th style="background:#f1c40f; color:#333;">Medium (AED 250-500)</th>
+        <th style="background:#e67e22;">High (AED 500-1,000)</th>
+        <th style="background:#e74c3c;">Critical (AED 1,000-5,000)</th>
+      </tr>
+      <tr>
+        <td style="font-weight:700;">Very Likely</td>
+        <td></td>
+        <td style="background:#fff3cd;"><strong>Fraud Monitoring Failure</strong><br><span style="font-size:11px;">AED 250 - No VRP fraud detection</span></td>
+        <td style="background:#fde8e8;"><strong>MFA Not Enforced</strong><br><span style="font-size:11px;">AED 750 - No MFA layer exists</span></td>
+        <td style="background:#fde8e8;"><strong>Breaking Change Mgmt</strong><br><span style="font-size:11px;">AED 5,000 - No versioning system</span></td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;">Likely</td>
+        <td style="background:#d4edda;"><strong>Notification Failure</strong><br><span style="font-size:11px;">AED 150 - No notification service</span></td>
+        <td style="background:#fff3cd;"><strong>Payment Status Bug</strong><br><span style="font-size:11px;">AED 350 - Status check disabled</span></td>
+        <td style="background:#fde8e8;"><strong>Consent Bypass</strong><br><span style="font-size:11px;">AED 500 - Mock consent data</span></td>
+        <td style="background:#fde8e8;"><strong>Data Mapping Failure</strong><br><span style="font-size:11px;">AED 5,000 - Modules not wired in</span></td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;">Possible</td>
+        <td></td>
+        <td style="background:#d1ecf1;"><strong>SLA Breach (&lt;6h)</strong><br><span style="font-size:11px;">AED 200 - 30s timeout helps</span></td>
+        <td style="background:#fff3cd;"><strong>Data Outside Scope</strong><br><span style="font-size:11px;">AED 750 - Boundary code exists but unwired</span></td>
+        <td style="background:#fff3cd;"><strong>Incorrect Categorization</strong><br><span style="font-size:11px;">AED 1,000 - No validation logic</span></td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;">Unlikely</td>
+        <td style="background:#d4edda;"><strong>SLA Breach (&gt;12h)</strong><br><span style="font-size:11px;">AED 350 - Lambda auto-scales</span></td>
+        <td style="background:#d4edda;"><strong>Auth Breach</strong><br><span style="font-size:11px;">AED 500 - JWT/JWE strong</span></td>
+        <td style="background:#d4edda;"><strong>SSL/TLS Failure</strong><br><span style="font-size:11px;">AED 750 - CA bundle in place</span></td>
+        <td style="background:#d1ecf1;"><strong>Security Breach</strong><br><span style="font-size:11px;">AED 750 - Strong crypto layer</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Financial Exposure by Category</h3>
+    <div class="liability-bar"><div class="label">Fraud Prevention</div><div class="bar-track"><div class="bar-fill bar-critical" style="width:95%;">AED 250+ (Missing)</div></div></div>
+    <div class="liability-bar"><div class="label">Breaking Changes/Deprecation</div><div class="bar-track"><div class="bar-fill bar-critical" style="width:90%;">AED 5,000 (No System)</div></div></div>
+    <div class="liability-bar"><div class="label">Consent Management</div><div class="bar-track"><div class="bar-fill bar-high" style="width:70%;">AED 350-5,000 (Mock Data)</div></div></div>
+    <div class="liability-bar"><div class="label">Data Mapping Accuracy</div><div class="bar-track"><div class="bar-fill bar-high" style="width:65%;">AED 500-5,000 (Not Wired)</div></div></div>
+    <div class="liability-bar"><div class="label">Security Controls</div><div class="bar-track"><div class="bar-fill bar-medium" style="width:40%;">AED 500-750 (MFA Gap)</div></div></div>
+    <div class="liability-bar"><div class="label">Payment Processing</div><div class="bar-track"><div class="bar-fill bar-medium" style="width:45%;">AED 350 (Status Bug)</div></div></div>
+    <div class="liability-bar"><div class="label">SLA Compliance</div><div class="bar-track"><div class="bar-fill bar-low" style="width:25%;">AED 200-350 (Mostly OK)</div></div></div>
+    <div class="liability-bar"><div class="label">Authentication</div><div class="bar-track"><div class="bar-fill bar-low" style="width:15%;">AED 500 (Strong)</div></div></div>
+  </div>
+</div>
+
+<!-- TAB 6: LIABILITY MATRIX -->
+<div id="liability" class="tab-content">
+  <div class="section-label">Complete Liability Matrix - LFI vs TPP with Codebase Coverage</div>
+
+  <div class="card">
+    <h3>Coverage Summary</h3>
+    <table>
+      <tr><th>Status</th><th>Count</th><th>Description</th></tr>
+      <tr><td><span class="badge badge-covered">STRONG/GOOD</span></td><td>12</td><td>Authentication, SSL/TLS, data mapping, timeout handling, beneficiary resolution</td></tr>
+      <tr><td><span class="badge badge-partial">PARTIAL</span></td><td>14</td><td>Code exists but uses mock data, not integrated into Lambda handlers, or has known bugs</td></tr>
+      <tr><td><span class="badge badge-gap">GAP / NOT BUILT</span></td><td>11</td><td>No implementation exists - fraud detection, MFA, notifications, versioning, consumer protection</td></tr>
+    </table>
+    <p style="margin-top:12px; font-size:13px; color:var(--muted);">
+      <strong>Key Notes:</strong> Indirect, consequential, and tortious losses are not compensated under OF standards. Nebras (API Hub/Trust Framework failures) is capped at AED 5,000,000 per claim. User bears liability only for errors they directly supply.
+    </p>
+  </div>
+</div>
+
+<!-- TAB 7: AUTOMATION STRATEGY -->
+<div id="automation" class="tab-content">
+  <div class="section-label">Test Automation Strategy - Test Pyramid for LFI Liability Framework</div>
+
+  <div class="card" style="background:linear-gradient(135deg,#1a3a5c,#2b5a8c); color:#fff;">
+    <h3 style="color:#e8a838;">Can These Tests Be Automated?</h3>
+    <p style="font-size:16px; margin:8px 0;"><strong>Yes - roughly 85% of the 156 test cases can be automated.</strong></p>
+    <p>The remaining 15% need manual exploratory testing (UX consent flows, audit trail reviews, regulator walk-throughs).</p>
+  </div>
+
+  <div class="card">
+    <h3>Automation Implementation Priority</h3>
+    <table>
+      <tr><th style="width:80px;">Phase</th><th style="width:200px;">What</th><th>Why This Order</th><th style="width:100px;">Effort</th><th style="width:120px;">Liability</th></tr>
+      <tr><td style="font-weight:700; color:#27ae60;">Phase 1</td><td><strong>Unit tests for consent & boundary modules</strong></td><td>These modules have ZERO tests today. Pure logic, highest ROI.</td><td>2-3 days</td><td>AED 350-5,000</td></tr>
+      <tr><td style="font-weight:700; color:#27ae60;">Phase 2</td><td><strong>Unit tests for payment mapping edge cases</strong></td><td>Payment status regression and null-safety gaps are real production risks.</td><td>1-2 days</td><td>AED 350</td></tr>
+      <tr><td style="font-weight:700; color:#e67e22;">Phase 3</td><td><strong>Wire consent/boundary into Lambda + test</strong></td><td>Modules are useless until integrated. Write integration tests first (TDD).</td><td>3-5 days</td><td>AED 250-5,000</td></tr>
+      <tr><td style="font-weight:700; color:#e67e22;">Phase 4</td><td><strong>Replace all mock _get_consent_data()</strong></td><td>Until real DynamoDB lookups replace hardcoded returns, consent validation is theatre.</td><td>2-3 days</td><td>AED 350-5,000</td></tr>
+      <tr><td style="font-weight:700; color:#e74c3c;">Phase 5</td><td><strong>E2E smoke tests (15 critical paths)</strong></td><td>Once wiring is done, add thin E2E tests against a test API Gateway stage.</td><td>2-3 days</td><td>All categories</td></tr>
+      <tr><td style="font-weight:700; color:#7f8c8d;">Phase 6</td><td><strong>Build fraud detection + unit tests</strong></td><td>The fraud/ directory doesn't exist. Build with TDD - tests come first.</td><td>5-7 days</td><td>AED 250-500</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Pyramid Level Summary</h3>
+    <table>
+      <tr><th>Level</th><th>Tests</th><th>Speed</th><th>Verdict</th></tr>
+      <tr><td style="font-weight:700; color:#27ae60;">Unit</td><td>96</td><td>&lt;30 seconds</td><td>Non-negotiable for a regulated financial system. Every consent rule, boundary check, risk calculation gets a unit test.</td></tr>
+      <tr><td style="font-weight:700; color:#e67e22;">Integration</td><td>45</td><td>2-5 minutes</td><td>The biggest risk is modules that exist but aren't wired in. Integration tests prove Lambda handlers call the compliance modules.</td></tr>
+      <tr><td style="font-weight:700; color:#e74c3c;">E2E / Contract</td><td>15</td><td>5-15 minutes</td><td>Only 15 tests. One per major liability. Proves the full chain works after deployment.</td></tr>
+      <tr><td style="font-weight:700; color:#7f8c8d;">Manual</td><td>23</td><td>Human time</td><td>Accessibility, security pen testing, audit trail review, UX judgment calls.</td></tr>
+    </table>
+  </div>
+</div>
+
+<button class="dl-btn" onclick="downloadHTML()">Download as HTML</button>
+
+<script>
+function openTab(evt, tabId) {
+  document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
+  document.getElementById(tabId).classList.add('active');
+  evt.currentTarget.classList.add('active');
+}
+
+document.querySelectorAll('.accordion-header').forEach(function(header) {
+  header.addEventListener('click', function() {
+    header.classList.toggle('open');
+    header.nextElementSibling.classList.toggle('open');
+  });
+});
+
+function downloadHTML() {
+  var html = document.documentElement.outerHTML;
+  var blob = new Blob([html], {type: 'text/html'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'ADCB_LFI_Test_Strategy_RST.html';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>

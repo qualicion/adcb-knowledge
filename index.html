@@ -70,8 +70,17 @@
       <span class="nav-chevron">&#x25B6;</span>
     </div>
     <div class="nav-sub" id="sub-lfi">
-      <div class="nav-item" onclick="navigate('lfi')" id="nav-lfi-home" style="opacity:.5;cursor:default;">
-        <span class="nav-icon">&#x1F6A7;</span> Coming Soon
+      <div class="nav-item" onclick="navigate('lfi','part-liabilities')" id="nav-liabilities">
+        <span class="nav-icon">&#x1F4DC;</span> Liability Framework
+      </div>
+      <div class="nav-item" onclick="navigate('lfi','part-how-it-works')" id="nav-how-it-works">
+        <span class="nav-icon">&#x2699;&#xFE0F;</span> How It Works
+      </div>
+      <div class="nav-item" onclick="navigate('lfi','part-gap-analysis')" id="nav-gap-analysis">
+        <span class="nav-icon">&#x1F50D;</span> Gap Analysis
+      </div>
+      <div class="nav-item" onclick="navigate('lfi','part-test-strategy')" id="nav-test-strategy">
+        <span class="nav-icon">&#x1F9EA;</span> Test Strategy
       </div>
     </div>
   </div>
@@ -590,17 +599,708 @@
     <!-- SECTION 3: LFI PROJECT                      -->
     <!-- ═══════════════════════════════════════════ -->
     <div class="section" id="section-lfi">
+
       <div class="hero-card">
-        <div class="hero-eyebrow">LFI Project · Licensed Financial Institution</div>
-        <h1>LFI Integration &amp; Implementation</h1>
-        <p>Documentation for the bank-side (LFI) implementation of UAE Open Finance — the systems that hold accounts, store data, and execute payments.</p>
+        <div class="hero-eyebrow">LFI Project · Licensed Financial Institution · da-of-api</div>
+        <h1>Liability Validations &amp; Compliance.<br><em>What They Mean, How They Work.</em></h1>
+        <p>ADCB is the bank — the Licensed Financial Institution. When a TPP asks for data or sends a payment, ADCB is the one fulfilling that request. If something goes wrong — data leaks, payments fail, consent is ignored — CBUAE holds ADCB financially liable. This section explains every liability, how the codebase protects against it, and where the gaps are.</p>
       </div>
 
-      <div style="text-align:center;padding:60px 20px;">
-        <div style="font-size:48px;margin-bottom:16px;">&#x1F6A7;</div>
-        <h2 style="color:var(--color-text-tertiary);margin-bottom:8px;">Coming Soon</h2>
-        <p style="color:var(--color-text-tertiary);max-width:400px;margin:0 auto;">LFI project documentation is currently being prepared and will be available here shortly.</p>
+      <div class="box box-gold">
+        <h3 style="color:var(--color-text-primary);margin-bottom:8px;">The one idea that unlocks everything here</h3>
+        <p>Think of ADCB as a vault operator. TPPs are authorised visitors who can open specific deposit boxes — but only the ones the customer said they could, only during visiting hours, and only if they show the right ID every time. The <strong>liability framework</strong> is the penalty schedule for when ADCB leaves a box open, lets the wrong visitor in, or loses track of who accessed what. Every AED fine below maps to a specific failure in that vault metaphor.</p>
       </div>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- PART 1: LIABILITY FRAMEWORK                  -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div id="part-liabilities"></div>
+      <div class="part-pill">Part 1</div>
+      <div class="section-lbl">Liability Framework</div>
+      <h2>What the fines mean — and why they exist</h2>
+      <p>CBUAE's Open Finance Framework defines specific AED penalties for every type of failure. These are not theoretical — they are contractual obligations between the LFI, TPPs, and the regulator. The fines are split into two sides: <strong>LFI liabilities</strong> (when the bank makes a mistake) and <strong>TPP liabilities</strong> (when the fintech app makes a mistake).</p>
+      <div class="sp12"></div>
+
+      <div class="box box-navy">
+        <h3 style="color:var(--color-text-primary);margin-bottom:8px;">Key rules to remember</h3>
+        <ul>
+          <li><strong>Indirect, consequential, and tortious losses</strong> are not compensated under OF standards — only direct losses.</li>
+          <li><strong>Nebras (API Hub)</strong> liability for Trust Framework failures is capped at <strong>AED 5,000,000</strong> per claim.</li>
+          <li><strong>Users</strong> bear liability only for errors they directly supply — e.g. incorrect beneficiary details they typed themselves.</li>
+          <li>Fines are <strong>per incident</strong> — a single bug that affects 100 customers means 100 separate liabilities.</li>
+        </ul>
+      </div>
+
+      <!-- LFI LIABILITIES TABLE -->
+      <div class="diagram-card">
+        <div class="diagram-hdr">LFI Liabilities — what ADCB is penalised for</div>
+        <div class="diagram-body" style="padding:0;">
+          <table class="err-table">
+            <thead><tr><th>Category</th><th>Issue</th><th>AED Fine</th><th style="width:320px;">What this means in plain language</th></tr></thead>
+            <tbody>
+              <tr><td rowspan="9" style="font-weight:600;color:var(--navy);vertical-align:top;border-right:1px solid var(--color-border);">General /<br>Consent /<br>Auth</td>
+                <td>Activity without valid consent</td><td><span class="err-type err-perm">Case specific</span></td>
+                <td>ADCB served data or executed a payment without a valid, unexpired consent from the customer. The most fundamental violation — like opening a vault box without the owner's key.</td></tr>
+              <tr><td>Consumer Protection obligations not followed</td><td><span class="err-type err-perm">1,000</span></td>
+                <td>ADCB failed to protect the customer's interests — unclear consent screens, missing disclosures, or not honouring customer rights under UAE law.</td></tr>
+              <tr><td>Failure to revoke consent (via LFI channel)</td><td><span class="err-type err-temp">350</span></td>
+                <td>Customer tapped "Revoke" in the ADCB app, but data kept flowing to the TPP. The revocation didn't propagate — the vault box stayed open after the owner asked to lock it.</td></tr>
+              <tr><td>Fraudulent/erroneous LFI authentication</td><td><span class="err-type err-perm">500</span></td>
+                <td>ADCB's login or token system let the wrong person in, or approved a token that should have been rejected. The vault accepted a forged key.</td></tr>
+              <tr><td>Failure to execute request within SLA</td><td><span class="err-type err-temp">200–350</span></td>
+                <td>ADCB took too long to respond. The fine scales with severity: AED 200 if resolved within 6 hours, AED 250 within 12 hours, AED 350 if it takes longer.</td></tr>
+              <tr><td>Failure to execute request accurately</td><td><span class="err-type err-perm">250</span></td>
+                <td>ADCB returned wrong data or processed a payment incorrectly — the balance was off, the account ID was wrong, or a payment went to the wrong recipient.</td></tr>
+              <tr><td>Data mapping failure causing TPP loss of consent</td><td><span class="err-type err-perm">5,000</span></td>
+                <td>A bug in ADCB's data mapping destroyed a TPP's long-lived consent. The TPP had a valid 90-day consent, but an error wiped it out — now the customer has to re-consent from scratch.</td></tr>
+              <tr><td>Failure to manage breaking changes/deprecation</td><td><span class="err-type err-perm">5,000</span></td>
+                <td>ADCB changed or removed an API endpoint without warning. TPP apps broke overnight. No sunset header, no advance notice — like changing the vault locks without telling the visitors.</td></tr>
+              <tr><td>Incorrect categorisation causing invalid pricing</td><td><span class="err-type err-perm">1,000</span></td>
+                <td>ADCB miscategorised an API call, causing the TPP to be charged the wrong Nebras fee. Financial harm through incorrect classification.</td></tr>
+
+              <tr><td rowspan="2" style="font-weight:600;color:var(--navy);vertical-align:top;border-right:1px solid var(--color-border);">Security<br>Incidents</td>
+                <td>Security breach (cyber/physical)</td><td><span class="err-type err-perm">750</span></td>
+                <td>A data breach — whether hacking, insider access, or physical theft — exposed customer data. The vault was broken into.</td></tr>
+              <tr><td>Data transmitted outside ecosystem</td><td><span class="err-type err-perm">750</span></td>
+                <td>Customer data left the authorised boundary — sent to an unregistered system, a non-GCC server, or stored in the wrong AWS region. The vault contents were moved to an unauthorised building.</td></tr>
+
+              <tr><td rowspan="4" style="font-weight:600;color:var(--navy);vertical-align:top;border-right:1px solid var(--color-border);">Data<br>Issues</td>
+                <td>Data shared outside consent scope</td><td><span class="err-type err-perm">750</span></td>
+                <td>A TPP asked for account data but ADCB also returned transaction history that wasn't in the consent. More data flowed than the customer agreed to.</td></tr>
+              <tr><td>Data transmitted incorrectly/mis-mapped</td><td><span class="err-type err-perm">500</span></td>
+                <td>Field mapping was wrong — the creditor name went into the debtor field, the currency code was missing, or Arabic characters were corrupted.</td></tr>
+              <tr><td>Inaccurate data in LFI mastered data</td><td><span class="err-type err-perm">500</span></td>
+                <td>ADCB's own records were wrong. The balance shown to the TPP didn't match the actual balance. The source data was the problem.</td></tr>
+              <tr><td>Inaccurate User-contributed data from LFI</td><td><span class="err-type err-sched">Direct losses</span></td>
+                <td>Data the customer entered (e.g. their own address) was passed through incorrectly. ADCB pays for actual damages, not a fixed fine.</td></tr>
+
+              <tr><td rowspan="3" style="font-weight:600;color:var(--navy);vertical-align:top;border-right:1px solid var(--color-border);">Payments</td>
+                <td>Incorrect beneficiary details (LFI supplied/proxy resolution)</td><td><span class="err-type err-perm">350</span></td>
+                <td>ADCB resolved the beneficiary wrong — the IBAN didn't match the name, or the proxy lookup returned the wrong account. Money could go to the wrong person.</td></tr>
+              <tr><td>Fraud monitoring failure for VRP/Delegated SCA</td><td><span class="err-type err-perm">250</span></td>
+                <td>ADCB didn't monitor Variable Recurring Payments for fraud. A compromised TPP drained a customer's account with 50 small payments and nobody noticed.</td></tr>
+              <tr><td>Failure to execute payment within SLA</td><td><span class="err-type err-sched">Case specific</span></td>
+                <td>A payment took too long or didn't go through. The customer's rent was late, and ADCB is liable for the delay.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sp16"></div>
+
+      <!-- TPP LIABILITIES TABLE -->
+      <div class="diagram-card">
+        <div class="diagram-hdr">TPP Liabilities — what the fintech app is penalised for</div>
+        <div class="diagram-body" style="padding:0;">
+          <table class="err-table">
+            <thead><tr><th>Category</th><th>Issue</th><th>AED Fine</th><th style="width:320px;">Why it matters to the LFI</th></tr></thead>
+            <tbody>
+              <tr><td rowspan="10" style="font-weight:600;color:var(--navy);vertical-align:top;border-right:1px solid var(--color-border);">General /<br>Consent /<br>Auth</td>
+                <td>Failure to maintain consent state causing user detriment</td><td><span class="err-type err-perm">500</span></td>
+                <td>The TPP lost track of whether a consent was still valid. ADCB must expose accurate consent state APIs — if those APIs use mock data, the TPP can't do its job.</td></tr>
+              <tr><td>Failure to revoke consent (via TPP channel)</td><td><span class="err-type err-temp">350</span></td>
+                <td>Customer revoked via the TPP app, but the TPP didn't forward the revocation. ADCB must honour revocation requests instantly when they arrive.</td></tr>
+              <tr><td>Consumer Protection obligations not followed</td><td><span class="err-type err-perm">1,000</span></td>
+                <td>The TPP misled the customer. Not directly ADCB's fault, but ADCB's consent screens must be clear enough that the customer understands what they're approving.</td></tr>
+              <tr><td>Inaccurate consent articulation to User</td><td><span class="err-type err-perm">350</span></td>
+                <td>The TPP showed the customer a misleading description of what they were consenting to. ADCB's scope definitions must be accurate for the TPP to display them correctly.</td></tr>
+              <tr><td>Failure to execute request within SLA</td><td><span class="err-type err-temp">200–350</span></td>
+                <td>Same sliding scale as LFI. If ADCB's APIs are slow, the TPP also breaches SLA — shared responsibility.</td></tr>
+              <tr><td>Failure to execute request accurately</td><td><span class="err-type err-perm">250</span></td>
+                <td>TPP processed the data wrong on their end. But if ADCB's data mapping was already inaccurate, the TPP inherits that inaccuracy.</td></tr>
+              <tr><td>Misrepresented service offering</td><td><span class="err-type err-perm">1,000</span></td>
+                <td>The TPP claimed it could do something it can't. Entirely TPP responsibility — ADCB isn't involved.</td></tr>
+              <tr><td>Failure to manage deprecation/endpoint updates</td><td><span class="err-type err-perm">2,500</span></td>
+                <td>The TPP didn't adapt to ADCB's API changes. But ADCB must give 90 days notice — without a notification system, this fine can boomerang back to ADCB.</td></tr>
+              <tr><td>Failure to send required notifications</td><td><span class="err-type err-temp">150</span></td>
+                <td>The TPP didn't notify the customer of changes. ADCB's role: provide accurate webhook/event data for the TPP to relay.</td></tr>
+              <tr><td>Incorrect categorisation causing invalid pricing</td><td><span class="err-type err-perm">1,000</span></td>
+                <td>Same as LFI — miscategorised calls lead to wrong Nebras fees. Both sides can be at fault.</td></tr>
+
+              <tr><td rowspan="3" style="font-weight:600;color:var(--navy);vertical-align:top;border-right:1px solid var(--color-border);">Security</td>
+                <td>Security breach (cyber/physical)</td><td><span class="err-type err-perm">750</span></td>
+                <td>TPP was breached. ADCB's exposure: was the data masked before it left? Were IBANs and emails redacted? If not, ADCB shares the blame.</td></tr>
+              <tr><td>Data transmitted outside ecosystem</td><td><span class="err-type err-perm">750</span></td>
+                <td>Same as LFI. ADCB's ecosystem boundary validator should catch this before data leaves.</td></tr>
+              <tr><td>Failure to ensure controlled access (MFA)</td><td><span class="err-type err-perm">750</span></td>
+                <td>The TPP accessed sensitive data without multi-factor authentication. ADCB must enforce MFA requirements — currently no MFA layer exists in the codebase.</td></tr>
+
+              <tr><td rowspan="5" style="font-weight:600;color:var(--navy);vertical-align:top;border-right:1px solid var(--color-border);">Payments</td>
+                <td>Incorrect beneficiary details (TPP supplied)</td><td><span class="err-type err-sched">350</span></td>
+                <td>TPP sent wrong IBAN or name. ADCB passes it through — this is the TPP's responsibility.</td></tr>
+              <tr><td>Payment request mismatch to User intention</td><td><span class="err-type err-perm">350</span></td>
+                <td>The TPP charged AED 500 when the customer approved AED 50. ADCB must validate the consent_id matches the payment request.</td></tr>
+              <tr><td>Fraudulent VRP/Delegated SCA payment</td><td><span class="err-type err-perm">500</span></td>
+                <td>A Variable Recurring Payment was used fraudulently. No VRP fraud monitoring exists in the codebase — this is a critical gap.</td></tr>
+              <tr><td>Payment initiated outside consent scope</td><td><span class="err-type err-perm">350</span></td>
+                <td>The TPP used a consent to make a payment it wasn't authorised for. ADCB's scope check should catch this — but it currently uses mock data.</td></tr>
+              <tr><td>Fraudulent payment requests (including RTP)</td><td><span class="err-type err-perm">500</span></td>
+                <td>Fraudulent Request-to-Pay. No fraud detection exists in the codebase to catch suspicious payment patterns.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="box box-teal">
+        <h3 style="color:var(--color-text-primary);margin-bottom:8px;">Reading the tables above</h3>
+        <p>The highest fines — <strong>AED 5,000</strong> — are reserved for two scenarios: destroying a TPP's long-lived consent through a data mapping bug, and breaking API changes without notice. These are the "nuclear" penalties because they affect the entire ecosystem, not just one customer. The most common fines — <strong>AED 250–500</strong> — cover accuracy and fraud monitoring failures. These happen per-incident, so a single bug affecting 1,000 customers means up to <strong>AED 500,000</strong> in exposure.</p>
+      </div>
+
+      <div class="sp24"></div>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- PART 2: HOW IT WORKS                         -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div id="part-how-it-works"></div>
+      <div class="part-pill">Part 2</div>
+      <div class="section-lbl">How it works</div>
+      <h2>The validation layers that prevent liability</h2>
+      <p>The LFI codebase (da-of-api) is designed around six defensive layers. Each layer maps directly to a category of liability in the tables above. When a request arrives from a TPP, it should pass through every relevant layer before data is returned or a payment is executed.</p>
+      <div class="sp12"></div>
+
+      <div class="box box-gold">
+        <h3 style="color:var(--color-text-primary);margin-bottom:8px;">Think of it as airport security</h3>
+        <p>Every TPP request goes through multiple checkpoints. <strong>Layer 1</strong> checks your passport (authentication). <strong>Layer 2</strong> checks your boarding pass matches your destination (consent). <strong>Layer 3</strong> checks you're not carrying prohibited items (boundary enforcement). <strong>Layer 4</strong> checks you're not on a watchlist (fraud detection). <strong>Layer 5</strong> makes sure your luggage goes to the right plane (data mapping). <strong>Layer 6</strong> tracks everything on camera (audit trail). Skip a checkpoint and something gets through that shouldn't.</p>
+      </div>
+
+      <!-- SYSTEM DIAGRAM -->
+      <div class="diagram-card">
+        <div class="diagram-hdr">Request flow — six defensive layers</div>
+        <div class="diagram-body">
+          <div class="sysmap">
+            <div class="sysmap-box bx-blue"><span class="bx-title">TPP Request</span><span class="bx-sub">API Gateway</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-purple"><span class="bx-title">Auth</span><span class="bx-sub">JWT / JWE</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-teal"><span class="bx-title">Consent</span><span class="bx-sub">Scope check</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-amber"><span class="bx-title">Boundary</span><span class="bx-sub">Field / IP / Geo</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-red"><span class="bx-title">Fraud</span><span class="bx-sub">Anomaly check</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-green"><span class="bx-title">Execute</span><span class="bx-sub">Data / Payment</span></div>
+          </div>
+          <div class="key-row">
+            <div class="key-item" style="border-right:1px solid var(--color-border);"><strong>If any layer rejects:</strong> Request blocked, violation logged, TPP receives error code</div>
+            <div class="key-item"><strong>If all layers pass:</strong> Data returned or payment sent to Payment Hub</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sp16"></div>
+
+      <!-- LAYER 1: AUTHENTICATION -->
+      <h3 style="color:var(--navy);">Layer 1 — Authentication (Protects against AED 500)</h3>
+      <p>Before anything else, prove you are who you claim to be. The authoriser Lambda validates every incoming request.</p>
+      <div class="sp8"></div>
+      <div class="diagram-card">
+        <div class="diagram-hdr">Authentication flow — three paths</div>
+        <div class="diagram-body">
+          <div class="sysmap">
+            <div class="sysmap-box bx-blue"><span class="bx-title">Cognito</span><span class="bx-sub">JWT token auth</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-purple"><span class="bx-title">JWE Decode</span><span class="bx-sub">PS256 signature</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-teal"><span class="bx-title">JWKS Verify</span><span class="bx-sub">Public key lookup</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-green"><span class="bx-title">Authorised</span><span class="bx-sub">10s leeway</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="box box-navy">
+        <p><strong>How it works:</strong> The authoriser checks three auth paths — Cognito (internal), Procash (banking), and Ozone proxy (TPP). Every JWT is verified against the issuer's JWKS endpoint using PS256 signatures. Tokens get a <strong>10-second leeway</strong> window — a token that expired 9 seconds ago is still accepted, but at 11 seconds it's rejected. This prevents clock-skew failures without opening a security hole.</p>
+        <p><strong>Liability it prevents:</strong> AED 500 for "Fraudulent/erroneous LFI authentication". If the JWT verification is bypassed, an attacker could impersonate any customer.</p>
+      </div>
+
+      <div class="sp16"></div>
+
+      <!-- LAYER 2: CONSENT VALIDATION -->
+      <h3 style="color:var(--navy);">Layer 2 — Consent Validation (Protects against AED 350–5,000)</h3>
+      <p>The customer said the TPP can see their accounts and balances. Did they also say transactions? Did the consent expire? Has the TPP already used it 1,000 times today?</p>
+      <div class="sp8"></div>
+      <div class="diagram-card">
+        <div class="diagram-hdr">Consent validation — five checks</div>
+        <div class="diagram-body">
+          <div class="sysmap">
+            <div class="sysmap-box bx-teal"><span class="bx-title">Scope Match</span><span class="bx-sub">Granted vs requested</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-amber"><span class="bx-title">Expiry Check</span><span class="bx-sub">90-day window</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-purple"><span class="bx-title">Usage Count</span><span class="bx-sub">Max 1,000 calls</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-blue"><span class="bx-title">Time Window</span><span class="bx-sub">22:00–06:00 block</span></div>
+            <div class="sysmap-arr">&#x203A;</div>
+            <div class="sysmap-box bx-red"><span class="bx-title">Enhanced Auth</span><span class="bx-sub">Sensitive scopes</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="box box-teal">
+        <p><strong>How it works:</strong> The <code>DynamicScopeValidator</code> checks five things in order:</p>
+        <ul>
+          <li><strong>Scope match</strong> — is the requested data cluster (accounts, transactions, beneficiaries) in the list the customer approved?</li>
+          <li><strong>Expiry</strong> — has the 90-day consent window passed? Checked to the second, in UTC.</li>
+          <li><strong>Usage limits</strong> — has this consent been used more than 1,000 times? Prevents data harvesting.</li>
+          <li><strong>Time restrictions</strong> — sensitive scopes (customer PII, beneficiaries) are blocked between 22:00–06:00 UTC. If someone breaches data at 3am, response time is slower = bigger damage.</li>
+          <li><strong>Enhanced authentication</strong> — restricted fields (national ID, date of birth) require step-up authentication beyond the basic token.</li>
+        </ul>
+        <p><strong>Liability it prevents:</strong> AED 350 (expired consent), AED 750 (data outside scope), AED 5,000 (consent destruction through mapping failure).</p>
+      </div>
+
+      <div class="sp16"></div>
+
+      <!-- LAYER 3: BOUNDARY ENFORCEMENT -->
+      <h3 style="color:var(--navy);">Layer 3 — Boundary Enforcement (Protects against AED 750–5,000)</h3>
+      <p>Even with valid consent, not everything should be visible. Boundary enforcement controls <em>what</em> data leaves, <em>where</em> it goes, and <em>how much</em> at a time.</p>
+      <div class="sp8"></div>
+      <div class="box box-purple">
+        <p><strong>Three types of boundaries:</strong></p>
+        <ul>
+          <li><strong>Account boundaries</strong> — The TPP can only see accounts listed in the consent. Request <code>acc_3</code> (the customer's mortgage) when consent only covers <code>acc_1</code> and <code>acc_2</code>? Blocked. Action: <code>BLOCK</code>.</li>
+          <li><strong>Field boundaries</strong> — Sensitive fields (IBAN, email, phone) are masked before leaving ADCB. Full IBAN <code>AE07 0331 2345 6789 0123 456</code> becomes <code>**********************3456</code>. National ID and date of birth are classified as <em>restricted</em> and require enhanced auth. Action: <code>ESCALATE</code>.</li>
+          <li><strong>Quota boundaries</strong> — Maximum 100 records per request, 10MB per transmission. A TPP trying to download 500 transactions in one call gets capped with pagination. Action: <code>FILTER</code>.</li>
+        </ul>
+      </div>
+      <div class="box box-navy">
+        <p><strong>Ecosystem boundary validation</strong> goes further — it checks <em>where</em> the data is going. Is the destination an authorised ecosystem participant (ADCB internal, CBUAE regulatory, Ozone partner)? Is the destination country in the GCC allowed list? Is the source-to-destination route crossing a restricted border (e.g. UAE to Iran)?</p>
+        <p>The <code>EcosystemBoundaryValidator</code> classifies every outbound transmission and blocks anything that violates geographic restrictions, data type rules, or transmission size limits.</p>
+      </div>
+
+      <div class="sp16"></div>
+
+      <!-- LAYER 4: FRAUD DETECTION -->
+      <h3 style="color:var(--navy);">Layer 4 — Fraud Detection (Protects against AED 250–500)</h3>
+      <p>Is this payment normal? Is this access pattern suspicious? Fraud detection looks at three dimensions.</p>
+      <div class="sp8"></div>
+      <div class="box box-red">
+        <h3 style="color:var(--color-text-primary);margin-bottom:8px;">Critical gap: this layer is not yet built</h3>
+        <p>The Implementation Guide references <code>anomaly_detector.py</code>, <code>vrp_sca_monitor.py</code>, and <code>fraud_integration_handler.py</code> — but none of these files exist in the codebase. The <code>src/security/fraud/</code> directory is empty. All fraud detection claims are documentation-only.</p>
+        <p>What <em>should</em> exist:</p>
+        <ul>
+          <li><strong>Frequency detection</strong> — 50 transactions/day limit per customer. The 51st should be blocked.</li>
+          <li><strong>Amount anomaly</strong> — a customer who normally spends AED 200–500 suddenly sends AED 49,999. Pattern analysis should flag this.</li>
+          <li><strong>VRP monitoring</strong> — Variable Recurring Payments need their own fraud checks. A merchant charging AED 950 twelve times in one day against a "max AED 1,000/month" VRP should be caught.</li>
+          <li><strong>Geographic restrictions</strong> — payments to sanctioned countries (Syria, Iran, North Korea) must be blocked immediately.</li>
+        </ul>
+      </div>
+
+      <div class="sp16"></div>
+
+      <!-- LAYER 5: DATA MAPPING & PAYMENT EXECUTION -->
+      <h3 style="color:var(--navy);">Layer 5 — Data Mapping &amp; Payment Execution (Protects against AED 250–500)</h3>
+      <p>Once a request passes all checks, it's time to actually fetch the data or send the payment. This is where field mapping accuracy matters.</p>
+      <div class="sp8"></div>
+      <div class="box box-navy">
+        <p><strong>Data sharing path:</strong> The data_sharing Lambda fetches from CDP (Customer Data Platform) or CRM, maps the response through one of <strong>12 mapping modules</strong> (accounts, balances, transactions, beneficiaries, customer, products, standing orders, direct debits, scheduled payments, offers, parties, statements), and returns it in Ozone-compliant format.</p>
+        <p><strong>Payment path:</strong> The payment Lambda decrypts the PII section (JWE-encrypted creditor name, IBAN), maps it from Ozone format to Payment Hub format (camelCase → PascalCase), sends it to the Payment Hub with a <strong>30-second timeout</strong>, and maps the response back. Key mapping: <code>BorneByCreditor→DEBT</code>, <code>BorneByDebtor→CRDT</code>, <code>FollowingServiceLevel→SLEV</code>, <code>Shared→SHAR</code>.</p>
+      </div>
+      <div class="box box-warn">
+        <h3 style="color:var(--color-text-primary);margin-bottom:8px;">Known regression: payment status check is disabled</h3>
+        <p>At <code>post_payments.py:657–664</code>, the transaction status validation is <strong>commented out</strong>. This means Payment Hub can return HTTP 201 (looks successful) with <code>TransactionStatus = "RJCT"</code> (actually rejected), and the customer is told their payment succeeded when it didn't. This is an AED 350 liability per occurrence — "Failure to execute request accurately".</p>
+      </div>
+
+      <div class="sp16"></div>
+
+      <!-- LAYER 6: AUDIT TRAIL -->
+      <h3 style="color:var(--navy);">Layer 6 — Audit Trail (Supports all liability categories)</h3>
+      <p>Every decision — allow, block, escalate — must be recorded. When CBUAE audits ADCB, they will ask: "show me every time you blocked a request, and show me every time you allowed one." Without a complete audit trail, ADCB cannot defend against any liability claim.</p>
+      <div class="sp8"></div>
+      <div class="box box-warn">
+        <h3 style="color:var(--color-text-primary);margin-bottom:8px;">Known weakness: audit data is stored in memory</h3>
+        <p>The boundary <code>violation_log</code>, fraud <code>customer_activity</code>, and ecosystem <code>transmission_log</code> are all stored as in-memory Python lists/dicts. When the Lambda cold-starts (AWS scales down and back up), all audit data is lost. A violation at 09:00 won't appear in the log at 09:05 if the Lambda recycled in between. This makes audit trail completeness impossible to guarantee.</p>
+        <p><strong>Fix needed:</strong> Persist all audit data to DynamoDB or CloudWatch, not in-memory structures.</p>
+      </div>
+
+      <div class="sp24"></div>
+      <hr>
+      <div class="sp24"></div>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- PART 3: GAP ANALYSIS                         -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div id="part-gap-analysis"></div>
+      <div class="part-pill">Part 3</div>
+      <div class="section-lbl">Gap Analysis</div>
+      <h2>Claims vs reality — what the codebase actually does</h2>
+      <p>Using James Bach's <strong>Claims Oracle</strong>: does the codebase deliver what the Implementation Guide promises? We compared every liability category against the actual source code. The results are split into three buckets.</p>
+      <div class="sp12"></div>
+
+      <!-- COVERAGE SUMMARY -->
+      <div class="diagram-card">
+        <div class="diagram-hdr">Coverage summary — 37 liability items assessed</div>
+        <div class="diagram-body">
+          <div class="sysmap" style="justify-content:center;">
+            <div class="sysmap-box bx-green" style="flex:none;width:160px;"><span class="bx-title">12 Strong/Good</span><span class="bx-sub">Auth, SSL, mapping, timeouts</span></div>
+            <div class="sysmap-arr" style="width:32px;">|</div>
+            <div class="sysmap-box bx-amber" style="flex:none;width:160px;"><span class="bx-title">14 Partial</span><span class="bx-sub">Code exists, not wired in</span></div>
+            <div class="sysmap-arr" style="width:32px;">|</div>
+            <div class="sysmap-box bx-red" style="flex:none;width:160px;"><span class="bx-title">11 Gap / Missing</span><span class="bx-sub">Not built at all</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sp16"></div>
+
+      <!-- CRITICAL GAPS -->
+      <div class="diagram-card">
+        <div class="diagram-hdr" style="background:#991B1B;">Critical gaps — compliance blockers</div>
+        <div class="diagram-body" style="padding:0;">
+          <table class="err-table">
+            <thead><tr><th style="width:40px;">#</th><th>Gap</th><th>Liability</th><th>Status</th><th style="width:300px;">What this means</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td><strong>Fraud detection modules don't exist</strong></td><td>AED 250–500</td>
+                <td><span class="err-type err-perm">NOT BUILT</span></td>
+                <td>The Implementation Guide references <code>anomaly_detector.py</code>, <code>vrp_sca_monitor.py</code>, <code>fraud_integration_handler.py</code> — none exist. The <code>src/security/fraud/</code> directory is empty. All fraud prevention is documentation-only.</td></tr>
+              <tr><td>2</td><td><strong>All consent data retrieval is mocked</strong></td><td>AED 350–5,000</td>
+                <td><span class="err-type err-perm">MOCK ONLY</span></td>
+                <td><code>_get_consent_data()</code> returns hardcoded data in 4 files. No DynamoDB integration. A revoked consent still appears valid. Rate limiting always returns 2 — far below any threshold.</td></tr>
+              <tr><td>3</td><td><strong>Rate limiting is non-functional</strong></td><td>AED 200–350</td>
+                <td><span class="err-type err-perm">MOCK ONLY</span></td>
+                <td><code>_get_recent_request_count()</code> always returns 2. A rogue TPP sending 500 requests per minute would never be throttled.</td></tr>
+              <tr><td>4</td><td><strong>Payment status check commented out</strong></td><td>AED 350</td>
+                <td><span class="err-type err-perm">REGRESSION</span></td>
+                <td>Transaction status validation is disabled at <code>post_payments.py:657–664</code>. A rejected payment (RJCT) passes through as success.</td></tr>
+              <tr><td>5</td><td><strong>No MFA enforcement</strong></td><td>AED 750</td>
+                <td><span class="err-type err-perm">NOT BUILT</span></td>
+                <td>The liability schedule requires "controlled access (MFA)" for sensitive data. No MFA layer exists anywhere in the codebase.</td></tr>
+              <tr><td>6</td><td><strong>Compliance modules not integrated into Lambda handlers</strong></td><td>AED 250–5,000</td>
+                <td><span class="err-type err-perm">NOT WIRED</span></td>
+                <td>Consent and security modules exist as standalone Python files but are never imported or called from the authoriser, data_sharing, or payment Lambda functions.</td></tr>
+              <tr><td>7</td><td><strong>No deprecation/versioning system</strong></td><td>AED 5,000</td>
+                <td><span class="err-type err-perm">NOT BUILT</span></td>
+                <td>No API versioning, sunset headers, or TPP notification system. A breaking change would hit every TPP simultaneously.</td></tr>
+              <tr><td>8</td><td><strong>Refund endpoint has no error handling</strong></td><td>AED 350</td>
+                <td><span class="err-type err-perm">MISSING</span></td>
+                <td>No try/except in <code>get_refund_detail_response()</code>. Any HTTP error crashes the Lambda instead of returning a graceful error.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sp16"></div>
+
+      <!-- HIGH GAPS -->
+      <div class="diagram-card">
+        <div class="diagram-hdr" style="background:#92400E;">High gaps — significant risk</div>
+        <div class="diagram-body" style="padding:0;">
+          <table class="err-table">
+            <thead><tr><th style="width:40px;">#</th><th>Gap</th><th>Liability</th><th style="width:320px;">Detail</th></tr></thead>
+            <tbody>
+              <tr><td>9</td><td><strong>In-memory state lost on Lambda restart</strong></td><td>AED 250</td>
+                <td><code>customer_activity</code> (fraud), <code>violation_log</code> (boundary), <code>transmission_log</code> (ecosystem) — all in-memory. Cold starts reset everything. A fraudster can time attacks around Lambda scaling events.</td></tr>
+              <tr><td>10</td><td><strong>Unbounded JWK cache (memory leak)</strong></td><td>AED 500</td>
+                <td><code>@functools.lru_cache(maxsize=None)</code> for JWK clients. With 200 registered TPPs, the cache grows indefinitely. Lambda will eventually hit its memory limit and crash.</td></tr>
+              <tr><td>11</td><td><strong>Simplified CIDR validation</strong></td><td>AED 750</td>
+                <td>IP whitelist uses string prefix matching instead of proper CIDR range calculation. <code>192.168.2.1</code> incorrectly matches a <code>192.168.1.0/24</code> whitelist because "192.168" is a shared prefix.</td></tr>
+              <tr><td>12</td><td><strong>Hardcoded "test" user-agent</strong></td><td>AED 350</td>
+                <td><code>x-customer-user-agent: "test"</code> in all production Payment Hub requests. Makes it impossible to trace which TPP initiated which payment during fraud investigations.</td></tr>
+              <tr><td>13</td><td><strong>Unsafe chained .get() in response mapping</strong></td><td>AED 350</td>
+                <td>The <code>currencyRequest</code> block uses long chained <code>.get().get().get()</code> without null safety. If any link in the chain is None, the Lambda crashes with an AttributeError.</td></tr>
+              <tr><td>14</td><td><strong>No notification service</strong></td><td>AED 150</td>
+                <td>LFI liability for "Failure to send required notifications". No email, webhook, or event system exists for TPP notifications.</td></tr>
+              <tr><td>15</td><td><strong>Zero tests for consent/security modules</strong></td><td>All</td>
+                <td>80+ tests exist for data_sharing, payment, and authoriser. Zero tests for any file in the consent/ or security/ directories.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sp16"></div>
+
+      <!-- FINANCIAL EXPOSURE -->
+      <div class="box box-red">
+        <h3 style="color:var(--color-text-primary);margin-bottom:8px;">Total financial exposure</h3>
+        <p>If all gaps were exploited simultaneously, ADCB's maximum per-incident liability exceeds <strong>AED 18,000</strong>. For a bug affecting 100 customers, that scales to <strong>AED 1.8 million</strong>. The three highest-risk areas:</p>
+        <ul>
+          <li><strong>Fraud Prevention</strong> — AED 250+ per incident, controls completely missing</li>
+          <li><strong>Breaking Changes</strong> — AED 5,000 per affected TPP, no versioning system exists</li>
+          <li><strong>Consent Management</strong> — AED 350–5,000, all validation uses mock data</li>
+        </ul>
+      </div>
+
+      <div class="sp24"></div>
+      <hr>
+      <div class="sp24"></div>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- PART 4: TEST STRATEGY                        -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div id="part-test-strategy"></div>
+      <div class="part-pill">Part 4</div>
+      <div class="section-lbl">Test Strategy</div>
+      <h2>Rapid Software Testing — liability-driven test design</h2>
+      <p>This test strategy uses James Bach's RST (Rapid Software Testing) methodology. Every test case maps to a specific AED liability. Higher fines get more test depth. The approach uses SFDPOT heuristics (Structure, Function, Data, Platform, Operations, Time) and consistency oracles to find gaps that requirements-based testing would miss.</p>
+      <div class="sp12"></div>
+
+      <div class="box box-gold">
+        <h3 style="color:var(--color-text-primary);margin-bottom:8px;">How we judge test results — six oracles</h3>
+        <p>An oracle is how you decide if the system behaved correctly. We use six:</p>
+        <ul>
+          <li><strong>Consistency Oracle</strong> — does behavior match CBUAE OF specs, Ozone API contract, and ADCB business rules?</li>
+          <li><strong>History Oracle</strong> — does the current version behave consistently with prior releases? Are regressions caught?</li>
+          <li><strong>Image Oracle</strong> — does the system project the trustworthiness expected of a regulated bank?</li>
+          <li><strong>Comparable Product Oracle</strong> — how does it compare with UK Open Banking (OBIE) and EU PSD2?</li>
+          <li><strong>Claims Oracle</strong> — does the codebase deliver what the Implementation Guide claims?</li>
+          <li><strong>Reference Oracle</strong> — does it comply with CBUAE penalties, ISO 27001, and data protection requirements?</li>
+        </ul>
+      </div>
+
+      <div class="sp16"></div>
+
+      <!-- TEST CASES: CONSENT -->
+      <h3 style="color:var(--navy);">Test Cases — Consent Management (AED 350–5,000)</h3>
+      <p>These scenarios test the consent validation layer with realistic situations — a TPP making a normal request, a consent expiring mid-session, a rogue TPP flooding the API.</p>
+      <div class="sp8"></div>
+      <div class="diagram-card">
+        <div class="diagram-hdr">Consent management — realistic test scenarios</div>
+        <div class="diagram-body" style="padding:0;">
+          <table class="err-table">
+            <thead><tr><th style="width:60px;">ID</th><th style="width:240px;">Scenario</th><th style="width:50px;">Priority</th><th>Expected Result</th><th style="width:260px;">Impact if it fails</th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:monospace;font-weight:700;color:var(--blue);">CON-02</td>
+                <td>TPP calls GET /customer but consent only grants accounts+balances.</td>
+                <td><span class="err-type err-perm">Crit</span></td>
+                <td>INSUFFICIENT_SCOPE, 403 returned</td>
+                <td>AED 5,000 if customer PII leaks beyond consent scope. Data protection violation.</td></tr>
+              <tr><td style="font-family:monospace;font-weight:700;color:var(--blue);">CON-03</td>
+                <td>90-day consent expired 1 second ago. TPP makes a request at 00:00:01 UTC past expiry.</td>
+                <td><span class="err-type err-perm">Crit</span></td>
+                <td>EXPIRED status, all access denied</td>
+                <td>AED 350 "activity without valid consent". CBUAE flags ADCB in next audit.</td></tr>
+              <tr><td style="font-family:monospace;font-weight:700;color:var(--blue);">CON-13</td>
+                <td>Customer revokes consent at 14:00. TPP makes a scheduled call at 14:01.</td>
+                <td><span class="err-type err-perm">Crit</span></td>
+                <td>REVOKED status, all access denied</td>
+                <td>AED 350 "failure to revoke consent". Customer explicitly withdrew permission — serving data is a trust betrayal.</td></tr>
+              <tr><td style="font-family:monospace;font-weight:700;color:var(--blue);">CON-18</td>
+                <td>Call <code>validate_consent_scope()</code> for a consent revoked 2 hours ago. Mock <code>_get_consent_data()</code> still returns valid.</td>
+                <td><span class="err-type err-perm">Crit</span></td>
+                <td><span class="err-type err-sched" style="background:#F4ECF7;color:#6C3483;border-color:#D2B4DE;">MOCK GAP</span> Returns valid — revoked consent invisible</td>
+                <td>Consent revocation does nothing. Data keeps flowing. AED 350–5,000 every time a revoked consent is honoured.</td></tr>
+              <tr><td style="font-family:monospace;font-weight:700;color:var(--blue);">CON-19</td>
+                <td>A rogue TPP sends 500 requests/minute. <code>_get_recent_request_count()</code> always returns 2.</td>
+                <td><span class="err-type err-perm">Crit</span></td>
+                <td><span class="err-type err-sched" style="background:#F4ECF7;color:#6C3483;border-color:#D2B4DE;">MOCK GAP</span> Rate limiting is fiction</td>
+                <td>API flooded, other customers affected. Infrastructure costs spike. SLA violations cascade.</td></tr>
+              <tr><td style="font-family:monospace;font-weight:700;color:var(--blue);">CON-09</td>
+                <td>TPP batch job runs at 3am UAE time (23:00 UTC) pulling customer names and phone numbers.</td>
+                <td><span class="err-type err-temp">High</span></td>
+                <td>Sensitive data blocked during 22:00–06:00 UTC</td>
+                <td>Nighttime data access without enhanced auth violates SCA principles.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sp16"></div>
+
+      <!-- TEST CASES: PAYMENTS -->
+      <h3 style="color:var(--navy);">Test Cases — Payment Processing (AED 350–500)</h3>
+      <p>These scenarios test the payment flow from PII decryption to Payment Hub response mapping — the path where real money moves.</p>
+      <div class="sp8"></div>
+      <div class="diagram-card">
+        <div class="diagram-hdr">Payment processing — realistic test scenarios</div>
+        <div class="diagram-body" style="padding:0;">
+          <table class="err-table">
+            <thead><tr><th style="width:60px;">ID</th><th style="width:240px;">Scenario</th><th style="width:50px;">Priority</th><th>Expected Result</th><th style="width:260px;">Impact if it fails</th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:monospace;font-weight:700;color:var(--blue);">PAY-01</td>
+                <td>Customer pays AED 2,500 rent via Tabby. All fields valid, valid consent.</td>
+                <td><span class="err-type err-perm">Crit</span></td>
+                <td>201, correct Ozone response with payment ID and status</td>
+                <td>Payment fails = customer can't pay rent. "Open Finance doesn't work" narrative kills TPP adoption.</td></tr>
+              <tr><td style="font-family:monospace;font-weight:700;color:var(--blue);">PAY-04</td>
+                <td>Payment Hub returns 201 but TransactionStatus = "RJCT". Status check is commented out.</td>
+                <td><span class="err-type err-perm">Crit</span></td>
+                <td><span class="err-type err-sched" style="background:#FFF7ED;color:#C2410C;border-color:#FED7AA;">REGRESSION</span> Passes as success — payment actually failed</td>
+                <td>Customer sees "Payment Successful" but money never arrives. Landlord doesn't get rent. AED 350 per occurrence.</td></tr>
+              <tr><td style="font-family:monospace;font-weight:700;color:var(--blue);">PAY-03</td>
+                <td>Payment Hub under heavy load on salary day. Response takes 31 seconds. Timeout is 30s.</td>
+                <td><span class="err-type err-temp">High</span></td>
+                <td>500 with timeout error, payment NOT sent (idempotent)</td>
+                <td>Customer doesn't know if money left their account. Duplicate payments if they retry.</td></tr>
+              <tr><td style="font-family:monospace;font-weight:700;color:var(--blue);">PAY-12</td>
+                <td>Customer requests refund status. Payment Hub is down. <code>get_refund_detail_response()</code> has no try/except.</td>
+                <td><span class="err-type err-perm">Crit</span></td>
+                <td><span class="err-type err-perm" style="background:#FEF2F2;">CRASH</span> Unhandled exception kills Lambda</td>
+                <td>Refund status completely unavailable. Customer waiting for AED 5,000 refund sees cryptic 502 error.</td></tr>
+              <tr><td style="font-family:monospace;font-weight:700;color:var(--blue);">PAY-13</td>
+                <td>Every payment has <code>x-customer-user-agent: "test"</code> in production headers.</td>
+                <td><span class="err-type err-temp">High</span></td>
+                <td><span class="err-type err-sched" style="background:#FFF7ED;color:#C2410C;border-color:#FED7AA;">HARDCODED</span> Should pass actual TPP identifier</td>
+                <td>Audit trail incomplete — can't trace which TPP sent a suspicious payment during fraud investigation.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sp16"></div>
+
+      <!-- TEST CASES: SECURITY & FRAUD -->
+      <h3 style="color:var(--navy);">Test Cases — Security &amp; Fraud Prevention (AED 250–750)</h3>
+      <div class="sp8"></div>
+      <div class="diagram-card">
+        <div class="diagram-hdr">Security &amp; fraud — realistic test scenarios</div>
+        <div class="diagram-body" style="padding:0;">
+          <table class="err-table">
+            <thead><tr><th style="width:60px;">ID</th><th style="width:240px;">Scenario</th><th style="width:50px;">Priority</th><th>Expected Result</th><th style="width:260px;">Impact if it fails</th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:monospace;font-weight:700;color:var(--blue);">SEC-01</td>
+                <td>Attacker modifies customer_id in JWT, re-signs with random key.</td>
+                <td><span class="err-type err-perm">Crit</span></td>
+                <td>PS256 signature verification fails, 401</td>
+                <td>AED 500 fraudulent auth. Account takeover = most damaging security incident.</td></tr>
+              <tr><td style="font-family:monospace;font-weight:700;color:var(--blue);">SEC-09</td>
+                <td>TPP accesses beneficiaries without any MFA challenge.</td>
+                <td><span class="err-type err-perm">Crit</span></td>
+                <td><span class="err-type err-perm" style="background:#FEF2F2;">GAP</span> No MFA enforcement exists</td>
+                <td>AED 750 per incident. CBUAE audit will flag as critical finding.</td></tr>
+              <tr><td style="font-family:monospace;font-weight:700;color:var(--blue);">FRD-01</td>
+                <td>Compromised TPP sends 51 small AED 100 payments from one account in 24 hours.</td>
+                <td><span class="err-type err-perm">Crit</span></td>
+                <td>51st transaction blocked, customer alerted</td>
+                <td>AED 5,100 stolen. "Open Finance enabled fraud" destroys public trust.</td></tr>
+              <tr><td style="font-family:monospace;font-weight:700;color:var(--blue);">FRD-04</td>
+                <td>Merchant charges VRP 12 times in one day against "max AED 1,000/month" consent.</td>
+                <td><span class="err-type err-perm">Crit</span></td>
+                <td><span class="err-type err-perm" style="background:#FEF2F2;">NOT IMPLEMENTED</span> All 12 charges go through</td>
+                <td>Customer loses AED 11,400 in one day. VRP was supposed to be safe.</td></tr>
+              <tr><td style="font-family:monospace;font-weight:700;color:var(--blue);">ECO-03</td>
+                <td>Disaster recovery replicates customer data from UAE to US AWS region.</td>
+                <td><span class="err-type err-perm">Crit</span></td>
+                <td>CROSS_BORDER_VIOLATION, blocked</td>
+                <td>UAE data residency law violation. "ADCB sent data to America" = career-ending headline.</td></tr>
+              <tr><td style="font-family:monospace;font-weight:700;color:var(--blue);">ECO-10</td>
+                <td>TPP routes through CDN node in Tehran due to network misconfiguration.</td>
+                <td><span class="err-type err-perm">Crit</span></td>
+                <td>Geographic breach, transmission blocked</td>
+                <td>Sanctions violation — CBUAE and international regulatory action. Existential reputation risk.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sp16"></div>
+
+      <!-- AUTOMATION STRATEGY -->
+      <h3 style="color:var(--navy);">Test Automation — the pyramid</h3>
+      <p>Of the 156 test cases identified, roughly <strong>85% can be automated</strong>. The remaining 15% need manual exploratory testing (UX consent flows, accessibility, security pen testing). Here's how the test pyramid breaks down:</p>
+      <div class="sp8"></div>
+
+      <div class="diagram-card">
+        <div class="diagram-hdr">Test pyramid — three levels</div>
+        <div class="diagram-body">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+            <div style="width:180px;padding:12px;background:#991B1B;color:#fff;text-align:center;border-radius:8px 8px 0 0;font-weight:600;font-size:12px;">
+              E2E / Contract<br><span style="font-size:10px;opacity:0.8;">~15 tests · 5–15 min</span>
+            </div>
+            <div style="width:300px;padding:14px;background:var(--amber);color:#fff;text-align:center;font-weight:600;font-size:12px;">
+              Integration Tests<br><span style="font-size:10px;opacity:0.8;">~45 tests · 2–5 min</span>
+            </div>
+            <div style="width:420px;padding:16px;background:var(--green);color:#fff;text-align:center;border-radius:0 0 8px 8px;font-weight:600;font-size:13px;">
+              Unit Tests<br><span style="font-size:10px;opacity:0.8;">~96 tests · &lt;30 seconds · Foundation</span>
+            </div>
+          </div>
+          <div class="key-row" style="margin-top:16px;">
+            <div class="key-item" style="border-right:1px solid var(--color-border);"><strong>Automatable:</strong> ~133 of 156 test cases</div>
+            <div class="key-item" style="border-right:1px solid var(--color-border);"><strong>Manual/Exploratory:</strong> ~23 tests</div>
+            <div class="key-item"><strong>Tool:</strong> pytest (already in codebase)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sp16"></div>
+
+      <!-- UNIT TESTS -->
+      <div class="box box-succ">
+        <h3 style="color:var(--color-text-primary);margin-bottom:8px;">Unit tests (96 tests) — absolutely essential</h3>
+        <p>Every consent validator, boundary enforcer, risk calculator, and data mapper is pure Python logic with zero external dependencies. These are the cheapest, fastest tests to write and run. Skipping them would be negligent for a regulated system.</p>
+        <ul>
+          <li><strong>Consent scope validation</strong> — 20 tests covering scope matching, expiry boundaries (1 second before/after), usage counts, restricted hours, hierarchical scopes</li>
+          <li><strong>Boundary enforcement</strong> — 15 tests covering account authorisation, field masking, quota limits, data type restrictions</li>
+          <li><strong>Ecosystem boundary</strong> — 12 tests covering cross-border validation, PII classification, transmission limits, restricted countries</li>
+          <li><strong>Payment mapping</strong> — 14 tests covering creditor name dicts, charge bearer mapping, PascalCase→camelCase conversion, Arabic UTF-8 preservation</li>
+          <li><strong>Data mapping modules</strong> — 18 tests covering all 12 mapping files for mandatory fields, address assembly, balance precision</li>
+        </ul>
+      </div>
+
+      <!-- INTEGRATION TESTS -->
+      <div class="box box-warn">
+        <h3 style="color:var(--color-text-primary);margin-bottom:8px;">Integration tests (45 tests) — necessary, with a caveat</h3>
+        <p>The biggest risk isn't that individual functions are wrong — it's that <strong>the modules aren't connected</strong>. Consent validators exist but Lambda handlers don't call them. Integration tests verify the wiring.</p>
+        <ul>
+          <li><strong>Lambda → Consent Validator</strong> — 8 tests. The critical missing wiring. Write the test first (red), then wire the code (green).</li>
+          <li><strong>Lambda → Boundary Enforcer</strong> — 6 tests. Account filtering, field masking, violation persistence (not in-memory).</li>
+          <li><strong>Payment → Payment Hub</strong> — 8 tests. Timeout handling, status code validation, SSL failure recovery.</li>
+          <li><strong>Consent → DynamoDB</strong> — 5 tests. Replace all mock <code>_get_consent_data()</code> with real lookups using moto.</li>
+        </ul>
+        <p><strong>Caveat:</strong> Integration tests for consent/boundary wiring can't be written until those modules are actually imported into Lambda handlers. Write the test first — this is TDD at the integration level.</p>
+      </div>
+
+      <!-- E2E TESTS -->
+      <div class="box box-navy">
+        <h3 style="color:var(--color-text-primary);margin-bottom:8px;">E2E tests (15 tests) — necessary but keep thin</h3>
+        <p>One test per major liability category. Proves the full chain works after deployment: TPP request → API Gateway → Authoriser → Lambda → Payment Hub/CDP → Response. Every E2E scenario should map directly to an AED fine. If it doesn't protect against a fine, push it down to integration or unit.</p>
+      </div>
+
+      <div class="sp16"></div>
+
+      <!-- IMPLEMENTATION PRIORITY -->
+      <h3 style="color:var(--navy);">Implementation priority — what to build first</h3>
+      <p>Don't build the whole pyramid at once. This order maximises liability coverage fastest:</p>
+      <div class="sp8"></div>
+      <div class="diagram-card">
+        <div class="diagram-hdr">Phased implementation — highest ROI first</div>
+        <div class="diagram-body" style="padding:0;">
+          <table class="err-table">
+            <thead><tr><th>Phase</th><th>What</th><th style="width:280px;">Why this order</th><th>Effort</th><th>Liability</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:700;color:var(--green);">Phase 1</td>
+                <td><strong>Unit tests for consent &amp; boundary modules</strong></td>
+                <td>Zero tests exist today. The code is pure logic. Each test maps to an AED fine. Highest ROI.</td>
+                <td>2–3 days</td><td>AED 350–5,000</td></tr>
+              <tr><td style="font-weight:700;color:var(--green);">Phase 2</td>
+                <td><strong>Unit tests for payment mapping edge cases</strong></td>
+                <td>Payment status regression and null-safety gaps are real production risks.</td>
+                <td>1–2 days</td><td>AED 350</td></tr>
+              <tr><td style="font-weight:700;color:var(--amber);">Phase 3</td>
+                <td><strong>Wire consent/boundary into Lambda + integration tests</strong></td>
+                <td>The modules are useless until integrated. Write integration tests first (TDD), then wire the imports.</td>
+                <td>3–5 days</td><td>AED 250–5,000</td></tr>
+              <tr><td style="font-weight:700;color:var(--amber);">Phase 4</td>
+                <td><strong>Replace all mock _get_consent_data()</strong></td>
+                <td>Until real DynamoDB lookups replace hardcoded returns, consent validation is theatre.</td>
+                <td>2–3 days</td><td>AED 350–5,000</td></tr>
+              <tr><td style="font-weight:700;color:#991B1B;">Phase 5</td>
+                <td><strong>E2E smoke tests (15 critical paths)</strong></td>
+                <td>Once wiring is done, add thin E2E tests against a test API Gateway stage.</td>
+                <td>2–3 days</td><td>All categories</td></tr>
+              <tr><td style="font-weight:700;color:var(--color-text-tertiary);">Phase 6</td>
+                <td><strong>Build fraud detection + unit tests (TDD)</strong></td>
+                <td>The fraud/ directory doesn't exist yet. Build with TDD — tests come first.</td>
+                <td>5–7 days</td><td>AED 250–500</td></tr>
+            </tbody>
+          </table>
+          <div style="padding:14px 16px;">
+            <div class="box box-navy" style="margin:0;">
+              <p><strong>Phase 1+2 alone (5 days)</strong> covers ~60% of liability exposure with unit tests only. <strong>CI integration:</strong> unit tests on every commit (&lt;30s), integration tests on PR merge (&lt;5min), E2E nightly or pre-release (&lt;15min).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sp16"></div>
+
+      <!-- FULL INTERACTIVE REPORT LINK -->
+      <div class="box box-gold">
+        <h3 style="color:var(--color-text-primary);margin-bottom:8px;">Full interactive test report</h3>
+        <p>The complete RST test strategy — including all 156 test cases across 8 categories, SFDPOT heuristic decomposition, risk heatmap, liability matrix with coverage status, and detailed automation strategy — is available as a standalone interactive report.</p>
+        <p><strong>Download:</strong> <a href="tpp-lfi-modeling.html" target="_blank" style="color:var(--blue);font-weight:600;">ADCB LFI Liability Framework — Full Test Strategy &amp; Analysis (HTML)</a></p>
+      </div>
+
+      <div style="text-align:center;padding:20px 0;">
+        <p style="font-size:11px;color:var(--color-text-tertiary);">ADCB Open Finance — LFI Liability Validations · da-of-api · Confidential · Internal use only</p>
+      </div>
+
     </div>
 
   </div><!-- /content -->

@@ -8,7 +8,9 @@ var SLUG_TO_ID = {
   'the-players': 'players', 'data-sharing': 'data', 'sip-payment': 'sip',
   'side-by-side': 'compare', 'payment-status': 'status',
   'system-map': 'system', 'consent-lifecycle': 'lifecycle',
-  'data-scheduler': 'scheduler', 'error-scenarios': 'errors'
+  'data-scheduler': 'scheduler', 'error-scenarios': 'errors',
+  'liability-framework': 'liabilities', 'how-it-works': 'how-it-works',
+  'gap-analysis': 'gap-analysis', 'test-strategy': 'test-strategy'
 };
 var ID_TO_SLUG = {};
 for (var slug in SLUG_TO_ID) { ID_TO_SLUG[SLUG_TO_ID[slug]] = slug; }
@@ -35,7 +37,7 @@ function parseHash() {
     var id = SLUG_TO_ID[slug] || slug;
     if (section === 'overview') {
       anchor = 'tab-' + id;
-    } else if (section === 'consent') {
+    } else if (section === 'consent' || section === 'lfi') {
       anchor = 'part-' + id;
     }
   }
