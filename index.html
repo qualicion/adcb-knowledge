@@ -607,252 +607,227 @@
 
       <div class="section-lbl">Test Setup &amp; Execution</div>
       <h2>Everything you need before you run a single test</h2>
-      <p>Work through each section top to bottom. If something is blocked, flag it in JIRA before starting execution. Set up bank accounts (Section 2) before creating consents (Section 3) — the consents reference the accounts at the LFI.</p>
+      <p>Work through each section top to bottom. If something is blocked, flag it in JIRA before starting execution. Set up bank accounts before creating consents — the consents reference the accounts at the LFI.</p>
       <div class="sp12"></div>
 
-      <!-- SECTION 1: SYSTEMS ACCESS -->
-      <div class="diagram-card">
-        <div class="diagram-hdr">1. Systems you need access to</div>
-        <div class="diagram-body" style="padding:0;">
-          <table class="err-table">
-            <thead><tr><th>System</th><th>What you need</th><th style="width:80px;">Action</th></tr></thead>
-            <tbody>
-              <tr><td><strong>DynamoDB</strong></td><td>Read and write access to the <strong>consent table</strong> in UAT. You will create test consents here and check their status after the scheduler runs.</td><td><span class="err-type err-perm">ACCESS</span></td></tr>
-              <tr><td><strong>Kafka Topics</strong></td><td>Read access to 4 topics: <code>tpp_accounts</code>, <code>tpp_balances</code>, <code>tpp_transactions</code>, <code>tpp_consents</code>. You need a consumer tool to see the events.</td><td><span class="err-type err-perm">ACCESS</span></td></tr>
-              <tr><td><strong>OF API Hub</strong></td><td>No direct access needed. The scheduler calls it. But confirm at least one LFI (ADCB or Model Bank) is responding in UAT.</td><td><span class="err-type err-sched">VERIFY</span></td></tr>
-              <tr><td><strong>Token Service</strong></td><td>No direct access needed. Just confirm it is running and returning tokens for your test consents.</td><td><span class="err-type err-sched">VERIFY</span></td></tr>
-              <tr><td><strong>Scheduler Logs</strong></td><td>Access to application logs where you can search by <code>run_id</code>. This is where you verify every step of the job.</td><td><span class="err-type err-perm">ACCESS</span></td></tr>
-              <tr><td><strong>Scheduler Config</strong></td><td>Ability to set environment variables: <code>SCHEDULER_ENABLED</code>, <code>SCHEDULER_CRON_HOURS</code>, <code>SCHEDULER_RUN_ON_STARTUP</code>.</td><td><span class="err-type err-perm">ACCESS</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="box box-warn">
-        <p><strong>Tip:</strong> Ask your DevOps or platform team for these upfront. Don't wait until test day. If any access is missing, create a blocker in JIRA immediately.</p>
-      </div>
-      <div class="sp12"></div>
+      <div class="step-list">
 
-      <!-- SECTION 1B: TOOLS -->
-      <div class="diagram-card">
-        <div class="diagram-hdr">Tools &amp; scheduler settings</div>
-        <div class="diagram-body" style="padding:0;">
-          <table class="err-table">
-            <thead><tr><th>Item</th><th>Details</th><th style="width:80px;">Action</th></tr></thead>
-            <tbody>
-              <tr><td><strong>Kafka Consumer</strong></td><td>Pick one: <strong>Kafka UI</strong>, <strong>kafkacat</strong>, <strong>Confluent Control Center</strong>, or a custom consumer script.</td><td><span class="err-type err-perm">SET UP</span></td></tr>
-              <tr><td><strong>Log Viewer</strong></td><td>CloudWatch, Kibana, Grafana Loki, etc. Make sure you can filter by <code>run_id</code>.</td><td><span class="err-type err-sched">VERIFY</span></td></tr>
-              <tr><td><strong>DynamoDB Console</strong></td><td>AWS Console or a DynamoDB tool to create, edit, and query consent records.</td><td><span class="err-type err-sched">VERIFY</span></td></tr>
-              <tr><td colspan="3" style="background:var(--navy);color:#fff;font-weight:600;letter-spacing:1px;font-size:12px;text-transform:uppercase;">Scheduler Environment Variables</td></tr>
-              <tr><td><code>SCHEDULER_ENABLED</code></td><td>Set to <code>true</code>. Default is false — the scheduler won't run until you flip this.</td><td><span class="err-type err-perm">SET UP</span></td></tr>
-              <tr><td><code>SCHEDULER_CRON_HOURS</code></td><td>Set to a time you can test at. Example: <code>"14"</code> for 2 PM. Comma-separated for multiple: <code>"10,14"</code>.</td><td><span class="err-type err-perm">SET UP</span></td></tr>
-              <tr><td><code>SCHEDULER_RUN_ON_STARTUP</code></td><td>Set to <code>true</code> for immediate run when the app restarts — no need to wait for cron.</td><td><span class="err-type err-perm">SET UP</span></td></tr>
-              <tr><td><code>SCHEDULER_MAX_CONCURRENT</code></td><td>Default is <code>5</code>. Leave at 5. Controls how many consents process simultaneously.</td><td><span class="err-type err-sched">VERIFY</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="box box-succ">
-        <p><strong>Quick start:</strong> Set <code>SCHEDULER_ENABLED=true</code> and <code>SCHEDULER_RUN_ON_STARTUP=true</code>, then restart the app. The job will run immediately — no need to wait for cron.</p>
-      </div>
-
-      <div class="sp16"></div>
-
-      <!-- SECTION 2: TEST ACCOUNTS -->
-      <div class="diagram-card">
-        <div class="diagram-hdr">2. Test accounts at the bank (LFI side)</div>
-        <div class="diagram-body">
-          <p style="margin-bottom:12px;">The scheduler fetches data from the LFI (ADCB or Model Bank) via the OF API Hub. The data must exist at the bank side. Set these up <strong>before</strong> creating the consents in DynamoDB.</p>
-          <table class="err-table" style="margin:0;">
-            <thead><tr><th>What</th><th>Details</th><th>Why</th></tr></thead>
-            <tbody>
-              <tr><td><strong>2 test accounts</strong></td><td>At ADCB or Model Bank with known IDs (e.g. <code>acct_001</code>, <code>acct_002</code>)</td><td>Scheduler calls <code>GET /accounts</code> and expects data back</td></tr>
-              <tr><td><strong>Balance data</strong></td><td>Each account must have a balance (any amount)</td><td><code>GET /accounts/id/balances</code> must return 200 OK</td></tr>
-              <tr><td><strong>Transaction data</strong></td><td>Each account must have at least 1 transaction</td><td><code>GET /accounts/id/transactions</code> must return 200 OK</td></tr>
-              <tr><td><strong>3-account consent</strong></td><td>One consent (C6) needs 3 linked accounts</td><td>Tests per-account iteration for balances + transactions</td></tr>
-              <tr><td><strong>Second LFI</strong></td><td>One consent (C5) points to a different LFI (e.g. Model Bank)</td><td>Tests data isolation between consents from different banks</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="box box-red">
-        <p><strong>Important:</strong> If the LFI test accounts don't have data, the scheduler will get empty responses or errors — and your tests will fail. Confirm the data exists first.</p>
-      </div>
-
-      <div class="sp16"></div>
-
-      <!-- SECTION 3: TEST CONSENTS -->
-      <div class="diagram-card">
-        <div class="diagram-hdr">3. Consents to create in DynamoDB (15 total)</div>
-        <div class="diagram-body" style="padding:0;">
-          <div style="padding:14px 16px 0;"><p>Create these in the DynamoDB consent table. Each one tests a different scenario. <span style="color:var(--green);font-weight:600;">Green</span> = happy path. <span style="color:var(--amber);font-weight:600;">Amber</span> = negative/edge.</p></div>
-
-          <div style="padding:8px 16px 0;"><p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--green);">Core Consents (Happy Path)</p></div>
-          <table class="err-table">
-            <thead><tr><th style="width:40px;">#</th><th style="width:90px;">Status</th><th>Permissions</th><th style="width:60px;">Expiry</th><th>What it tests</th></tr></thead>
-            <tbody>
-              <tr><td style="font-weight:700;">C1</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsBasic + ReadBalances + ReadTransactionsBasic</td><td>90 days</td><td>Full data sync — accounts, balances, transactions</td></tr>
-              <tr><td style="font-weight:700;">C2</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsBasic only</td><td>90 days</td><td>Accounts only — balances and transactions skipped</td></tr>
-              <tr><td style="font-weight:700;">C3</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsBasic + ReadBalances</td><td>90 days</td><td>Accounts + balances — transactions skipped</td></tr>
-              <tr><td style="font-weight:700;">C4</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsDetail</td><td>90 days</td><td>Detail permission also triggers account fetch</td></tr>
-              <tr><td style="font-weight:700;">C5</td><td><span class="status-ok">Authorized</span></td><td>Full (same as C1)</td><td>90 days</td><td>Different LFI (Model Bank) — tests data isolation</td></tr>
-              <tr><td style="font-weight:700;">C6</td><td><span class="status-ok">Authorized</span></td><td>ReadBalances + ReadTransactionsDetail</td><td>90 days</td><td>3 accounts — tests per-account iteration</td></tr>
-            </tbody>
-          </table>
-
-          <div style="padding:8px 16px 0;"><p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--amber);">Negative / Edge Consents</p></div>
-          <table class="err-table">
-            <thead><tr><th style="width:40px;">#</th><th style="width:90px;">Status</th><th>Permissions</th><th style="width:70px;">Expiry</th><th>What it tests</th></tr></thead>
-            <tbody>
-              <tr><td style="font-weight:700;">C7</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsBasic</td><td style="color:var(--color-error);font-weight:600;">Yesterday</td><td>Expired date — should be skipped by scheduler</td></tr>
-              <tr><td style="font-weight:700;">C8</td><td><span class="status-rev">Revoked</span></td><td>ReadAccountsBasic</td><td>90 days</td><td>Wrong status — should be skipped</td></tr>
-              <tr><td style="font-weight:700;">C9</td><td><span style="font-weight:600;color:var(--blue);">AwaitingAuth</span></td><td>ReadAccountsBasic</td><td>90 days</td><td>Wrong status — should be skipped</td></tr>
-              <tr><td style="font-weight:700;">C10</td><td><span class="status-rev">Expired</span></td><td>ReadAccountsBasic</td><td style="color:var(--color-error);font-weight:600;">Past</td><td>Expired status — should be skipped</td></tr>
-              <tr><td style="font-weight:700;">C11</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsBasic + ReadBalances</td><td>90 days</td><td>Near-expiry token — tests auto-refresh</td></tr>
-              <tr><td style="font-weight:700;">C12</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsBasic</td><td>90 days</td><td>Broken token — tests error handling</td></tr>
-              <tr><td style="font-weight:700;">C13</td><td><span class="status-ok">Authorized</span></td><td><em style="color:var(--color-text-tertiary);">(empty)</em></td><td>90 days</td><td>No permissions — should be skipped</td></tr>
-              <tr><td style="font-weight:700;">C14</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsBasic</td><td>Exactly 90d</td><td>Known expiry — tests date storage</td></tr>
-              <tr><td style="font-weight:700;">C15</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsBasic</td><td>90 days</td><td>10+ copies — tests concurrency limit</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="sp20"></div>
-      <hr>
-      <div class="sp20"></div>
-
-      <!-- HAPPY PATH WALKTHROUGH -->
-      <div class="section-lbl">Happy Path Walkthrough</div>
-      <h2>Full data sync — step by step with Consent C1</h2>
-      <p>This walkthrough shows what you (the QA tester) do at each step, what the system does in response, and where to check the data landed. Follow this flow to execute the happy path end-to-end.</p>
-      <div class="sp12"></div>
-
-      <!-- STEP 1 -->
-      <div class="diagram-card">
-        <div class="diagram-hdr" style="display:flex;justify-content:space-between;align-items:center;"><span>Step 1 — Set the scheduler configuration</span><span style="font-size:10px;letter-spacing:0;text-transform:none;opacity:0.7;">You do this</span></div>
-        <div class="diagram-body">
-          <div class="box box-navy" style="margin-bottom:0;">
-            <p><strong>What you do:</strong> Set the environment variables to enable the scheduler and make it run at a testable time.</p>
-            <ul>
-              <li>Set <code>SCHEDULER_ENABLED = true</code></li>
-              <li>Set <code>SCHEDULER_CRON_HOURS</code> to the next hour (or use <code>SCHEDULER_RUN_ON_STARTUP = true</code> for immediate run)</li>
-              <li>Confirm <code>SCHEDULER_MAX_CONCURRENT = 5</code></li>
-            </ul>
+        <!-- COLLAPSIBLE 1: SYSTEMS ACCESS -->
+        <div class="step-item open" style="border-left-color:var(--teal);">
+          <div class="step-head" onclick="toggleStep(this)">
+            <div class="step-num" style="background:var(--teal);">1</div>
+            <div class="step-title">Systems you need access to</div>
+            <span class="step-chevron">&#x25B6;</span>
+          </div>
+          <div class="step-body" style="padding-left:16px;padding-right:16px;">
+            <table class="err-table">
+              <thead><tr><th>System</th><th>What you need</th><th style="width:80px;">Action</th></tr></thead>
+              <tbody>
+                <tr><td><strong>DynamoDB</strong></td><td>Read and write access to the <strong>consent table</strong> in UAT. You will create test consents here and check their status after the scheduler runs.</td><td><span class="err-type err-perm">ACCESS</span></td></tr>
+                <tr><td><strong>Kafka Topics</strong></td><td>Read access to 4 topics: <code>tpp_accounts</code>, <code>tpp_balances</code>, <code>tpp_transactions</code>, <code>tpp_consents</code>. You need a consumer tool to see the events.</td><td><span class="err-type err-perm">ACCESS</span></td></tr>
+                <tr><td><strong>OF API Hub</strong></td><td>No direct access needed. The scheduler calls it. Confirm at least one LFI (ADCB or Model Bank) is responding in UAT.</td><td><span class="err-type err-sched">VERIFY</span></td></tr>
+                <tr><td><strong>Token Service</strong></td><td>No direct access needed. Confirm it is running and returning tokens for your test consents.</td><td><span class="err-type err-sched">VERIFY</span></td></tr>
+                <tr><td><strong>Scheduler Logs</strong></td><td>Access to application logs where you can search by <code>run_id</code>. This is where you verify every step of the job.</td><td><span class="err-type err-perm">ACCESS</span></td></tr>
+                <tr><td><strong>Scheduler Config</strong></td><td>Ability to set environment variables: <code>SCHEDULER_ENABLED</code>, <code>SCHEDULER_CRON_HOURS</code>, <code>SCHEDULER_RUN_ON_STARTUP</code>.</td><td><span class="err-type err-perm">ACCESS</span></td></tr>
+              </tbody>
+            </table>
+            <div class="box box-warn" style="margin-top:12px;">
+              <p><strong>Tip:</strong> Ask your DevOps or platform team for these upfront. Don't wait until test day. If any access is missing, create a blocker in JIRA immediately.</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- STEP 2 -->
-      <div class="diagram-card">
-        <div class="diagram-hdr" style="display:flex;justify-content:space-between;align-items:center;"><span>Step 2 — Create test consent C1 in DynamoDB</span><span style="font-size:10px;letter-spacing:0;text-transform:none;opacity:0.7;">You do this</span></div>
-        <div class="diagram-body">
-          <div class="box box-navy" style="margin-bottom:0;">
-            <p><strong>What you do:</strong> Create (or confirm) consent C1 in the DynamoDB consent table:</p>
-            <ul>
-              <li><strong>status:</strong> Authorized</li>
-              <li><strong>expiration_date:</strong> 90 days from today</li>
-              <li><strong>permissions:</strong> <code>ReadAccountsBasic</code> <code>ReadBalances</code> <code>ReadTransactionsBasic</code></li>
-              <li><strong>LFI:</strong> ADCB</li>
-              <li>Note the <strong>consent_id</strong> — you will use it to trace everything downstream</li>
-            </ul>
+        <!-- COLLAPSIBLE 2: TOOLS & SETTINGS -->
+        <div class="step-item" style="border-left-color:var(--blue);">
+          <div class="step-head" onclick="toggleStep(this)">
+            <div class="step-num" style="background:var(--blue);">2</div>
+            <div class="step-title">Tools &amp; scheduler settings</div>
+            <span class="step-chevron">&#x25B6;</span>
+          </div>
+          <div class="step-body" style="padding-left:16px;padding-right:16px;">
+            <table class="err-table">
+              <thead><tr><th>Item</th><th>Details</th><th style="width:80px;">Action</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Kafka Consumer</strong></td><td>Pick one: <strong>Kafka UI</strong>, <strong>kafkacat</strong>, <strong>Confluent Control Center</strong>, or a custom consumer script.</td><td><span class="err-type err-perm">SET UP</span></td></tr>
+                <tr><td><strong>Log Viewer</strong></td><td>CloudWatch, Kibana, Grafana Loki, etc. Make sure you can filter by <code>run_id</code>.</td><td><span class="err-type err-sched">VERIFY</span></td></tr>
+                <tr><td><strong>DynamoDB Console</strong></td><td>AWS Console or a DynamoDB tool to create, edit, and query consent records.</td><td><span class="err-type err-sched">VERIFY</span></td></tr>
+                <tr><td colspan="3" style="background:var(--navy);color:#fff;font-weight:600;letter-spacing:1px;font-size:12px;text-transform:uppercase;">Scheduler Environment Variables</td></tr>
+                <tr><td><code>SCHEDULER_ENABLED</code></td><td>Set to <code>true</code>. Default is false — the scheduler won't run until you flip this.</td><td><span class="err-type err-perm">SET UP</span></td></tr>
+                <tr><td><code>SCHEDULER_CRON_HOURS</code></td><td>Set to a time you can test at. Example: <code>"14"</code> for 2 PM. Comma-separated for multiple: <code>"10,14"</code>.</td><td><span class="err-type err-perm">SET UP</span></td></tr>
+                <tr><td><code>SCHEDULER_RUN_ON_STARTUP</code></td><td>Set to <code>true</code> for immediate run when the app restarts — no need to wait for cron.</td><td><span class="err-type err-perm">SET UP</span></td></tr>
+                <tr><td><code>SCHEDULER_MAX_CONCURRENT</code></td><td>Default is <code>5</code>. Leave at 5. Controls how many consents process simultaneously.</td><td><span class="err-type err-sched">VERIFY</span></td></tr>
+              </tbody>
+            </table>
+            <div class="box box-succ" style="margin-top:12px;">
+              <p><strong>Quick start:</strong> Set <code>SCHEDULER_ENABLED=true</code> and <code>SCHEDULER_RUN_ON_STARTUP=true</code>, then restart the app. The job will run immediately — no need to wait for cron.</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- STEP 3 -->
-      <div class="diagram-card">
-        <div class="diagram-hdr" style="display:flex;justify-content:space-between;align-items:center;"><span>Step 3 — Scheduler fires, job starts</span><span style="font-size:10px;letter-spacing:0;text-transform:none;opacity:0.7;">System does this</span></div>
-        <div class="diagram-body">
-          <p>Wait for cron time (or restart the app if using <code>RUN_ON_STARTUP</code>). Then open the <strong>scheduler logs</strong> and look for a new <code>run_id</code> entry.</p>
-          <div class="box box-succ" style="margin-bottom:0;margin-top:10px;">
-            <p><strong>PASS if:</strong> You see a <code>STARTED</code> log entry with a new <code>run_id</code> at the expected time.</p>
+        <!-- COLLAPSIBLE 3: TEST ACCOUNTS -->
+        <div class="step-item" style="border-left-color:var(--amber);">
+          <div class="step-head" onclick="toggleStep(this)">
+            <div class="step-num" style="background:var(--amber);">3</div>
+            <div class="step-title">Test accounts at the bank (LFI side)</div>
+            <span class="step-chevron">&#x25B6;</span>
+          </div>
+          <div class="step-body" style="padding-left:16px;padding-right:16px;">
+            <p style="margin-bottom:12px;">The scheduler fetches data from the LFI (ADCB or Model Bank) via the OF API Hub. The data must exist at the bank side. Set these up <strong>before</strong> creating the consents in DynamoDB.</p>
+            <table class="err-table" style="margin:0;">
+              <thead><tr><th>What</th><th>Details</th><th>Why</th></tr></thead>
+              <tbody>
+                <tr><td><strong>2 test accounts</strong></td><td>At ADCB or Model Bank with known IDs (e.g. <code>acct_001</code>, <code>acct_002</code>)</td><td>Scheduler calls <code>GET /accounts</code> and expects data back</td></tr>
+                <tr><td><strong>Balance data</strong></td><td>Each account must have a balance (any amount)</td><td><code>GET /accounts/id/balances</code> must return 200 OK</td></tr>
+                <tr><td><strong>Transaction data</strong></td><td>Each account must have at least 1 transaction</td><td><code>GET /accounts/id/transactions</code> must return 200 OK</td></tr>
+                <tr><td><strong>3-account consent</strong></td><td>One consent (C6) needs 3 linked accounts</td><td>Tests per-account iteration for balances + transactions</td></tr>
+                <tr><td><strong>Second LFI</strong></td><td>One consent (C5) points to a different LFI (e.g. Model Bank)</td><td>Tests data isolation between consents from different banks</td></tr>
+              </tbody>
+            </table>
+            <div class="box box-red" style="margin-top:12px;">
+              <p><strong>Important:</strong> If the LFI test accounts don't have data, the scheduler will get empty responses or errors — and your tests will fail. Confirm the data exists first.</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- STEP 4 -->
-      <div class="diagram-card">
-        <div class="diagram-hdr" style="display:flex;justify-content:space-between;align-items:center;"><span>Step 4 — System queries DynamoDB for your consent</span><span style="font-size:10px;letter-spacing:0;text-transform:none;opacity:0.7;">System does this</span></div>
-        <div class="diagram-body">
-          <p>The job queries DynamoDB for <code>status = "Authorized"</code> AND <code>expiration_date > now()</code>. Returns consent C1.</p>
-          <div class="box box-succ" style="margin-bottom:0;margin-top:10px;">
-            <p><strong>PASS if:</strong> C1 is processed. C7 (expired date), C8 (revoked), C9 (awaiting), C10 (expired status) are <strong>all absent</strong> from the log.</p>
+        <!-- COLLAPSIBLE 4: TEST CONSENTS -->
+        <div class="step-item" style="border-left-color:var(--purple);">
+          <div class="step-head" onclick="toggleStep(this)">
+            <div class="step-num" style="background:var(--purple);">4</div>
+            <div class="step-title">Consents to create in DynamoDB (15 total)</div>
+            <span class="step-chevron">&#x25B6;</span>
+          </div>
+          <div class="step-body" style="padding-left:16px;padding-right:16px;">
+            <p>Create these in the DynamoDB consent table. Each one tests a different scenario. <span style="color:var(--green);font-weight:600;">Green</span> = happy path. <span style="color:var(--amber);font-weight:600;">Amber</span> = negative/edge.</p>
+            <div class="sp8"></div>
+            <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--green);">Core Consents (Happy Path)</p>
+            <table class="err-table">
+              <thead><tr><th style="width:40px;">#</th><th style="width:90px;">Status</th><th>Permissions</th><th style="width:60px;">Expiry</th><th>What it tests</th></tr></thead>
+              <tbody>
+                <tr><td style="font-weight:700;">C1</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsBasic + ReadBalances + ReadTransactionsBasic</td><td>90 days</td><td>Full data sync — accounts, balances, transactions</td></tr>
+                <tr><td style="font-weight:700;">C2</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsBasic only</td><td>90 days</td><td>Accounts only — balances and transactions skipped</td></tr>
+                <tr><td style="font-weight:700;">C3</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsBasic + ReadBalances</td><td>90 days</td><td>Accounts + balances — transactions skipped</td></tr>
+                <tr><td style="font-weight:700;">C4</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsDetail</td><td>90 days</td><td>Detail permission also triggers account fetch</td></tr>
+                <tr><td style="font-weight:700;">C5</td><td><span class="status-ok">Authorized</span></td><td>Full (same as C1)</td><td>90 days</td><td>Different LFI (Model Bank) — tests data isolation</td></tr>
+                <tr><td style="font-weight:700;">C6</td><td><span class="status-ok">Authorized</span></td><td>ReadBalances + ReadTransactionsDetail</td><td>90 days</td><td>3 accounts — tests per-account iteration</td></tr>
+              </tbody>
+            </table>
+            <div class="sp8"></div>
+            <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--amber);">Negative / Edge Consents</p>
+            <table class="err-table">
+              <thead><tr><th style="width:40px;">#</th><th style="width:90px;">Status</th><th>Permissions</th><th style="width:70px;">Expiry</th><th>What it tests</th></tr></thead>
+              <tbody>
+                <tr><td style="font-weight:700;">C7</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsBasic</td><td style="color:var(--color-error);font-weight:600;">Yesterday</td><td>Expired date — should be skipped by scheduler</td></tr>
+                <tr><td style="font-weight:700;">C8</td><td><span class="status-rev">Revoked</span></td><td>ReadAccountsBasic</td><td>90 days</td><td>Wrong status — should be skipped</td></tr>
+                <tr><td style="font-weight:700;">C9</td><td><span style="font-weight:600;color:var(--blue);">AwaitingAuth</span></td><td>ReadAccountsBasic</td><td>90 days</td><td>Wrong status — should be skipped</td></tr>
+                <tr><td style="font-weight:700;">C10</td><td><span class="status-rev">Expired</span></td><td>ReadAccountsBasic</td><td style="color:var(--color-error);font-weight:600;">Past</td><td>Expired status — should be skipped</td></tr>
+                <tr><td style="font-weight:700;">C11</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsBasic + ReadBalances</td><td>90 days</td><td>Near-expiry token — tests auto-refresh</td></tr>
+                <tr><td style="font-weight:700;">C12</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsBasic</td><td>90 days</td><td>Broken token — tests error handling</td></tr>
+                <tr><td style="font-weight:700;">C13</td><td><span class="status-ok">Authorized</span></td><td><em style="color:var(--color-text-tertiary);">(empty)</em></td><td>90 days</td><td>No permissions — should be skipped</td></tr>
+                <tr><td style="font-weight:700;">C14</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsBasic</td><td>Exactly 90d</td><td>Known expiry — tests date storage</td></tr>
+                <tr><td style="font-weight:700;">C15</td><td><span class="status-ok">Authorized</span></td><td>ReadAccountsBasic</td><td>90 days</td><td>10+ copies — tests concurrency limit</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
 
-      <!-- STEP 5 -->
-      <div class="diagram-card">
-        <div class="diagram-hdr" style="display:flex;justify-content:space-between;align-items:center;"><span>Step 5 — System gets a valid token for C1</span><span style="font-size:10px;letter-spacing:0;text-transform:none;opacity:0.7;">System does this</span></div>
-        <div class="diagram-body">
-          <p>Calls <code>token_service.get_valid_token(C1)</code>. Returns a valid access_token. If the token was near expiry, it auto-refreshes first.</p>
-          <div class="box box-succ" style="margin-bottom:0;margin-top:10px;">
-            <p><strong>PASS if:</strong> No token errors in logs. The job continues to the data fetch steps.</p>
+        <!-- COLLAPSIBLE 5: HAPPY PATH WALKTHROUGH -->
+        <div class="step-item" style="border-left-color:var(--green);">
+          <div class="step-head" onclick="toggleStep(this)">
+            <div class="step-num" style="background:var(--green);">5</div>
+            <div class="step-title">Happy path walkthrough — full data sync with C1</div>
+            <span class="step-chevron">&#x25B6;</span>
+          </div>
+          <div class="step-body" style="padding-left:16px;padding-right:16px;">
+            <p>This shows what you (the QA tester) do at each step, what the system does in response, and where to check the data landed. Follow this flow end-to-end.</p>
+            <div class="sp12"></div>
+
+            <!-- STEPS 1-2: QA SETUP -->
+            <div class="diagram-card">
+              <div class="diagram-hdr" style="display:flex;justify-content:space-between;align-items:center;"><span>Steps 1–2 — You configure and create</span><span style="font-size:10px;letter-spacing:0;text-transform:none;opacity:0.7;">You do this</span></div>
+              <div class="diagram-body">
+                <div class="box box-navy" style="margin-bottom:0;">
+                  <p><strong>Step 1:</strong> Set <code>SCHEDULER_ENABLED = true</code>, set <code>SCHEDULER_CRON_HOURS</code> to the next hour (or <code>RUN_ON_STARTUP = true</code>), confirm <code>MAX_CONCURRENT = 5</code>.</p>
+                  <p><strong>Step 2:</strong> Create consent C1 in DynamoDB — <code>status: Authorized</code>, <code>expiry: 90 days</code>, permissions: <code>ReadAccountsBasic</code> + <code>ReadBalances</code> + <code>ReadTransactionsBasic</code>, LFI: ADCB. Note the <strong>consent_id</strong>.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEPS 3-5: SYSTEM STARTUP -->
+            <div class="diagram-card">
+              <div class="diagram-hdr" style="display:flex;justify-content:space-between;align-items:center;"><span>Steps 3–5 — Scheduler starts, finds consent, gets token</span><span style="font-size:10px;letter-spacing:0;text-transform:none;opacity:0.7;">System does this</span></div>
+              <div class="diagram-body">
+                <p><strong>Step 3:</strong> Scheduler fires — generates a unique <code>run_id</code> (UUID). Look for <code>STARTED</code> log entry.</p>
+                <p><strong>Step 4:</strong> Queries DynamoDB for <code>status=Authorized</code> AND <code>expiry > now()</code>. Returns C1. Skips C7–C10.</p>
+                <p><strong>Step 5:</strong> Gets a valid token via <code>token_service.get_valid_token(C1)</code>. Auto-refreshes if near expiry.</p>
+                <div class="box box-succ" style="margin-bottom:0;margin-top:10px;">
+                  <p><strong>PASS if:</strong> <code>STARTED</code> log present, C1 is processed, C7–C10 absent, no token errors.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 6: PERMISSIONS -->
+            <div class="diagram-card">
+              <div class="diagram-hdr" style="display:flex;justify-content:space-between;align-items:center;"><span>Step 6 — System checks permissions, decides what to fetch</span><span style="font-size:10px;letter-spacing:0;text-transform:none;opacity:0.7;">System does this</span></div>
+              <div class="diagram-body">
+                <div class="sysmap" style="margin:8px 0;">
+                  <div class="sysmap-box bx-teal"><span class="bx-title">ReadAccountsBasic</span><span class="bx-sub">fetch accounts</span></div>
+                  <div class="sysmap-arr">+</div>
+                  <div class="sysmap-box bx-blue"><span class="bx-title">ReadBalances</span><span class="bx-sub">fetch balances</span></div>
+                  <div class="sysmap-arr">+</div>
+                  <div class="sysmap-box bx-purple"><span class="bx-title">ReadTransactionsBasic</span><span class="bx-sub">fetch transactions</span></div>
+                </div>
+                <div class="box box-succ" style="margin-bottom:0;">
+                  <p><strong>PASS if:</strong> All 3 data types listed in logs. None skipped.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEPS 7-9: KAFKA -->
+            <div class="diagram-card">
+              <div class="diagram-hdr" style="display:flex;justify-content:space-between;align-items:center;"><span>Steps 7–9 — Data fetched and published to Kafka</span><span style="font-size:10px;letter-spacing:0;text-transform:none;opacity:0.7;">System does this &bull; You verify Kafka</span></div>
+              <div class="diagram-body" style="padding:0;">
+                <table class="err-table">
+                  <thead><tr><th>API Call</th><th>Kafka Topic</th><th>Events</th><th>What you check</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>GET /accounts</code></td><td><code>tpp_accounts</code></td><td>1 event (2 accounts)</td><td>Correct <code>consent_id</code> as key. Payload has 2 accounts.</td></tr>
+                    <tr><td><code>GET /accounts/{id}/balances</code><br><span style="font-size:11px;color:var(--color-text-tertiary);">per account</span></td><td><code>tpp_balances</code></td><td>2 events</td><td>Each tied to <code>consent_id</code>. Balance data matches LFI.</td></tr>
+                    <tr><td><code>GET /accounts/{id}/transactions</code><br><span style="font-size:11px;color:var(--color-text-tertiary);">per account</span></td><td><code>tpp_transactions</code></td><td>2 events</td><td>Each tied to <code>consent_id</code>. Transaction data present.</td></tr>
+                  </tbody>
+                </table>
+                <div style="padding:12px 14px;">
+                  <div class="box box-navy" style="margin:0;">
+                    <p><strong>Note:</strong> <code>tpp_consents</code> is for consent lifecycle events, <strong>not</strong> data sync.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 10: FINAL -->
+            <div class="diagram-card">
+              <div class="diagram-hdr" style="display:flex;justify-content:space-between;align-items:center;background:var(--green);"><span>Step 10 — You verify the run summary</span><span style="font-size:10px;letter-spacing:0;text-transform:none;opacity:0.7;">You do this</span></div>
+              <div class="diagram-body">
+                <p>Find the run summary in scheduler logs for your <code>run_id</code>:</p>
+                <div style="background:var(--color-surface-secondary);border:1px solid var(--color-border);border-radius:8px;padding:14px 18px;margin:12px 0;font-family:var(--font-family-mono);font-size:13px;color:var(--navy);">
+                  { "run_id": "a1b2c3d4-...", "consents": 1, "accounts": 2, "balances": 2, "transactions": 2, "errors": 0 }
+                </div>
+                <div class="box box-succ" style="margin-bottom:0;">
+                  <p><strong>OVERALL PASS if:</strong></p>
+                  <ul>
+                    <li><strong>consents = 1</strong> — only C1 processed</li>
+                    <li><strong>accounts = 2</strong> — matching LFI</li>
+                    <li><strong>balances = 2</strong> — one per account</li>
+                    <li><strong>transactions = 2</strong> — one per account</li>
+                    <li><strong>errors = 0</strong></li>
+                    <li>All Kafka events have correct <code>consent_id</code> as key</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
-      </div>
 
-      <!-- STEP 6 -->
-      <div class="diagram-card">
-        <div class="diagram-hdr" style="display:flex;justify-content:space-between;align-items:center;"><span>Step 6 — System checks permissions, decides what to fetch</span><span style="font-size:10px;letter-spacing:0;text-transform:none;opacity:0.7;">System does this</span></div>
-        <div class="diagram-body">
-          <p>Reads C1's permissions and maps them to API calls:</p>
-          <div class="sysmap" style="margin:12px 0;">
-            <div class="sysmap-box bx-teal"><span class="bx-title">ReadAccountsBasic</span><span class="bx-sub">fetch accounts</span></div>
-            <div class="sysmap-arr">+</div>
-            <div class="sysmap-box bx-blue"><span class="bx-title">ReadBalances</span><span class="bx-sub">fetch balances</span></div>
-            <div class="sysmap-arr">+</div>
-            <div class="sysmap-box bx-purple"><span class="bx-title">ReadTransactionsBasic</span><span class="bx-sub">fetch transactions</span></div>
-          </div>
-          <div class="box box-succ" style="margin-bottom:0;">
-            <p><strong>PASS if:</strong> All 3 data types listed in logs. None skipped (because C1 has all permissions).</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- STEPS 7-9: DATA FETCH -->
-      <div class="diagram-card">
-        <div class="diagram-hdr" style="display:flex;justify-content:space-between;align-items:center;"><span>Steps 7–9 — System fetches data and publishes to Kafka</span><span style="font-size:10px;letter-spacing:0;text-transform:none;opacity:0.7;">System does this &bull; You verify Kafka</span></div>
-        <div class="diagram-body">
-          <p>For each data type, the system calls the OF API Hub and publishes to the matching Kafka topic:</p>
-          <div class="sp8"></div>
-          <table class="err-table" style="margin:0;">
-            <thead><tr><th>API Call</th><th>Kafka Topic</th><th>Events Expected</th><th>What you check</th></tr></thead>
-            <tbody>
-              <tr><td><code>GET /accounts</code></td><td><code>tpp_accounts</code></td><td>1 event (2 accounts)</td><td>Event has correct <code>consent_id</code> as key. Payload has 2 accounts.</td></tr>
-              <tr><td><code>GET /accounts/{id}/balances</code><br><span style="font-size:11px;color:var(--color-text-tertiary);">Called per account</span></td><td><code>tpp_balances</code></td><td>2 events (1 per account)</td><td>Each event tied to <code>consent_id</code>. Balance data matches LFI.</td></tr>
-              <tr><td><code>GET /accounts/{id}/transactions</code><br><span style="font-size:11px;color:var(--color-text-tertiary);">Called per account</span></td><td><code>tpp_transactions</code></td><td>2 events (1 per account)</td><td>Each event tied to <code>consent_id</code>. Transaction data present.</td></tr>
-            </tbody>
-          </table>
-          <div class="sp8"></div>
-          <div class="box box-navy" style="margin-bottom:0;">
-            <p><strong>Note:</strong> <code>tpp_consents</code> is for consent lifecycle events (<code>consent.created</code>, <code>consent.authorized</code>), <strong>not</strong> for data sync. Don't expect data sync events there.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- STEP 10: VERIFY -->
-      <div class="diagram-card">
-        <div class="diagram-hdr" style="display:flex;justify-content:space-between;align-items:center;background:var(--green);"><span>Step 10 — You verify the run summary</span><span style="font-size:10px;letter-spacing:0;text-transform:none;opacity:0.7;">You do this</span></div>
-        <div class="diagram-body">
-          <p>Go back to the scheduler logs and find the run summary for your <code>run_id</code>. Check that all counts match:</p>
-          <div style="background:var(--color-surface-secondary);border:1px solid var(--color-border);border-radius:8px;padding:14px 18px;margin:12px 0;font-family:var(--font-family-mono);font-size:13px;color:var(--navy);">
-            { "run_id": "a1b2c3d4-...", "consents": 1, "accounts": 2, "balances": 2, "transactions": 2, "errors": 0 }
-          </div>
-          <div class="box box-succ" style="margin-bottom:0;">
-            <p><strong>OVERALL PASS if all of these are true:</strong></p>
-            <ul>
-              <li><strong>consents = 1</strong> — only C1 was processed</li>
-              <li><strong>accounts = 2</strong> — matching what the LFI returned</li>
-              <li><strong>balances = 2</strong> — one per account</li>
-              <li><strong>transactions = 2</strong> — one per account</li>
-              <li><strong>errors = 0</strong> — no failures</li>
-              <li>All Kafka events have the correct <code>consent_id</code> as key</li>
-              <li>Event payloads match the API responses</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      </div><!-- /step-list -->
 
       </div><!-- /panel-con-testing -->
 
