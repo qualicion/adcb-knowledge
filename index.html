@@ -66,20 +66,20 @@
     <div class="nav-group-label">LFI Project</div>
 
     <div class="nav-item nav-parent" onclick="toggleNav('lfi')" id="nav-lfi">
-      <span style="display:flex;align-items:center;gap:10px;"><span class="nav-icon">&#x1F3E6;</span> LFI Overview</span>
+      <span style="display:flex;align-items:center;gap:10px;"><span class="nav-icon">&#x1F3E6;</span> LFI Project</span>
       <span class="nav-chevron">&#x25B6;</span>
     </div>
     <div class="nav-sub" id="sub-lfi">
-      <div class="nav-item" onclick="navigate('lfi','part-liabilities')" id="nav-liabilities">
-        <span class="nav-icon">&#x1F4DC;</span> Liability Framework
+      <div class="nav-item" onclick="navigate('lfi','tab-lfi-fines')" id="nav-lfi-fines">
+        <span class="nav-icon">&#x1F4DC;</span> Liability Fines
       </div>
-      <div class="nav-item" onclick="navigate('lfi','part-how-it-works')" id="nav-how-it-works">
+      <div class="nav-item" onclick="navigate('lfi','tab-lfi-how')" id="nav-lfi-how">
         <span class="nav-icon">&#x2699;&#xFE0F;</span> How It Works
       </div>
-      <div class="nav-item" onclick="navigate('lfi','part-gap-analysis')" id="nav-gap-analysis">
+      <div class="nav-item" onclick="navigate('lfi','tab-lfi-gaps')" id="nav-lfi-gaps">
         <span class="nav-icon">&#x1F50D;</span> Gap Analysis
       </div>
-      <div class="nav-item" onclick="navigate('lfi','part-test-strategy')" id="nav-test-strategy">
+      <div class="nav-item" onclick="navigate('lfi','tab-lfi-tests')" id="nav-lfi-tests">
         <span class="nav-icon">&#x1F9EA;</span> Test Strategy
       </div>
     </div>
@@ -611,11 +611,19 @@
         <p>Think of ADCB as a vault operator. TPPs are authorised visitors who can open specific deposit boxes — but only the ones the customer said they could, only during visiting hours, and only if they show the right ID every time. The <strong>liability framework</strong> is the penalty schedule for when ADCB leaves a box open, lets the wrong visitor in, or loses track of who accessed what. Every AED fine below maps to a specific failure in that vault metaphor.</p>
       </div>
 
+      <!-- LFI Tabs -->
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="lfi-fines" onclick="switchLfiTab('lfi-fines', this)">Liability Fines</button>
+        <button class="tab-btn" data-tab="lfi-how" onclick="switchLfiTab('lfi-how', this)">How It Works</button>
+        <button class="tab-btn" data-tab="lfi-gaps" onclick="switchLfiTab('lfi-gaps', this)">Gap Analysis</button>
+        <button class="tab-btn" data-tab="lfi-tests" onclick="switchLfiTab('lfi-tests', this)">Test Strategy</button>
+      </div>
+
       <!-- ═══════════════════════════════════════════ -->
-      <!-- PART 1: LIABILITY FRAMEWORK                  -->
+      <!-- TAB 1: LIABILITY FINES                        -->
       <!-- ═══════════════════════════════════════════ -->
-      <div id="part-liabilities"></div>
-      <div class="part-pill">Part 1</div>
+      <div class="tab-panel active" id="panel-lfi-fines">
+
       <div class="section-lbl">Liability Framework</div>
       <h2>What the fines mean — and why they exist</h2>
       <p>CBUAE's Open Finance Framework defines specific AED penalties for every type of failure. These are not theoretical — they are contractual obligations between the LFI, TPPs, and the regulator. The fines are split into two sides: <strong>LFI liabilities</strong> (when the bank makes a mistake) and <strong>TPP liabilities</strong> (when the fintech app makes a mistake).</p>
@@ -746,13 +754,13 @@
         <p>The highest fines — <strong>AED 5,000</strong> — are reserved for two scenarios: destroying a TPP's long-lived consent through a data mapping bug, and breaking API changes without notice. These are the "nuclear" penalties because they affect the entire ecosystem, not just one customer. The most common fines — <strong>AED 250–500</strong> — cover accuracy and fraud monitoring failures. These happen per-incident, so a single bug affecting 1,000 customers means up to <strong>AED 500,000</strong> in exposure.</p>
       </div>
 
-      <div class="sp24"></div>
+      </div><!-- /panel-lfi-fines -->
 
       <!-- ═══════════════════════════════════════════ -->
-      <!-- PART 2: HOW IT WORKS                         -->
+      <!-- TAB 2: HOW IT WORKS                          -->
       <!-- ═══════════════════════════════════════════ -->
-      <div id="part-how-it-works"></div>
-      <div class="part-pill">Part 2</div>
+      <div class="tab-panel" id="panel-lfi-how">
+
       <div class="section-lbl">How it works</div>
       <h2>The validation layers that prevent liability</h2>
       <p>The LFI codebase (da-of-api) is designed around six defensive layers. Each layer maps directly to a category of liability in the tables above. When a request arrives from a TPP, it should pass through every relevant layer before data is returned or a payment is executed.</p>
@@ -910,15 +918,13 @@
         <p><strong>Fix needed:</strong> Persist all audit data to DynamoDB or CloudWatch, not in-memory structures.</p>
       </div>
 
-      <div class="sp24"></div>
-      <hr>
-      <div class="sp24"></div>
+      </div><!-- /panel-lfi-how -->
 
       <!-- ═══════════════════════════════════════════ -->
-      <!-- PART 3: GAP ANALYSIS                         -->
+      <!-- TAB 3: GAP ANALYSIS                          -->
       <!-- ═══════════════════════════════════════════ -->
-      <div id="part-gap-analysis"></div>
-      <div class="part-pill">Part 3</div>
+      <div class="tab-panel" id="panel-lfi-gaps">
+
       <div class="section-lbl">Gap Analysis</div>
       <h2>Claims vs reality — what the codebase actually does</h2>
       <p>Using James Bach's <strong>Claims Oracle</strong>: does the codebase deliver what the Implementation Guide promises? We compared every liability category against the actual source code. The results are split into three buckets.</p>
@@ -1017,15 +1023,13 @@
         </ul>
       </div>
 
-      <div class="sp24"></div>
-      <hr>
-      <div class="sp24"></div>
+      </div><!-- /panel-lfi-gaps -->
 
       <!-- ═══════════════════════════════════════════ -->
-      <!-- PART 4: TEST STRATEGY                        -->
+      <!-- TAB 4: TEST STRATEGY                         -->
       <!-- ═══════════════════════════════════════════ -->
-      <div id="part-test-strategy"></div>
-      <div class="part-pill">Part 4</div>
+      <div class="tab-panel" id="panel-lfi-tests">
+
       <div class="section-lbl">Test Strategy</div>
       <h2>Rapid Software Testing — liability-driven test design</h2>
       <p>This test strategy uses James Bach's RST (Rapid Software Testing) methodology. Every test case maps to a specific AED liability. Higher fines get more test depth. The approach uses SFDPOT heuristics (Structure, Function, Data, Platform, Operations, Time) and consistency oracles to find gaps that requirements-based testing would miss.</p>
@@ -1296,6 +1300,8 @@
         <p>The complete RST test strategy — including all 156 test cases across 8 categories, SFDPOT heuristic decomposition, risk heatmap, liability matrix with coverage status, and detailed automation strategy — is available as a standalone interactive report.</p>
         <p><strong>Download:</strong> <a href="tpp-lfi-modeling.html" target="_blank" style="color:var(--blue);font-weight:600;">ADCB LFI Liability Framework — Full Test Strategy &amp; Analysis (HTML)</a></p>
       </div>
+
+      </div><!-- /panel-lfi-tests -->
 
       <div style="text-align:center;padding:20px 0;">
         <p style="font-size:11px;color:var(--color-text-tertiary);">ADCB Open Finance — LFI Liability Validations · da-of-api · Confidential · Internal use only</p>

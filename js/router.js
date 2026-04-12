@@ -9,8 +9,8 @@ var SLUG_TO_ID = {
   'side-by-side': 'compare', 'payment-status': 'status',
   'system-map': 'system', 'consent-lifecycle': 'lifecycle',
   'data-scheduler': 'scheduler', 'error-scenarios': 'errors',
-  'liability-framework': 'liabilities', 'how-it-works': 'how-it-works',
-  'gap-analysis': 'gap-analysis', 'test-strategy': 'test-strategy'
+  'liability-fines': 'lfi-fines', 'how-it-works': 'lfi-how',
+  'gap-analysis': 'lfi-gaps', 'test-strategy': 'lfi-tests'
 };
 var ID_TO_SLUG = {};
 for (var slug in SLUG_TO_ID) { ID_TO_SLUG[SLUG_TO_ID[slug]] = slug; }
@@ -37,7 +37,9 @@ function parseHash() {
     var id = SLUG_TO_ID[slug] || slug;
     if (section === 'overview') {
       anchor = 'tab-' + id;
-    } else if (section === 'consent' || section === 'lfi') {
+    } else if (section === 'lfi') {
+      anchor = 'tab-' + id;
+    } else if (section === 'consent') {
       anchor = 'part-' + id;
     }
   }

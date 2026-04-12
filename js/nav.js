@@ -48,7 +48,7 @@ function navigateToRoute(section, anchor) {
   }
 
   // Update breadcrumb
-  var names = { overview: 'General Overview', consent: 'Consent & Scheduler', lfi: 'LFI Liability Validations' };
+  var names = { overview: 'General Overview', consent: 'Consent & Scheduler', lfi: 'LFI Project' };
   document.getElementById('bc-current').textContent = names[section] || section;
 
   // Handle tab activation for overview
@@ -66,8 +66,26 @@ function navigateToRoute(section, anchor) {
     if (panel) panel.classList.add('active');
   }
 
-  // Handle anchors for consent and lfi sections
-  if ((section === 'consent' || section === 'lfi') && anchor) {
+  // Handle tab activation for LFI
+  if (section === 'lfi' && anchor) {
+    var lfiTabName = anchor.replace('tab-', '');
+    document.querySelectorAll('#section-lfi .tab-btn').forEach(function(b) {
+      b.classList.remove('active');
+      if (b.getAttribute('data-tab') === lfiTabName) {
+        b.classList.add('active');
+      }
+    });
+    document.querySelectorAll('#section-lfi .tab-panel').forEach(function(p){ p.classList.remove('active'); });
+    var lfiPanel = document.getElementById('panel-' + lfiTabName);
+    if (lfiPanel) lfiPanel.classList.add('active');
+
+    // Highlight sidebar sub-item
+    var navItem = document.getElementById('nav-' + lfiTabName);
+    if (navItem) navItem.classList.add('active');
+  }
+
+  // Handle anchors for consent section
+  if (section === 'consent' && anchor) {
     setTimeout(function() {
       var el = document.getElementById(anchor);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });

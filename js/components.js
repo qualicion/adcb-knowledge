@@ -34,6 +34,10 @@ function switchTab(name, btn) {
   navigate('overview', 'tab-' + name);
 }
 
+function switchLfiTab(name, btn) {
+  navigate('lfi', 'tab-' + name);
+}
+
 /* ── PLAYER CARDS ── */
 var PLAYER_KEYS = ['user', 'tpp', 'hub', 'lfi'];
 
