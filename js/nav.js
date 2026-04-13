@@ -48,7 +48,7 @@ function navigateToRoute(section, anchor) {
   }
 
   // Update breadcrumb
-  var names = { overview: 'General Overview', consent: 'Consent & Scheduler', lfi: 'LFI Project' };
+  var names = { overview: 'General Overview', consent: 'Consent & Scheduler', lfi: 'LFI Project', cmi: 'CMI Dashboard' };
   document.getElementById('bc-current').textContent = names[section] || section;
 
   // Handle tab activation for overview
@@ -98,6 +98,36 @@ function navigateToRoute(section, anchor) {
 
     var lfiNavItem = document.getElementById('nav-' + lfiTabName);
     if (lfiNavItem) lfiNavItem.classList.add('active');
+  }
+
+  // Handle CMI Dashboard navigation
+  if (section === 'cmi') {
+    // Reset all CMI pages to hidden
+    document.querySelectorAll('.cmi-page').forEach(function(p){ p.classList.remove('active'); });
+    document.querySelectorAll('.cmi-nav-item').forEach(function(n){ n.classList.remove('active'); });
+
+    if (anchor) {
+      var cmiTabName = anchor.replace('tab-', '');
+      // Check if it's a screen page or the overview
+      if (cmiTabName === 'cmi-overview') {
+        document.getElementById('cmi-page-overview').classList.add('active');
+        var cmiNavItem = document.getElementById('nav-cmi-overview');
+        if (cmiNavItem) cmiNavItem.classList.add('active');
+      } else {
+        // It's a screen like cmi-cmi01, cmi-cmi02, etc.
+        var screenId = cmiTabName.replace('cmi-', '');
+        cmiRenderPage(screenId);
+        var screenPage = document.getElementById('cmi-page-' + screenId);
+        if (screenPage) screenPage.classList.add('active');
+        var cmiScreenNav = document.getElementById('nav-' + cmiTabName);
+        if (cmiScreenNav) cmiScreenNav.classList.add('active');
+      }
+    } else {
+      // Default to overview
+      document.getElementById('cmi-page-overview').classList.add('active');
+      var cmiOverviewNav = document.getElementById('nav-cmi-overview');
+      if (cmiOverviewNav) cmiOverviewNav.classList.add('active');
+    }
   }
 
   closeSidebar();

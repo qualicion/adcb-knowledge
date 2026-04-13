@@ -7,6 +7,9 @@
 renderSteps('data-steps', DATA_STEPS);
 renderSteps('sip-steps', SIP_STEPS);
 
+// Initialize CMI progress
+if (typeof cmiUpdateProgress === 'function') cmiUpdateProgress();
+
 // Wire up hash-based routing
 window.addEventListener('hashchange', function() {
   var route = parseHash();

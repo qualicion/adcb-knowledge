@@ -65,6 +65,41 @@
       </div>
     </div>
 
+    <div class="sp8"></div>
+    <div class="nav-item nav-parent" onclick="toggleNav('cmi')" id="nav-cmi">
+      <span style="display:flex;align-items:center;gap:10px;"><span class="nav-icon">&#x1F4CB;</span> CMI Dashboard</span>
+      <span class="nav-chevron">&#x25B6;</span>
+    </div>
+    <div class="nav-sub" id="sub-cmi">
+      <div class="nav-item cmi-nav-item" onclick="navigate('cmi','tab-cmi-overview')" id="nav-cmi-overview">
+        <span class="nav-icon">&#x1F3E0;</span> Overview
+      </div>
+      <div class="nav-item cmi-nav-item" onclick="navigate('cmi','tab-cmi-cmi01')" id="nav-cmi-cmi01">
+        <span class="nav-icon">&#x1F4CB;</span> Current Consents
+      </div>
+      <div class="nav-item cmi-nav-item" onclick="navigate('cmi','tab-cmi-cmi02')" id="nav-cmi-cmi02">
+        <span class="nav-icon">&#x1F4C5;</span> Consent History
+      </div>
+      <div class="nav-item cmi-nav-item" onclick="navigate('cmi','tab-cmi-cmi03')" id="nav-cmi-cmi03">
+        <span class="nav-icon">&#x1F50D;</span> Filter &amp; Search
+      </div>
+      <div class="nav-item cmi-nav-item" onclick="navigate('cmi','tab-cmi-cmi04')" id="nav-cmi-cmi04">
+        <span class="nav-icon">&#x1F4C4;</span> Consent Detail
+      </div>
+      <div class="nav-item cmi-nav-item" onclick="navigate('cmi','tab-cmi-cmi05')" id="nav-cmi-cmi05">
+        <span class="nav-icon">&#x1F4E1;</span> GET /consents
+      </div>
+      <div class="nav-item cmi-nav-item" onclick="navigate('cmi','tab-cmi-cmi06')" id="nav-cmi-cmi06">
+        <span class="nav-icon">&#x1F4E1;</span> GET /consents/{id}
+      </div>
+      <div class="nav-item cmi-nav-item" onclick="navigate('cmi','tab-cmi-cmi07')" id="nav-cmi-cmi07">
+        <span class="nav-icon">&#x1F6AB;</span> DELETE /consents/{id}
+      </div>
+      <div class="nav-item cmi-nav-item" onclick="navigate('cmi','tab-cmi-cmi08')" id="nav-cmi-cmi08">
+        <span class="nav-icon">&#x1F4B3;</span> GET /payments
+      </div>
+    </div>
+
     <div class="sp16"></div>
     <div class="nav-group-label">LFI Project</div>
 
@@ -1550,11 +1585,169 @@
 
     </div>
 
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION: CMI DASHBOARD                      -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="section" id="section-cmi">
+
+      <div class="hero-card">
+        <div class="hero-eyebrow">CMI Dashboard &middot; Full QA Review &middot; All Screens</div>
+        <h1>Consent Management Interface<br><em>ACs + Gaps + RST Tests</em></h1>
+        <p>Every screen and API in the CMI Dashboard. Pick a screen from the sidebar &mdash; each section covers what it does, acceptance criteria, gaps, and test scenarios. 50 ACs &middot; 23 Gaps &middot; 22 Test Scenarios.</p>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="cmi-progress">
+        <span class="cmi-progress-label">AC Progress</span>
+        <div class="cmi-progress-bar"><div class="cmi-progress-fill" id="cmi-pf" style="width:0%"></div></div>
+        <div class="cmi-progress-stats">
+          <span class="cmi-ps"><span class="cmi-dot" style="background:var(--color-success)"></span><span id="cmi-cnt-a">0</span> Agreed</span>
+          <span class="cmi-ps"><span class="cmi-dot" style="background:var(--color-warning)"></span><span id="cmi-cnt-w">0</span> Discuss</span>
+          <span class="cmi-ps"><span class="cmi-dot" style="background:var(--color-error)"></span><span id="cmi-cnt-b">0</span> Blocked</span>
+          <span class="cmi-ps"><span class="cmi-dot" style="background:var(--color-border)"></span><span id="cmi-cnt-d">50</span> Draft</span>
+        </div>
+      </div>
+
+      <!-- CMI Overview Page -->
+      <div class="cmi-page active" id="cmi-page-overview">
+        <div class="box box-navy">
+          <h3 style="margin-bottom:8px;">How to use this section</h3>
+          <p>Each screen is self-contained. <strong>Frontend ACs</strong> &mdash; what the user sees. <strong>Backend ACs</strong> &mdash; what the API must return. <strong>Gaps</strong> &mdash; unclear, missing, or contradictory requirements. <strong>RST Tests</strong> &mdash; realistic test scenarios using James Bach&rsquo;s Rapid Software Testing approach.</p>
+        </div>
+
+        <div class="box box-gold">
+          <p><strong>CMI-01 confirmed updates:</strong> IBAN + account number both required. Consent ID masked as ****XXXX on all screens. Pagination = 10 per page. Sort = by recent consent ID. LFI logo fallback = initials. Search by LFI name or Account/IBAN (not consent ID).</p>
+        </div>
+
+        <div class="box box-warn">
+          <p><strong>Status chips:</strong> Click the Draft/Agreed/Discuss/Blocked chip on any AC to change its status. The progress bar at the top tracks how many ACs your team has agreed.</p>
+        </div>
+
+        <div class="cmi-screen-grid">
+          <div class="cmi-screen-card" onclick="cmiGoToScreen('cmi01')">
+            <div class="cmi-sc-num">CMI-01 &middot; Frontend</div>
+            <div class="cmi-sc-name">Current Consents Screen</div>
+            <div class="cmi-sc-desc">The main landing screen. Shows all active consents with status, LFI, IBAN, payment data, and expiry warnings.</div>
+            <div class="cmi-sc-counts"><span class="cmi-sc-cnt cnt-fe">8 FE ACs</span><span class="cmi-sc-cnt cnt-gap">5 Gaps</span><span class="cmi-sc-cnt cnt-rst">4 Tests</span></div>
+          </div>
+          <div class="cmi-screen-card" onclick="cmiGoToScreen('cmi02')">
+            <div class="cmi-sc-num">CMI-02 &middot; Frontend</div>
+            <div class="cmi-sc-name">Consent History Screen</div>
+            <div class="cmi-sc-desc">Shows terminated consents &mdash; Expired, Revoked, Consumed, Rejected &mdash; with timelines and CSV export.</div>
+            <div class="cmi-sc-counts"><span class="cmi-sc-cnt cnt-fe">6 FE ACs</span><span class="cmi-sc-cnt cnt-gap">3 Gaps</span><span class="cmi-sc-cnt cnt-rst">3 Tests</span></div>
+          </div>
+          <div class="cmi-screen-card" onclick="cmiGoToScreen('cmi03')">
+            <div class="cmi-sc-num">CMI-03 &middot; Frontend</div>
+            <div class="cmi-sc-name">Filter, Search &amp; Sort</div>
+            <div class="cmi-sc-desc">Filter by type, LFI, and expiry. Search within 500ms. Sort columns. Results count updates live.</div>
+            <div class="cmi-sc-counts"><span class="cmi-sc-cnt cnt-fe">6 FE ACs</span><span class="cmi-sc-cnt cnt-gap">3 Gaps</span><span class="cmi-sc-cnt cnt-rst">3 Tests</span></div>
+          </div>
+          <div class="cmi-screen-card" onclick="cmiGoToScreen('cmi04')">
+            <div class="cmi-sc-num">CMI-04 &middot; Frontend</div>
+            <div class="cmi-sc-name">Consent Detail &amp; Actions</div>
+            <div class="cmi-sc-desc">Full consent details: permissions, payment info, IBAN, FX details, activity timeline. Revoke and Suspend actions.</div>
+            <div class="cmi-sc-counts"><span class="cmi-sc-cnt cnt-fe">10 FE ACs</span><span class="cmi-sc-cnt cnt-gap">4 Gaps</span><span class="cmi-sc-cnt cnt-rst">4 Tests</span></div>
+          </div>
+          <div class="cmi-screen-card" onclick="cmiGoToScreen('cmi05')">
+            <div class="cmi-sc-num">CMI-05 &middot; Backend API</div>
+            <div class="cmi-sc-name">GET /consents</div>
+            <div class="cmi-sc-desc">Returns the paginated consent list. Filters by status, LFI, type. Returns masked consent IDs and IBAN data.</div>
+            <div class="cmi-sc-counts"><span class="cmi-sc-cnt cnt-be">6 BE ACs</span><span class="cmi-sc-cnt cnt-gap">2 Gaps</span><span class="cmi-sc-cnt cnt-rst">2 Tests</span></div>
+          </div>
+          <div class="cmi-screen-card" onclick="cmiGoToScreen('cmi06')">
+            <div class="cmi-sc-num">CMI-06 &middot; Backend API</div>
+            <div class="cmi-sc-name">GET /consents/{id}</div>
+            <div class="cmi-sc-desc">Returns full detail for a single consent including permissions, payment details, activity log, and IBAN.</div>
+            <div class="cmi-sc-counts"><span class="cmi-sc-cnt cnt-be">5 BE ACs</span><span class="cmi-sc-cnt cnt-gap">2 Gaps</span><span class="cmi-sc-cnt cnt-rst">2 Tests</span></div>
+          </div>
+          <div class="cmi-screen-card" onclick="cmiGoToScreen('cmi07')">
+            <div class="cmi-sc-num">CMI-07 &middot; Backend API</div>
+            <div class="cmi-sc-name">DELETE /consents/{id}</div>
+            <div class="cmi-sc-desc">Revokes a consent. Must complete within 500ms. Creates an audit log. Returns 400 if consent cannot be revoked.</div>
+            <div class="cmi-sc-counts"><span class="cmi-sc-cnt cnt-be">5 BE ACs</span><span class="cmi-sc-cnt cnt-gap">2 Gaps</span><span class="cmi-sc-cnt cnt-rst">2 Tests</span></div>
+          </div>
+          <div class="cmi-screen-card" onclick="cmiGoToScreen('cmi08')">
+            <div class="cmi-sc-num">CMI-08 &middot; Backend API</div>
+            <div class="cmi-sc-name">GET /payments</div>
+            <div class="cmi-sc-desc">Returns payment execution history for a consent. Paginated, filterable by status (completed, failed, refunded).</div>
+            <div class="cmi-sc-counts"><span class="cmi-sc-cnt cnt-be">4 BE ACs</span><span class="cmi-sc-cnt cnt-gap">2 Gaps</span><span class="cmi-sc-cnt cnt-rst">2 Tests</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen pages (rendered dynamically by JS) -->
+      <div class="cmi-page" id="cmi-page-cmi01"></div>
+      <div class="cmi-page" id="cmi-page-cmi02"></div>
+      <div class="cmi-page" id="cmi-page-cmi03"></div>
+      <div class="cmi-page" id="cmi-page-cmi04"></div>
+      <div class="cmi-page" id="cmi-page-cmi05"></div>
+      <div class="cmi-page" id="cmi-page-cmi06"></div>
+      <div class="cmi-page" id="cmi-page-cmi07"></div>
+      <div class="cmi-page" id="cmi-page-cmi08"></div>
+
+      <div style="text-align:center;padding:20px 0;">
+        <p style="font-size:11px;color:var(--color-text-tertiary);">ADCB Open Finance &mdash; CMI Dashboard QA Review &middot; v2.1-final &middot; DPE-568 &middot; Confidential</p>
+      </div>
+    </div>
+
   </div><!-- /content -->
 </div><!-- /main -->
 
+<!-- CMI Phone Preview Modal -->
+<div class="cmi-modal-bg" id="cmi-phoneModal" onclick="if(event.target===this)cmiClosePhone()">
+  <div class="cmi-modal-wrap">
+    <div class="cmi-modal-topbar">
+      <button class="cmi-modal-close" onclick="cmiClosePhone()">&#x2715; Close</button>
+      <span style="color:#fff;font-size:13px;font-weight:600" id="cmi-modal-title">Screen Preview</span>
+    </div>
+    <div class="cmi-scenario-strip" id="cmi-scenarioStrip"></div>
+    <div class="cmi-phone" id="cmi-thePhone">
+      <div class="cmi-p-sb"><span class="cmi-p-sb-t">9:41</span><div style="display:flex;gap:5px;align-items:center"><svg width="13" height="10" fill="#fff" viewBox="0 0 15 11"><rect x="0" y="4" width="3" height="7" rx="1"/><rect x="4" y="2" width="3" height="9" rx="1"/><rect x="8" y="0" width="3" height="11" rx="1"/><rect x="12" y="0" width="3" height="11" rx="1" opacity=".3"/></svg><svg width="22" height="10" fill="#fff" viewBox="0 0 25 12"><rect x=".5" y="1" width="20" height="10" rx="2" stroke="#fff" stroke-width="1.2" fill="none"/><rect x="2" y="2.5" width="15" height="7" rx="1"/><path d="M21.5 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg></div></div>
+      <div class="cmi-p-hdr">
+        <div class="cmi-p-logo">
+          <img src="assets/images/adcb-logo.svg" alt="ADCB" style="height:15px;filter:brightness(0) invert(1)"/>
+          <div class="cmi-p-div"></div><span class="cmi-p-sub">Open Finance</span>
+        </div>
+        <div class="cmi-p-bell"><svg width="12" height="12" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+      </div>
+      <div class="cmi-p-tabs">
+        <div class="cmi-p-tab on" id="cmi-ptab-c" onclick="cmiPhoneSwTab('c')">Current Consents</div>
+        <div class="cmi-p-tab" id="cmi-ptab-h" onclick="cmiPhoneSwTab('h')">Consent History</div>
+      </div>
+      <div id="cmi-pPhoneBody" style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0"></div>
+      <div class="cmi-p-det" id="cmi-pDet">
+        <div class="cmi-p-detbar">
+          <div class="cmi-p-back" onclick="cmiPhoneCloseDet()"><svg width="14" height="14" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Consents</div>
+        </div>
+        <div class="cmi-p-detscroll" id="cmi-pDetInner"></div>
+      </div>
+      <div class="cmi-p-foverlay" id="cmi-pFilter" onclick="if(event.target===this)cmiPhoneCloseFilter()">
+        <div class="cmi-p-sheet">
+          <div class="cmi-p-shandle"></div>
+          <div class="cmi-p-shdr"><h5>Filter</h5><span onclick="cmiPhoneClearFilters()">Clear all</span></div>
+          <div class="cmi-p-fsec"><h6>Status</h6><div class="cmi-p-chips" id="cmi-fStatus"><div class="cmi-p-chip on" onclick="cmiPhoneToggleChip(this)">Authorized</div><div class="cmi-p-chip on" onclick="cmiPhoneToggleChip(this)">Suspended</div><div class="cmi-p-chip" onclick="cmiPhoneToggleChip(this)">Expired</div><div class="cmi-p-chip" onclick="cmiPhoneToggleChip(this)">Revoked</div></div></div>
+          <div class="cmi-p-fsec"><h6>Type</h6><div class="cmi-p-chips" id="cmi-fType"><div class="cmi-p-chip" onclick="cmiPhoneToggleChip(this)">Data Sharing</div><div class="cmi-p-chip" onclick="cmiPhoneToggleChip(this)">Payment</div><div class="cmi-p-chip" onclick="cmiPhoneToggleChip(this)">Multi-Payment</div><div class="cmi-p-chip" onclick="cmiPhoneToggleChip(this)">Combined</div></div></div>
+          <div class="cmi-p-fsec"><h6>LFI</h6><div class="cmi-p-chips" id="cmi-fLFI"><div class="cmi-p-chip" onclick="cmiPhoneToggleChip(this)">Emirates NBD</div><div class="cmi-p-chip" onclick="cmiPhoneToggleChip(this)">FAB</div><div class="cmi-p-chip" onclick="cmiPhoneToggleChip(this)">ADIB</div><div class="cmi-p-chip" onclick="cmiPhoneToggleChip(this)">Mashreq</div></div></div>
+          <div class="cmi-p-sfooter"><button class="cmi-p-sbtn cmi-p-clear" onclick="cmiPhoneCloseFilter()">Cancel</button><button class="cmi-p-sbtn cmi-p-apply" onclick="cmiPhoneApplyFilters()">Apply Filters</button></div>
+        </div>
+      </div>
+      <div class="cmi-p-confirm" id="cmi-pConfirm">
+        <div class="cmi-p-dialog">
+          <div class="cmi-p-dlg-title">Revoke Consent?</div>
+          <div class="cmi-p-dlg-body">Consent <strong id="cmi-dlg-cid"></strong> for <strong id="cmi-dlg-lfi"></strong></div>
+          <div class="cmi-p-dlg-info">This action is <strong>permanent</strong> and cannot be undone. The LFI will be notified immediately.</div>
+          <div class="cmi-p-dlg-btns"><button class="cmi-p-dlg-cancel" onclick="cmiCloseConfirm()">Cancel</button><button class="cmi-p-dlg-confirm" onclick="cmiConfirmRevoke()">Revoke Consent</button></div>
+        </div>
+      </div>
+    </div>
+    <div style="color:rgba(255,255,255,.45);font-size:10px;text-align:center;padding-top:4px">Tap scenario buttons above &middot; Tap cards to open detail &middot; Try filter, search, and actions</div>
+  </div>
+</div>
+
 <script src="js/data.js"></script>
+<script src="js/cmi-data.js"></script>
 <script src="js/components.js"></script>
+<script src="js/cmi-engine.js"></script>
 <script src="js/router.js"></script>
 <script src="js/nav.js"></script>
 <script src="js/app.js"></script>
