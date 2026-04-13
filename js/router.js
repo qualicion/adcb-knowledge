@@ -15,7 +15,10 @@ var SLUG_TO_ID = {
   'current-consents': 'cmi-cmi01', 'consent-history': 'cmi-cmi02',
   'filter-search': 'cmi-cmi03', 'consent-detail': 'cmi-cmi04',
   'get-consents': 'cmi-cmi05', 'get-consent-detail': 'cmi-cmi06',
-  'delete-consent': 'cmi-cmi07', 'get-payments': 'cmi-cmi08'
+  'delete-consent': 'cmi-cmi07', 'get-payments': 'cmi-cmi08',
+  'payment-flow': 'sipcop-flow', 'cop-deep-dive': 'sipcop-cop-detail',
+  'user-stories': 'sipcop-stories', 'sip-prototype': 'sipcop-prototype',
+  'rst-scenarios': 'sipcop-rst', 'design-gaps': 'sipcop-gaps'
 };
 var ID_TO_SLUG = {};
 for (var slug in SLUG_TO_ID) { ID_TO_SLUG[SLUG_TO_ID[slug]] = slug; }
@@ -40,7 +43,7 @@ function parseHash() {
 
   if (slug) {
     var id = SLUG_TO_ID[slug] || slug;
-    if (section === 'overview' || section === 'consent' || section === 'lfi' || section === 'cmi') {
+    if (section === 'overview' || section === 'consent' || section === 'lfi' || section === 'cmi' || section === 'sipcop') {
       anchor = 'tab-' + id;
     }
   }

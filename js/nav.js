@@ -48,7 +48,7 @@ function navigateToRoute(section, anchor) {
   }
 
   // Update breadcrumb
-  var names = { overview: 'General Overview', consent: 'Consent & Scheduler', lfi: 'LFI Project', cmi: 'CMI Dashboard' };
+  var names = { overview: 'General Overview', consent: 'Consent & Scheduler', lfi: 'LFI Project', sipcop: 'SIP CoP Flow', cmi: 'CMI Dashboard' };
   document.getElementById('bc-current').textContent = names[section] || section;
 
   // Handle tab activation for overview
@@ -98,6 +98,26 @@ function navigateToRoute(section, anchor) {
 
     var lfiNavItem = document.getElementById('nav-' + lfiTabName);
     if (lfiNavItem) lfiNavItem.classList.add('active');
+  }
+
+  // Handle SIP CoP Flow navigation
+  if (section === 'sipcop') {
+    // Initialize SIP CoP content on first visit
+    if (typeof sipCopInit === 'function' && !window._sipCopInitDone) {
+      sipCopInit();
+      window._sipCopInitDone = true;
+    }
+    if (anchor) {
+      var sipTabName = anchor.replace('tab-sipcop-', '');
+      if (typeof sipGoTab === 'function') sipGoTab(sipTabName);
+      var sipNavItem = document.getElementById('nav-sipcop-' + sipTabName);
+      if (sipNavItem) sipNavItem.classList.add('active');
+    } else {
+      // Default to flow tab
+      if (typeof sipGoTab === 'function') sipGoTab('flow');
+      var sipFlowNav = document.getElementById('nav-sipcop-flow');
+      if (sipFlowNav) sipFlowNav.classList.add('active');
+    }
   }
 
   // Handle CMI Dashboard navigation
