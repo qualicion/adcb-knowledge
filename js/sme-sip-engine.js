@@ -228,83 +228,97 @@ function smeRenderPrototype() {
   if (!el || !SME_SIP_SCENARIOS) return;
 
   var groups = [
-    {
-      label: 'Happy Path',
-      color: '#15803D',
-      items: ['login', 'consent-details', 'account-select', 'account-selected', 'pin', 'redirect']
-    },
-    {
-      label: 'Account Variants',
-      color: '#D97706',
-      items: ['one-account', 'two-accounts', 'tpp-selected']
-    },
-    {
-      label: 'Error Screens',
-      color: '#E31E24',
-      items: ['access-restricted', 'no-accounts', 'auth-expired', 'unsuccessful']
-    },
-    {
-      label: 'Cancel / Abandon',
-      color: '#475569',
-      items: ['cancel-consent']
-    },
-    {
-      label: 'TPP Redirect',
-      color: '#1E40AF',
-      items: ['tpp-redirect-to-app']
-    },
-    {
-      label: 'Payment Confirmation',
-      color: '#0F766E',
-      items: ['confirm-payment', 'identify-superuser']
-    },
-    {
-      label: 'System Errors',
-      color: '#7C3AED',
-      items: ['payment-execution', 'timeout-error']
-    }
+    { id:'happy', label:'Happy Path', color:'#15803D', bg:'#F0FDF4',
+      items:['login','consent-details','account-select','account-selected','pin','redirect'] },
+    { id:'variants', label:'Account Variants', color:'#D97706', bg:'#FFFBEB',
+      items:['one-account','two-accounts','tpp-selected'] },
+    { id:'errors', label:'Error Screens', color:'#E31E24', bg:'#FEF2F2',
+      items:['access-restricted','no-accounts','auth-expired','unsuccessful'] },
+    { id:'cancel', label:'Cancel / Abandon', color:'#475569', bg:'#F8FAFC',
+      items:['cancel-consent'] },
+    { id:'redirect', label:'TPP Redirect', color:'#1E40AF', bg:'#EFF6FF',
+      items:['tpp-redirect-to-app'] },
+    { id:'confirm', label:'Payment', color:'#0F766E', bg:'#F0FDFA',
+      items:['confirm-payment','identify-superuser'] },
+    { id:'system', label:'System Errors', color:'#7C3AED', bg:'#F5F3FF',
+      items:['payment-execution','timeout-error'] }
   ];
 
-  var sidebarHtml = '<div class="sme-prototype-sidebar">';
+  /* Category tabs */
+  var catHtml = '<div class="sme-proto-cats">';
   for (var gi = 0; gi < groups.length; gi++) {
     var grp = groups[gi];
-    sidebarHtml += '<div class="sme-scenario-group">' +
-      '<div class="sme-scenario-group-label" style="color:' + grp.color + ';">' + grp.label + '</div>';
-    for (var sci = 0; sci < grp.items.length; sci++) {
-      var scKey = grp.items[sci];
-      var scData = SME_SIP_SCENARIOS[scKey];
-      if (!scData) continue;
-      sidebarHtml +=
-        '<button class="sme-scenario-btn" id="sme-sbtn-' + scKey + '" ' +
-          'onclick="smeShowScenario(\'' + scKey + '\',this)" ' +
-          'style="border-left-color:' + grp.color + ';">' +
-          '<span class="sme-scenario-indicator" style="background:' + grp.color + ';"></span>' +
-          scData.title +
-        '</button>';
-    }
-    sidebarHtml += '</div>';
+    catHtml += '<button class="sme-proto-cat' + (gi === 0 ? ' active' : '') + '" ' +
+      'id="sme-cat-' + grp.id + '" ' +
+      'onclick="smeSelectCategory(\'' + grp.id + '\',this)" ' +
+      'style="--cat-color:' + grp.color + ';--cat-bg:' + grp.bg + '">' +
+      '<span class="sme-proto-cat-dot" style="background:' + grp.color + '"></span>' +
+      grp.label +
+    '</button>';
   }
-  sidebarHtml += '</div>';
+  catHtml += '</div>';
 
+  /* Scenario chips per category */
+  var chipsHtml = '';
+  for (var ci = 0; ci < groups.length; ci++) {
+    var g = groups[ci];
+    chipsHtml += '<div class="sme-proto-chip-row' + (ci === 0 ? ' active' : '') + '" id="sme-chips-' + g.id + '">';
+    for (var si = 0; si < g.items.length; si++) {
+      var key = g.items[si];
+      var sc = SME_SIP_SCENARIOS[key];
+      if (!sc) continue;
+      var isFirst = ci === 0 && si === 0;
+      chipsHtml += '<button class="sme-proto-chip' + (isFirst ? ' active' : '') + '" ' +
+        'id="sme-sbtn-' + key + '" ' +
+        'onclick="smeShowScenario(\'' + key + '\',this)" ' +
+        'style="--chip-color:' + g.color + ';--chip-bg:' + g.bg + '">' +
+        '<span class="sme-proto-chip-num">' + (si + 1) + '</span>' +
+        sc.title +
+      '</button>';
+    }
+    chipsHtml += '</div>';
+  }
+
+  /* Phone + Dev panel */
   var mainHtml =
     '<div class="sme-prototype-main">' +
       '<div class="sme-phone-wrap">' +
-        '<div class="sme-phone-label">ProCash / AlTareq</div>' +
         '<div class="sme-phone-frame">' +
           '<div class="sme-phone-notch"></div>' +
           '<div class="sme-phone-screen" id="sme-phone-screen"></div>' +
         '</div>' +
       '</div>' +
       '<div class="sme-dev-panel" id="sme-dev-panel">' +
-        '<div class="sme-dev-panel-header">Developer Panel</div>' +
+        '<div class="sme-dev-panel-header">' +
+          '<span class="sme-dev-panel-dot" style="background:#F85149"></span>' +
+          '<span class="sme-dev-panel-dot" style="background:#E3B341"></span>' +
+          '<span class="sme-dev-panel-dot" style="background:#56D364"></span>' +
+          '<span id="sme-dev-panel-title" style="margin-left:8px">API Calls</span>' +
+        '</div>' +
         '<div class="sme-dev-panel-body" id="sme-dev-panel-body"></div>' +
       '</div>' +
     '</div>';
 
-  el.innerHTML = '<div class="sme-prototype-layout">' + sidebarHtml + mainHtml + '</div>';
+  el.innerHTML = catHtml + '<div class="sme-proto-chips-wrap">' + chipsHtml + '</div>' + mainHtml;
 
-  /* Load initial scenario */
   smeShowScenario(smeCurrentScenario, document.getElementById('sme-sbtn-' + smeCurrentScenario));
+}
+
+function smeSelectCategory(catId, btn) {
+  var cats = document.querySelectorAll('.sme-proto-cat');
+  for (var i = 0; i < cats.length; i++) cats[i].classList.remove('active');
+  if (btn) btn.classList.add('active');
+
+  var rows = document.querySelectorAll('.sme-proto-chip-row');
+  for (var j = 0; j < rows.length; j++) rows[j].classList.remove('active');
+  var target = document.getElementById('sme-chips-' + catId);
+  if (target) target.classList.add('active');
+
+  /* Auto-select first chip in category */
+  if (target) {
+    var firstChip = target.querySelector('.sme-proto-chip');
+    if (firstChip) firstChip.click();
+  }
 }
 
 function smeShowScenario(name, btn) {
@@ -312,22 +326,22 @@ function smeShowScenario(name, btn) {
   if (!data) return;
   smeCurrentScenario = name;
 
-  /* Update phone screen */
   var phoneEl = document.getElementById('sme-phone-screen');
   if (phoneEl) phoneEl.innerHTML = data.screenHtml;
 
-  /* Update dev panel */
   var devEl = document.getElementById('sme-dev-panel-body');
   if (devEl) devEl.innerHTML = data.apisHtml;
 
-  /* Update sidebar button active state */
-  var allBtns = document.querySelectorAll('.sme-scenario-btn');
-  for (var i = 0; i < allBtns.length; i++) allBtns[i].classList.remove('active');
+  var titleEl = document.getElementById('sme-dev-panel-title');
+  if (titleEl) titleEl.textContent = data.title;
+
+  var allChips = document.querySelectorAll('.sme-proto-chip');
+  for (var i = 0; i < allChips.length; i++) allChips[i].classList.remove('active');
   if (btn) {
     btn.classList.add('active');
   } else {
-    var foundBtn = document.getElementById('sme-sbtn-' + name);
-    if (foundBtn) foundBtn.classList.add('active');
+    var found = document.getElementById('sme-sbtn-' + name);
+    if (found) found.classList.add('active');
   }
 }
 

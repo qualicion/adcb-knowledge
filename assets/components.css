@@ -957,36 +957,57 @@
 }
 
 /* ── SME PROTOTYPE LAYOUT ── */
-.sme-prototype-layout{
-  display:flex;gap:16px;align-items:flex-start;
+/* ── SME PROTO: CATEGORY TABS ── */
+.sme-proto-cats{
+  display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;
 }
-.sme-prototype-sidebar{
-  width:220px;flex-shrink:0;
-  background:var(--color-surface);border:1px solid var(--color-border);
-  border-radius:var(--radius-card);padding:12px;
+.sme-proto-cat{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 14px;border-radius:var(--radius-badge);
+  border:1.5px solid var(--color-border);background:var(--color-surface);
+  font:var(--font-label);font-weight:600;color:var(--color-text-secondary);
+  cursor:pointer;transition:all .15s;user-select:none;
 }
-.sme-scenario-group{margin-bottom:14px;}
-.sme-scenario-group:last-child{margin-bottom:0;}
-.sme-scenario-group-label{
-  font:var(--font-label);font-weight:700;text-transform:uppercase;
-  letter-spacing:.7px;margin-bottom:6px;padding-left:4px;
+.sme-proto-cat:hover{border-color:var(--cat-color,var(--navy));color:var(--cat-color,var(--navy));}
+.sme-proto-cat.active{
+  background:var(--cat-bg,#F0FDF4);border-color:var(--cat-color,var(--navy));
+  color:var(--cat-color,var(--navy));font-weight:700;
 }
-.sme-scenario-btn{
-  display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;
-  border:none;background:transparent;border-radius:var(--radius-button);
-  cursor:pointer;font:var(--font-body);color:var(--color-text-secondary);
-  text-align:left;border-left:3px solid transparent;
-  transition:background .1s;user-select:none;margin-bottom:2px;
+.sme-proto-cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ── SME PROTO: SCENARIO CHIPS ── */
+.sme-proto-chips-wrap{margin-bottom:20px;}
+.sme-proto-chip-row{display:none;flex-wrap:wrap;gap:6px;}
+.sme-proto-chip-row.active{display:flex;}
+.sme-proto-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 14px;border-radius:var(--radius-button);
+  border:1.5px solid var(--color-border);background:var(--color-surface);
+  font:var(--font-body);font-weight:500;color:var(--color-text-secondary);
+  cursor:pointer;transition:all .15s;user-select:none;
 }
-.sme-scenario-btn:hover{background:var(--color-surface-secondary);color:var(--color-text-primary);}
-.sme-scenario-btn.active{
-  background:var(--color-surface-secondary);color:var(--navy);font-weight:600;
+.sme-proto-chip:hover{
+  border-color:var(--chip-color,var(--navy));background:var(--chip-bg,#F8FAFC);
+  color:var(--chip-color,var(--navy));
 }
-.sme-scenario-indicator{
-  width:7px;height:7px;border-radius:50%;flex-shrink:0;
+.sme-proto-chip.active{
+  background:var(--chip-bg,#F0FDF4);border-color:var(--chip-color,var(--navy));
+  color:var(--chip-color,var(--navy));font-weight:700;
+  box-shadow:0 0 0 1px var(--chip-color,var(--navy));
 }
+.sme-proto-chip-num{
+  width:20px;height:20px;border-radius:50%;
+  background:var(--color-surface-tertiary);color:var(--color-text-secondary);
+  font:var(--font-detail);font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.sme-proto-chip.active .sme-proto-chip-num{
+  background:var(--chip-color,var(--navy));color:#fff;
+}
+
+/* ── SME PROTO: MAIN AREA ── */
 .sme-prototype-main{
-  flex:1;display:flex;gap:16px;align-items:flex-start;min-width:0;
+  display:flex;gap:20px;align-items:flex-start;min-width:0;
 }
 .sme-phone-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;}
 .sme-phone-label{
@@ -1017,7 +1038,9 @@
   background:#161B22;border-bottom:1px solid #30363D;
   padding:10px 16px;font-size:12px;font-weight:700;color:#8B949E;
   text-transform:uppercase;letter-spacing:.6px;
+  display:flex;align-items:center;gap:5px;
 }
+.sme-dev-panel-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .sme-dev-panel-body{padding:14px;overflow-y:auto;flex:1;}
 .sme-dev-section{margin-bottom:16px;}
 .sme-dev-label{
@@ -1221,9 +1244,9 @@
 }
 
 @media(max-width:900px){
-  .sme-prototype-layout{flex-direction:column;}
-  .sme-prototype-sidebar{width:100%;}
   .sme-prototype-main{flex-direction:column;}
+  .sme-proto-cats{gap:4px;}
+  .sme-proto-cat{padding:5px 10px;font-size:11px;}
   .sme-metrics-row{grid-template-columns:repeat(3,1fr);}
   .sme-ac-grid{grid-template-columns:1fr;}
   .sme-arch-row{flex-direction:column;}
