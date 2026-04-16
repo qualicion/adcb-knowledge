@@ -328,11 +328,27 @@ function cmiRunScenario(id, btn) {
 
 function cmiClosePhone() { document.getElementById('cmi-phoneModal').classList.remove('open'); }
 
+function cmiUpdateDevPanel(scenario) {
+  var key = cmiCurrentPhonePage + '|' + scenario;
+  var devBody = document.getElementById('cmi-devBody');
+  var devTitle = document.getElementById('cmi-dev-title');
+  if (!devBody) return;
+  if (typeof CMI_SCENARIO_APIS !== 'undefined' && CMI_SCENARIO_APIS[key]) {
+    var api = CMI_SCENARIO_APIS[key];
+    devBody.innerHTML = api.html;
+    if (devTitle) devTitle.textContent = api.title;
+  } else {
+    devBody.innerHTML = '<div style="padding:20px;text-align:center;color:#8B949E;font-size:12px;">Select a scenario to see API calls</div>';
+    if (devTitle) devTitle.textContent = 'API Calls';
+  }
+}
+
 function cmiRenderPhoneBody(scenario) {
   cmiCurrentScenario = scenario;
   var body = document.getElementById('cmi-pPhoneBody');
   cmiPhoneCloseDet();
   cmiPhoneCloseFilter();
+  cmiUpdateDevPanel(scenario);
   var cnf = document.getElementById('cmi-pConfirm'); if (cnf) cnf.classList.remove('open');
 
   var isHistory = ['history','ac12','ac13'].indexOf(scenario) >= 0;
