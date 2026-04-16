@@ -130,7 +130,7 @@
     <div class="nav-group-label">LFI Project</div>
 
     <div class="nav-item nav-parent" onclick="toggleNav('lfi')" id="nav-lfi">
-      <span style="display:flex;align-items:center;gap:10px;"><span class="nav-icon">&#x1F3E6;</span> LFI Project</span>
+      <span style="display:flex;align-items:center;gap:10px;"><span class="nav-icon">&#x1F3E6;</span> Liability Validations</span>
       <span class="nav-chevron">&#x25B6;</span>
     </div>
     <div class="nav-sub" id="sub-lfi">
@@ -1651,14 +1651,14 @@
         <p>Complete implementation guide for ADCB's SME Single Instant Payment flow via ProCash Mobile App. Covers the end-to-end customer journey, clickable prototype with API calls, acceptance criteria from JIRA, system architecture, and gaps analysis.</p>
       </div>
 
-      <div class="sme-section-tabs" id="sme-tabs">
-        <button class="sme-stab active" data-tab="overview" onclick="smeGoTab('overview')">Overview</button>
-        <button class="sme-stab" data-tab="flow" onclick="smeGoTab('flow')">E2E Flow</button>
-        <button class="sme-stab" data-tab="prototype" onclick="smeGoTab('prototype')">Prototype</button>
-        <button class="sme-stab" data-tab="acceptance" onclick="smeGoTab('acceptance')">Acceptance Criteria</button>
-        <button class="sme-stab" data-tab="architecture" onclick="smeGoTab('architecture')">Architecture</button>
-        <button class="sme-stab" data-tab="apis" onclick="smeGoTab('apis')">API Reference</button>
-        <button class="sme-stab" data-tab="gaps" onclick="smeGoTab('gaps')">Gaps &amp; Questions</button>
+      <div class="tab-bar" id="sme-tabs">
+        <button class="tab-btn sme-stab active" data-tab="overview" onclick="smeGoTab('overview')">Overview</button>
+        <button class="tab-btn sme-stab" data-tab="flow" onclick="smeGoTab('flow')">E2E Flow</button>
+        <button class="tab-btn sme-stab" data-tab="prototype" onclick="smeGoTab('prototype')">Prototype</button>
+        <button class="tab-btn sme-stab" data-tab="acceptance" onclick="smeGoTab('acceptance')">Acceptance Criteria</button>
+        <button class="tab-btn sme-stab" data-tab="architecture" onclick="smeGoTab('architecture')">Architecture</button>
+        <button class="tab-btn sme-stab" data-tab="apis" onclick="smeGoTab('apis')">API Reference</button>
+        <button class="tab-btn sme-stab" data-tab="gaps" onclick="smeGoTab('gaps')">Gaps &amp; Questions</button>
       </div>
 
       <div class="sme-page active" id="sme-page-overview"><div id="sme-overview-content"></div></div>
@@ -1686,13 +1686,13 @@
       </div>
 
       <!-- Tab bar -->
-      <div class="sip-section-tabs" id="sip-tabs">
-        <button class="sip-stab active" data-tab="flow" onclick="sipGoTab('flow')">Payment Flow</button>
-        <button class="sip-stab" data-tab="cop-detail" onclick="sipGoTab('cop-detail')">CoP Deep Dive</button>
-        <button class="sip-stab" data-tab="stories" onclick="sipGoTab('stories')">User Stories</button>
-        <button class="sip-stab" data-tab="prototype" onclick="sipGoTab('prototype')">Prototype</button>
-        <button class="sip-stab" data-tab="rst" onclick="sipGoTab('rst')">RST Scenarios</button>
-        <button class="sip-stab" data-tab="gaps" onclick="sipGoTab('gaps')">Design Gaps</button>
+      <div class="tab-bar" id="sip-tabs">
+        <button class="tab-btn sip-stab active" data-tab="flow" onclick="sipGoTab('flow')">Payment Flow</button>
+        <button class="tab-btn sip-stab" data-tab="cop-detail" onclick="sipGoTab('cop-detail')">CoP Deep Dive</button>
+        <button class="tab-btn sip-stab" data-tab="stories" onclick="sipGoTab('stories')">User Stories</button>
+        <button class="tab-btn sip-stab" data-tab="prototype" onclick="sipGoTab('prototype')">Prototype</button>
+        <button class="tab-btn sip-stab" data-tab="rst" onclick="sipGoTab('rst')">RST Scenarios</button>
+        <button class="tab-btn sip-stab" data-tab="gaps" onclick="sipGoTab('gaps')">Design Gaps</button>
       </div>
 
       <!-- Tab pages (rendered by JS) -->

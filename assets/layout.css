@@ -13,7 +13,7 @@ body{font:var(--font-body);background:var(--color-surface-secondary);color:var(-
 
 /* ── SIDEBAR ── */
 .sidebar{
-  width:260px;min-width:260px;background:var(--navy);
+  width:300px;min-width:300px;background:var(--navy);
   display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;
   z-index:100;transition:transform .25s ease;
 }
@@ -54,7 +54,7 @@ body{font:var(--font-body);background:var(--color-surface-secondary);color:var(-
 }
 
 /* ── MAIN CONTENT ── */
-.main{margin-left:260px;flex:1;min-width:0;}
+.main{margin-left:300px;flex:1;min-width:0;}
 
 /* ── TOP BAR ── */
 .topbar{
