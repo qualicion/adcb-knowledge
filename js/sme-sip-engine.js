@@ -53,7 +53,7 @@ function smeMakeCollapsible(id, title, contentHtml, startOpen) {
       '<span class="sme-collapsible-title">' + title + '</span>' +
       '<span class="sme-collapsible-chev" id="sme-col-chev-' + id + '" style="transition:transform .2s ease;display:inline-block;' + (open ? 'transform:rotate(90deg)' : '') + '">&#x25B6;</span>' +
     '</div>' +
-    '<div id="sme-col-body-' + id + '" style="display:' + (open ? 'block' : 'none') + ';">' +
+    '<div id="sme-col-body-' + id + '" style="display:' + (open ? 'block' : 'none') + ';padding:16px 20px;border-top:1px solid var(--color-border);">' +
       contentHtml +
     '</div>' +
   '</div>';

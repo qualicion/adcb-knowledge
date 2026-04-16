@@ -48,7 +48,7 @@ function navigateToRoute(section, anchor) {
   }
 
   // Update breadcrumb
-  var names = { overview: 'General Overview', consent: 'Consent & Scheduler', lfi: 'LFI Project', smesip: 'SME SIP Portal', sipcop: 'SIP CoP Flow', cmi: 'CMI Dashboard' };
+  var names = { overview: 'General Overview', consent: 'Consent & Scheduler', lfi: 'LFI Project', smesip: 'Single Instant Payment (SME)', sipcop: 'Single Instant Payment', cmi: 'CMI Dashboard' };
   document.getElementById('bc-current').textContent = names[section] || section;
 
   // Handle tab activation for overview

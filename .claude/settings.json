@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "/Users/boduniyi/Documents/Toonday/Personal/Career/Employment/Worked/Halian/Projects/ADCB/adcb-knowledge/assets",
+      "/Users/boduniyi/Documents/Toonday/Personal/Career/Employment/Worked/Halian/Projects/ADCB/TPP/tpp/of-dev-portal/apps/web/public/fonts/proximanova",
+      "/Users/boduniyi/Documents/Toonday/Personal/Career/Employment/Worked/Halian/Projects/ADCB/TPP/tpp/of-dev-portal/apps/web/public"
+    ],
+    "allow": [
+      "Bash(wc:*)"
+    ]
+  }
+}
