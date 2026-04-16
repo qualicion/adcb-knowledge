@@ -227,59 +227,53 @@ function smeRenderPrototype() {
   var el = document.getElementById('sme-prototype-content');
   if (!el || !SME_SIP_SCENARIOS) return;
 
-  var groups = [
-    { id:'happy', label:'Happy Path', color:'#15803D', bg:'#F0FDF4',
-      items:['login','consent-details','account-select','account-selected','pin','redirect'] },
-    { id:'variants', label:'Account Variants', color:'#D97706', bg:'#FFFBEB',
-      items:['one-account','two-accounts','tpp-selected'] },
-    { id:'errors', label:'Error Screens', color:'#E31E24', bg:'#FEF2F2',
-      items:['access-restricted','no-accounts','auth-expired','unsuccessful'] },
-    { id:'cancel', label:'Cancel / Abandon', color:'#475569', bg:'#F8FAFC',
-      items:['cancel-consent'] },
-    { id:'redirect', label:'TPP Redirect', color:'#1E40AF', bg:'#EFF6FF',
-      items:['tpp-redirect-to-app'] },
-    { id:'confirm', label:'Payment', color:'#0F766E', bg:'#F0FDFA',
-      items:['confirm-payment','identify-superuser'] },
-    { id:'system', label:'System Errors', color:'#7C3AED', bg:'#F5F3FF',
-      items:['payment-execution','timeout-error'] }
+  /* Flat list of all scenarios with short labels */
+  window._smeProtoGroups = [
+    { id:'happy', label:'\u2705 Happy Path', color:'#15803D',
+      items:[
+        {key:'login',short:'1. Login'},
+        {key:'consent-details',short:'2. Consent'},
+        {key:'account-select',short:'3. Select Account'},
+        {key:'account-selected',short:'4. Confirm'},
+        {key:'pin',short:'5. PIN / EFR'},
+        {key:'redirect',short:'6. Redirect'}
+      ]},
+    { id:'variants', label:'\uD83D\uDD04 Account Variants', color:'#D97706',
+      items:[
+        {key:'one-account',short:'1 Account'},
+        {key:'two-accounts',short:'2 Accounts'},
+        {key:'tpp-selected',short:'TPP Pre-selected'}
+      ]},
+    { id:'errors', label:'\u274C Error Screens', color:'#E31E24',
+      items:[
+        {key:'access-restricted',short:'Access Restricted'},
+        {key:'no-accounts',short:'No Accounts'},
+        {key:'auth-expired',short:'Auth Expired'},
+        {key:'unsuccessful',short:'Unsuccessful'}
+      ]},
+    { id:'other', label:'\u2699 Other Flows', color:'#475569',
+      items:[
+        {key:'cancel-consent',short:'Cancel'},
+        {key:'tpp-redirect-to-app',short:'TPP Deep Link'},
+        {key:'confirm-payment',short:'Confirm Payment'},
+        {key:'identify-superuser',short:'Superuser Check'},
+        {key:'payment-execution',short:'Payment Exec'},
+        {key:'timeout-error',short:'Timeout Error'}
+      ]}
   ];
 
-  /* Category tabs */
-  var catHtml = '<div class="sme-proto-cats">';
-  for (var gi = 0; gi < groups.length; gi++) {
-    var grp = groups[gi];
-    catHtml += '<button class="sme-proto-cat' + (gi === 0 ? ' active' : '') + '" ' +
-      'id="sme-cat-' + grp.id + '" ' +
-      'onclick="smeSelectCategory(\'' + grp.id + '\',this)" ' +
-      'style="--cat-color:' + grp.color + ';--cat-bg:' + grp.bg + '">' +
-      '<span class="sme-proto-cat-dot" style="background:' + grp.color + '"></span>' +
-      grp.label +
-    '</button>';
+  /* Dropdown + steps bar */
+  var pickerHtml = '<div class="sme-proto-picker">' +
+    '<select class="sme-proto-select" id="sme-proto-select" onchange="smeOnCategoryChange(this.value)">';
+  for (var gi = 0; gi < window._smeProtoGroups.length; gi++) {
+    var g = window._smeProtoGroups[gi];
+    pickerHtml += '<option value="' + g.id + '">' + g.label + ' (' + g.items.length + ')</option>';
   }
-  catHtml += '</div>';
+  pickerHtml += '</select>' +
+    '<div class="sme-proto-steps" id="sme-proto-steps"></div>' +
+  '</div>';
 
-  /* Scenario chips per category */
-  var chipsHtml = '';
-  for (var ci = 0; ci < groups.length; ci++) {
-    var g = groups[ci];
-    chipsHtml += '<div class="sme-proto-chip-row' + (ci === 0 ? ' active' : '') + '" id="sme-chips-' + g.id + '">';
-    for (var si = 0; si < g.items.length; si++) {
-      var key = g.items[si];
-      var sc = SME_SIP_SCENARIOS[key];
-      if (!sc) continue;
-      var isFirst = ci === 0 && si === 0;
-      chipsHtml += '<button class="sme-proto-chip' + (isFirst ? ' active' : '') + '" ' +
-        'id="sme-sbtn-' + key + '" ' +
-        'onclick="smeShowScenario(\'' + key + '\',this)" ' +
-        'style="--chip-color:' + g.color + ';--chip-bg:' + g.bg + '">' +
-        '<span class="sme-proto-chip-num">' + (si + 1) + '</span>' +
-        sc.title +
-      '</button>';
-    }
-    chipsHtml += '</div>';
-  }
-
-  /* Phone + Dev panel */
+  /* Phone + Dev panel side by side */
   var mainHtml =
     '<div class="sme-prototype-main">' +
       '<div class="sme-phone-wrap">' +
@@ -299,26 +293,35 @@ function smeRenderPrototype() {
       '</div>' +
     '</div>';
 
-  el.innerHTML = catHtml + '<div class="sme-proto-chips-wrap">' + chipsHtml + '</div>' + mainHtml;
-
-  smeShowScenario(smeCurrentScenario, document.getElementById('sme-sbtn-' + smeCurrentScenario));
+  el.innerHTML = pickerHtml + mainHtml;
+  smeOnCategoryChange('happy');
 }
 
-function smeSelectCategory(catId, btn) {
-  var cats = document.querySelectorAll('.sme-proto-cat');
-  for (var i = 0; i < cats.length; i++) cats[i].classList.remove('active');
-  if (btn) btn.classList.add('active');
-
-  var rows = document.querySelectorAll('.sme-proto-chip-row');
-  for (var j = 0; j < rows.length; j++) rows[j].classList.remove('active');
-  var target = document.getElementById('sme-chips-' + catId);
-  if (target) target.classList.add('active');
-
-  /* Auto-select first chip in category */
-  if (target) {
-    var firstChip = target.querySelector('.sme-proto-chip');
-    if (firstChip) firstChip.click();
+function smeOnCategoryChange(catId) {
+  var grp = null;
+  for (var i = 0; i < window._smeProtoGroups.length; i++) {
+    if (window._smeProtoGroups[i].id === catId) { grp = window._smeProtoGroups[i]; break; }
   }
+  if (!grp) return;
+
+  var stepsEl = document.getElementById('sme-proto-steps');
+  if (!stepsEl) return;
+
+  var html = '';
+  for (var j = 0; j < grp.items.length; j++) {
+    var item = grp.items[j];
+    html += '<button class="sme-proto-step-btn' + (j === 0 ? ' active' : '') + '" ' +
+      'id="sme-sbtn-' + item.key + '" ' +
+      'onclick="smeShowScenario(\'' + item.key + '\',this)" ' +
+      'style="--step-color:' + grp.color + '">' +
+      item.short +
+    '</button>';
+  }
+  stepsEl.innerHTML = html;
+
+  /* Auto-select first */
+  var firstKey = grp.items[0].key;
+  smeShowScenario(firstKey, document.getElementById('sme-sbtn-' + firstKey));
 }
 
 function smeShowScenario(name, btn) {
@@ -335,7 +338,7 @@ function smeShowScenario(name, btn) {
   var titleEl = document.getElementById('sme-dev-panel-title');
   if (titleEl) titleEl.textContent = data.title;
 
-  var allChips = document.querySelectorAll('.sme-proto-chip');
+  var allChips = document.querySelectorAll('.sme-proto-step-btn');
   for (var i = 0; i < allChips.length; i++) allChips[i].classList.remove('active');
   if (btn) {
     btn.classList.add('active');
