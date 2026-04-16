@@ -18,7 +18,11 @@ var SLUG_TO_ID = {
   'delete-consent': 'cmi-cmi07', 'get-payments': 'cmi-cmi08',
   'payment-flow': 'sipcop-flow', 'cop-deep-dive': 'sipcop-cop-detail',
   'user-stories': 'sipcop-stories', 'sip-prototype': 'sipcop-prototype',
-  'rst-scenarios': 'sipcop-rst', 'design-gaps': 'sipcop-gaps'
+  'rst-scenarios': 'sipcop-rst', 'design-gaps': 'sipcop-gaps',
+  'sme-overview': 'smesip-overview', 'sme-e2e-flow': 'smesip-flow',
+  'sme-prototype': 'smesip-prototype', 'sme-acceptance': 'smesip-acceptance',
+  'sme-architecture': 'smesip-architecture', 'sme-api-reference': 'smesip-apis',
+  'sme-gaps': 'smesip-gaps'
 };
 var ID_TO_SLUG = {};
 for (var slug in SLUG_TO_ID) { ID_TO_SLUG[SLUG_TO_ID[slug]] = slug; }
@@ -43,7 +47,7 @@ function parseHash() {
 
   if (slug) {
     var id = SLUG_TO_ID[slug] || slug;
-    if (section === 'overview' || section === 'consent' || section === 'lfi' || section === 'cmi' || section === 'sipcop') {
+    if (section === 'overview' || section === 'consent' || section === 'lfi' || section === 'cmi' || section === 'sipcop' || section === 'smesip') {
       anchor = 'tab-' + id;
     }
   }

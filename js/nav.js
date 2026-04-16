@@ -48,7 +48,7 @@ function navigateToRoute(section, anchor) {
   }
 
   // Update breadcrumb
-  var names = { overview: 'General Overview', consent: 'Consent & Scheduler', lfi: 'LFI Project', sipcop: 'SIP CoP Flow', cmi: 'CMI Dashboard' };
+  var names = { overview: 'General Overview', consent: 'Consent & Scheduler', lfi: 'LFI Project', smesip: 'SME SIP Portal', sipcop: 'SIP CoP Flow', cmi: 'CMI Dashboard' };
   document.getElementById('bc-current').textContent = names[section] || section;
 
   // Handle tab activation for overview
@@ -98,6 +98,24 @@ function navigateToRoute(section, anchor) {
 
     var lfiNavItem = document.getElementById('nav-' + lfiTabName);
     if (lfiNavItem) lfiNavItem.classList.add('active');
+  }
+
+  // Handle SME SIP Portal navigation
+  if (section === 'smesip') {
+    if (typeof smeSipInit === 'function' && !window._smeSipInitDone) {
+      smeSipInit();
+      window._smeSipInitDone = true;
+    }
+    if (anchor) {
+      var smeTabName = anchor.replace('tab-smesip-', '');
+      if (typeof smeGoTab === 'function') smeGoTab(smeTabName);
+      var smeNavItem = document.getElementById('nav-smesip-' + smeTabName);
+      if (smeNavItem) smeNavItem.classList.add('active');
+    } else {
+      if (typeof smeGoTab === 'function') smeGoTab('overview');
+      var smeOverviewNav = document.getElementById('nav-smesip-overview');
+      if (smeOverviewNav) smeOverviewNav.classList.add('active');
+    }
   }
 
   // Handle SIP CoP Flow navigation

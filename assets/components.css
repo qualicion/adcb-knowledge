@@ -884,6 +884,356 @@
 }
 
 /* ============================================================
+   SME SIP Solution Portal — Component Styles
+   LFI-side SME Single Instant Payment journey
+   All classes prefixed with sme-
+   ============================================================ */
+
+/* ── SME PAGES ── */
+.sme-page{display:none;}
+.sme-page.active{display:block;animation:fadeIn .25s ease;}
+
+/* ── SME SECTION TABS ── */
+.sme-tab-bar{
+  display:flex;gap:0;border-bottom:2px solid var(--color-border);
+  margin-bottom:var(--space-section-gap);overflow-x:auto;
+}
+.sme-stab{
+  padding:10px 18px;font:var(--font-body);font-weight:500;
+  color:var(--color-text-secondary);cursor:pointer;
+  border-bottom:3px solid transparent;margin-bottom:-2px;
+  user-select:none;white-space:nowrap;transition:all .15s ease;
+}
+.sme-stab:hover{color:var(--color-text-primary);}
+.sme-stab.active{color:var(--navy);border-bottom-color:var(--navy);font-weight:700;}
+
+/* ── SME METRICS ── */
+.sme-metrics-row{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:12px;
+  margin-bottom:var(--space-section-gap);
+}
+.sme-metric-card{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-card);padding:20px 16px;text-align:center;
+}
+.sme-metric-num{
+  font-size:32px;font-weight:800;line-height:1;margin-bottom:6px;
+}
+.sme-metric-label{
+  font:var(--font-label);color:var(--color-text-secondary);line-height:1.4;
+}
+
+/* ── SME COLLAPSIBLE ── */
+.sme-collapsible{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-card);overflow:hidden;margin-bottom:12px;
+}
+.sme-collapsible-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;cursor:pointer;user-select:none;
+  background:var(--color-surface-secondary);transition:background .1s;
+}
+.sme-collapsible-header:hover{background:var(--color-border);}
+.sme-collapsible-title{
+  font-size:14px;font-weight:700;color:var(--navy);flex:1;
+}
+.sme-collapsible-chev{
+  color:var(--color-text-tertiary);font-size:10px;
+}
+
+/* ── SME FLOW ── */
+.sme-flow-container{overflow-x:auto;padding-bottom:8px;}
+.sme-flow-steps{
+  display:flex;align-items:flex-start;gap:0;min-width:max-content;
+}
+.sme-flow-step{display:flex;align-items:center;gap:0;}
+.sme-flow-node{
+  width:100px;min-height:90px;border:2px solid;border-radius:var(--radius-card);
+  padding:12px 8px;text-align:center;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;cursor:default;
+}
+.sme-flow-arrow{
+  width:28px;text-align:center;color:var(--color-border);font-size:18px;flex-shrink:0;
+}
+
+/* ── SME PROTOTYPE LAYOUT ── */
+.sme-prototype-layout{
+  display:flex;gap:16px;align-items:flex-start;
+}
+.sme-prototype-sidebar{
+  width:220px;flex-shrink:0;
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-card);padding:12px;
+}
+.sme-scenario-group{margin-bottom:14px;}
+.sme-scenario-group:last-child{margin-bottom:0;}
+.sme-scenario-group-label{
+  font:var(--font-label);font-weight:700;text-transform:uppercase;
+  letter-spacing:.7px;margin-bottom:6px;padding-left:4px;
+}
+.sme-scenario-btn{
+  display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;
+  border:none;background:transparent;border-radius:var(--radius-button);
+  cursor:pointer;font:var(--font-body);color:var(--color-text-secondary);
+  text-align:left;border-left:3px solid transparent;
+  transition:background .1s;user-select:none;margin-bottom:2px;
+}
+.sme-scenario-btn:hover{background:var(--color-surface-secondary);color:var(--color-text-primary);}
+.sme-scenario-btn.active{
+  background:var(--color-surface-secondary);color:var(--navy);font-weight:600;
+}
+.sme-scenario-indicator{
+  width:7px;height:7px;border-radius:50%;flex-shrink:0;
+}
+.sme-prototype-main{
+  flex:1;display:flex;gap:16px;align-items:flex-start;min-width:0;
+}
+.sme-phone-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.sme-phone-label{
+  font:var(--font-label);color:var(--color-text-secondary);
+  text-align:center;font-weight:600;
+}
+.sme-phone-frame{
+  width:280px;background:#F8FAFC;border-radius:32px;
+  border:7px solid #1C1C1E;overflow:hidden;
+  display:flex;flex-direction:column;position:relative;
+  min-height:540px;flex-shrink:0;
+}
+.sme-phone-notch{
+  height:24px;background:#1C1C1E;border-radius:0 0 14px 14px;
+  width:90px;margin:0 auto;flex-shrink:0;
+}
+.sme-phone-screen{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+}
+.sme-phone-screen::-webkit-scrollbar{display:none;}
+
+/* ── SME DEV PANEL ── */
+.sme-dev-panel{
+  flex:1;min-width:0;background:#0D1117;border-radius:var(--radius-card);
+  border:1px solid #30363D;overflow:hidden;display:flex;flex-direction:column;
+}
+.sme-dev-panel-header{
+  background:#161B22;border-bottom:1px solid #30363D;
+  padding:10px 16px;font-size:12px;font-weight:700;color:#8B949E;
+  text-transform:uppercase;letter-spacing:.6px;
+}
+.sme-dev-panel-body{padding:14px;overflow-y:auto;flex:1;}
+.sme-dev-section{margin-bottom:16px;}
+.sme-dev-label{
+  font-size:10px;font-weight:700;color:#8B949E;
+  text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;
+}
+.sme-dev-path{
+  display:block;font-family:var(--font-family-mono);font-size:12px;
+  color:#7EE787;margin-bottom:8px;word-break:break-all;
+}
+
+/* Method badges */
+.sme-api-badge{
+  display:inline-block;padding:2px 8px;border-radius:4px;
+  font-size:10px;font-weight:800;letter-spacing:.4px;margin-bottom:6px;
+}
+.sme-badge-get{background:#0D4F3C;color:#3FB950;}
+.sme-badge-post{background:#1A3557;color:#58A6FF;}
+.sme-badge-patch{background:#4D3800;color:#D29922;}
+.sme-badge-oauth{background:#3B2A4E;color:#BC8CFF;}
+
+/* Code blocks (dark theme) */
+.sme-code-block{
+  background:#0D1117;border:1px solid #30363D;border-radius:6px;
+  padding:12px 14px;font-family:var(--font-family-mono);font-size:11px;
+  line-height:1.6;white-space:pre-wrap;word-break:break-all;margin:0;
+  overflow-x:auto;
+}
+/* Syntax token colours */
+.sme-ck{color:#8B949E;}   /* comment */
+.sme-cv{color:#C9D1D9;}   /* default / value */
+.sme-cs{color:#A5D6FF;}   /* string */
+.sme-cn{color:#79C0FF;}   /* number */
+
+/* ── SME ALTAREQ SCREEN COMPONENTS ── */
+.sme-at-header{
+  background:#0F766E;padding:12px 16px;display:flex;
+  align-items:center;justify-content:center;flex-shrink:0;
+}
+.sme-at-logo{
+  font-size:16px;font-weight:800;color:#fff;letter-spacing:.5px;
+}
+.sme-at-stepper{
+  display:flex;align-items:center;padding:10px 14px;
+  background:#fff;border-bottom:1px solid var(--color-border);flex-shrink:0;
+}
+.sme-at-step{
+  display:flex;align-items:center;gap:5px;font-size:10px;
+  font-weight:600;color:var(--color-text-secondary);
+}
+.sme-at-step span{
+  width:18px;height:18px;border-radius:50%;background:var(--color-border);
+  color:var(--color-text-secondary);font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.sme-at-step-active{color:#0F766E;}
+.sme-at-step-active span{background:#0F766E;color:#fff;}
+.sme-at-step-line{flex:1;height:1px;background:var(--color-border);margin:0 6px;}
+
+.sme-at-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 0;border-bottom:1px solid var(--color-border);
+}
+.sme-at-row-k{font-size:12px;color:var(--color-text-secondary);}
+.sme-at-row-v{font-size:13px;font-weight:600;color:var(--color-text-primary);text-align:right;max-width:60%;}
+
+.sme-at-btn-primary{
+  display:block;width:100%;padding:12px;
+  background:linear-gradient(135deg,#0F766E,#0E9488);
+  color:#fff;font-size:14px;font-weight:700;border:none;
+  border-radius:var(--radius-button);cursor:pointer;text-align:center;
+  box-sizing:border-box;
+}
+.sme-at-btn-cancel{
+  display:block;width:100%;padding:11px;margin-top:8px;
+  background:transparent;color:var(--color-text-secondary);
+  font-size:13px;font-weight:600;border:1px solid var(--color-border);
+  border-radius:var(--radius-button);cursor:pointer;text-align:center;
+  box-sizing:border-box;
+}
+
+.sme-at-auth-opt{
+  padding:10px 12px;border:1.5px solid var(--color-border);
+  border-radius:var(--radius-button);margin-bottom:8px;
+  font-size:13px;font-weight:500;color:var(--color-text-primary);
+  cursor:pointer;
+}
+.sme-at-auth-active{
+  border-color:#E31E24;background:#FFF8F8;color:#E31E24;font-weight:700;
+}
+
+.sme-at-acct-item{
+  display:flex;align-items:center;gap:10px;padding:9px 0;
+  border-bottom:1px solid var(--color-border);
+}
+.sme-at-acct-selected{
+  background:#F0FDFA;border-radius:var(--radius-button);
+  padding:9px 10px;border:1px solid #99F6E4;
+}
+
+/* PIN keypad */
+.sme-pin-key{
+  display:flex;align-items:center;justify-content:center;
+  height:44px;border-radius:var(--radius-button);background:var(--color-surface-secondary);
+  border:1px solid var(--color-border);font-size:18px;font-weight:600;
+  color:var(--color-text-primary);cursor:pointer;user-select:none;
+}
+.sme-pin-key:active{background:var(--color-border);}
+
+/* ── SME ACCEPTANCE CRITERIA ── */
+.sme-ac-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:12px;padding:16px;
+}
+.sme-ac-card{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-card);overflow:hidden;
+}
+.sme-ac-card-header{
+  padding:10px 14px;background:var(--color-surface-secondary);
+  border-bottom:1px solid var(--color-border);
+  display:flex;align-items:center;gap:8px;
+}
+.sme-ac-id{
+  font-family:var(--font-family-mono);font-size:11px;font-weight:800;
+  color:var(--navy);flex-shrink:0;
+}
+.sme-ac-title{font-size:12px;font-weight:700;color:var(--color-text-primary);}
+
+.sme-ac-gwt{display:flex;flex-direction:column;gap:0;}
+.sme-gwt-row{padding:8px 14px;border-bottom:1px solid var(--color-border);}
+.sme-gwt-row:last-child{border-bottom:none;}
+.sme-gwt-given{background:#EFF6FF;}
+.sme-gwt-when{background:#FFFBEB;}
+.sme-gwt-then{background:#F0FDF4;}
+.sme-gwt-key{
+  font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;
+  display:inline-block;margin-bottom:4px;
+}
+.sme-gwt-given .sme-gwt-key{color:#1E40AF;}
+.sme-gwt-when .sme-gwt-key{color:#92400E;}
+.sme-gwt-then .sme-gwt-key{color:#14532D;}
+.sme-gwt-list{
+  margin:0;padding-left:16px;
+  list-style:disc;
+}
+.sme-gwt-list li{
+  font-size:12px;color:var(--color-text-secondary);
+  line-height:1.5;margin-bottom:3px;
+}
+.sme-gwt-list li:last-child{margin-bottom:0;}
+
+/* ── SME ARCHITECTURE ── */
+.sme-arch-row{
+  display:flex;align-items:stretch;gap:0;
+  overflow-x:auto;margin-bottom:16px;
+}
+.sme-arch-box{
+  flex:1;min-width:140px;border-radius:var(--radius-card);
+  padding:16px 14px;border:2px solid;display:flex;flex-direction:column;
+}
+.sme-arch-box-name{font-size:14px;font-weight:800;margin-bottom:2px;}
+.sme-arch-box-sub{font-size:10px;font-weight:400;margin-bottom:10px;opacity:.75;}
+.sme-arch-box-list{margin:0;padding-left:14px;list-style:disc;}
+.sme-arch-box-list li{font-size:11px;line-height:1.5;margin-bottom:4px;}
+
+.sme-arch-tpp{background:#EFF6FF;border-color:#BFDBFE;color:#1E40AF;}
+.sme-arch-nebras{background:#F5F3FF;border-color:#DDD6FE;color:#5B21B6;}
+.sme-arch-adcb{background:#FFF1F0;border-color:#FECACA;color:#991B1B;}
+.sme-arch-procash{background:#F0FDFA;border-color:#99F6E4;color:#0F766E;}
+
+.sme-arch-arr{
+  width:28px;min-width:28px;display:flex;align-items:center;
+  justify-content:center;color:var(--color-border);font-size:16px;flex-shrink:0;
+}
+
+/* ── SME API SECTIONS ── */
+.sme-api-path{
+  font-family:var(--font-family-mono);font-size:13px;color:var(--navy);
+}
+
+/* ── SME GAP CARDS ── */
+.sme-gap-card{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-card);overflow:hidden;margin-bottom:14px;
+}
+.sme-gap-card-header{
+  padding:14px 16px;border-bottom:1px solid var(--color-border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sme-gap-item{
+  padding:14px 16px 14px 20px;border-bottom:1px solid var(--color-border);
+  margin-bottom:0;
+}
+.sme-gap-item:last-child{border-bottom:none;}
+
+/* ── RESPONSIVE ── */
+@keyframes sme-spin{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
+
+@media(max-width:900px){
+  .sme-prototype-layout{flex-direction:column;}
+  .sme-prototype-sidebar{width:100%;}
+  .sme-prototype-main{flex-direction:column;}
+  .sme-metrics-row{grid-template-columns:repeat(3,1fr);}
+  .sme-ac-grid{grid-template-columns:1fr;}
+  .sme-arch-row{flex-direction:column;}
+  .sme-arch-arr{transform:rotate(90deg);}
+}
+@media(max-width:600px){
+  .sme-metrics-row{grid-template-columns:1fr 1fr;}
+}
+
+/* ============================================================
    SIP CoP Flow — Component Styles
    Single Instant Payment with Confirmation of Payee
    ============================================================ */
