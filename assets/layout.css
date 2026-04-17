@@ -23,9 +23,12 @@ body{font:var(--font-body);background:var(--color-surface-secondary);color:var(-
 
 .nav-section{padding:16px 0 8px;overflow-y:auto;flex:1;}
 .nav-group-label{
-  font:var(--font-label);color:rgba(255,255,255,.35);
-  letter-spacing:1.4px;text-transform:uppercase;
-  padding:0 22px 8px;
+  font:var(--font-label);font-weight:700;color:rgba(255,255,255,.85);
+  letter-spacing:1.6px;text-transform:uppercase;
+  padding:8px 22px;margin:0 -16px;
+  background:rgba(255,255,255,.08);
+  border-top:1px solid rgba(255,255,255,.1);
+  border-bottom:1px solid rgba(255,255,255,.06);
 }
 .nav-item{
   display:flex;align-items:center;gap:10px;
