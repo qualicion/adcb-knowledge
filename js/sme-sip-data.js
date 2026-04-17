@@ -1256,6 +1256,21 @@ var SME_SIP_ARCH = {
     { name: 'ProCash',    desc: 'ADCB\'s mobile banking app for SME customers. Handles authentication (EFR/PIN/Face ID) and renders the AlTareq consent screens.' },
     { name: 'CASA',       desc: 'Current Account and Savings Account held at ADCB. Only eligible CASA accounts in AED are returned for SME SIP payments.' },
     { name: 'IPS/UAEFTS', desc: 'UAE Instant Payment System and UAE Funds Transfer System — the underlying payment rails that execute the SIP once authorised.' }
+  ],
+
+  glossary: [
+    { term: 'PAR', full: 'Pushed Authorisation Request', plain: 'Before the TPP can redirect you to your bank, it sends a sealed request to the hub saying "I want to start a payment." The hub checks it\'s genuine and gives back a one-time ticket (request_uri). Think of it as getting a visitor pass before entering the building.' },
+    { term: 'mTLS', full: 'Mutual TLS (Transport Layer Security)', plain: 'Normal HTTPS means the website proves its identity to you. mTLS goes both ways — the TPP also has to prove its identity to the bank. Both sides show their certificates. Like two people at a door both showing their ID badges before either one can enter.' },
+    { term: 'FAPI 2.0', full: 'Financial-grade API Security Profile', plain: 'A set of security rules specifically designed for banking. It says: "normal web security isn\'t good enough for moving money — use these extra-strict rules." Every API call in Open Finance must follow FAPI 2.0.' },
+    { term: 'PKCE', full: 'Proof Key for Code Exchange', plain: 'When the TPP sends you to the bank, it creates a secret code and sends a scrambled version. When the bank sends you back, the TPP proves it\'s the same app by showing the original secret. This prevents someone from hijacking the redirect and stealing the authorisation.' },
+    { term: 'SCA', full: 'Strong Customer Authentication', plain: 'You must prove you\'re really you using at least two different methods — e.g. something you know (PIN) and something you have (your phone). Just a password isn\'t enough. This is why you enter a PIN or use Face ID during the payment flow.' },
+    { term: 'JAR', full: 'JWT-Secured Authorisation Request', plain: 'Instead of sending payment details as plain text, the TPP wraps them in a digitally signed envelope (a JWT). The bank can verify the envelope wasn\'t tampered with in transit. Like a wax-sealed letter — you can tell if someone opened it.' },
+    { term: 'CoP', full: 'Confirmation of Payee', plain: 'Before you send money, the system checks: "does the name you typed match the actual name on that bank account?" This catches typos and prevents you from accidentally paying the wrong person or getting scammed.' },
+    { term: 'OAuth 2.0', full: 'Open Authorization 2.0', plain: 'The standard way to let one app (the TPP) access your data at another app (your bank) without giving it your password. You log in directly at your bank, approve the request, and the bank gives the TPP a time-limited token instead.' },
+    { term: 'EFR', full: 'Electronic Fund Release', plain: 'The final step where ADCB releases the money. In practice, this is your PIN entry or biometric confirmation in ProCash. Once you pass EFR, the payment is authorised and sent to the payment rail.' },
+    { term: 'Deep Link', full: 'App-to-App Direct Navigation', plain: 'A special URL that opens a specific screen inside a mobile app instead of a website. When the TPP redirects you, the deep link goes straight to ProCash\'s consent screen — no browser, no extra steps.' },
+    { term: 'IBAN', full: 'International Bank Account Number', plain: 'A standardised format for identifying bank accounts across borders. In the UAE it starts with "AE" followed by 21 digits. Every CASA account at ADCB has one. v2.1 requires IBAN format for all domestic creditor accounts.' },
+    { term: 'CASA', full: 'Current Account / Savings Account', plain: 'The standard bank accounts you use day-to-day. For SME SIP, only AED CASA accounts are eligible — no foreign currency accounts, no fixed deposits, no investment accounts.' }
   ]
 };
 

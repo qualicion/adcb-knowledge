@@ -253,24 +253,28 @@ function smeRenderPrototype() {
       ]},
     { id:'variants', label:'\uD83D\uDD04 Account Variants', color:'#D97706',
       items:[
-        {key:'one-account',short:'1 Account'},
-        {key:'two-accounts',short:'2 Accounts'},
-        {key:'tpp-selected',short:'TPP Pre-selected'}
+        {key:'login',short:'1. Login'},
+        {key:'consent-details',short:'2. Consent'},
+        {key:'one-account',short:'\u2794 1 Account'},
+        {key:'two-accounts',short:'\u2794 2 Accounts'},
+        {key:'tpp-selected',short:'\u2794 TPP Pre-selected'}
       ]},
     { id:'errors', label:'\u274C Error Screens', color:'#E31E24',
       items:[
-        {key:'access-restricted',short:'Access Restricted'},
-        {key:'no-accounts',short:'No Accounts'},
-        {key:'auth-expired',short:'Auth Expired'},
-        {key:'unsuccessful',short:'Unsuccessful'}
+        {key:'login',short:'1. Login'},
+        {key:'identify-superuser',short:'2. Eligibility'},
+        {key:'access-restricted',short:'\u2794 Access Restricted'},
+        {key:'no-accounts',short:'\u2794 No Accounts'},
+        {key:'auth-expired',short:'\u2794 Auth Expired'},
+        {key:'unsuccessful',short:'\u2794 PIN Failed (3x)'}
       ]},
     { id:'other', label:'\u2699 Other Flows', color:'#475569',
       items:[
-        {key:'cancel-consent',short:'Cancel'},
-        {key:'tpp-redirect-to-app',short:'TPP Deep Link'},
-        {key:'confirm-payment',short:'Confirm Payment'},
-        {key:'identify-superuser',short:'Superuser Check'},
-        {key:'payment-execution',short:'Payment Exec'},
+        {key:'tpp-redirect-to-app',short:'0. TPP Deep Link'},
+        {key:'login',short:'1. Login'},
+        {key:'cancel-consent',short:'\u2794 Cancel'},
+        {key:'confirm-payment',short:'\u2794 Confirm Payment'},
+        {key:'payment-execution',short:'\u2794 Payment Exec'},
         {key:'timeout-error',short:'Timeout Error'}
       ]}
   ];
@@ -529,8 +533,28 @@ function smeRenderArchitecture() {
 
   secHtml += '</div>';
 
+  /* ── Glossary ── */
+  var glossaryHtml = '';
+  if (SME_SIP_ARCH.glossary && SME_SIP_ARCH.glossary.length) {
+    glossaryHtml =
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
+    for (var gli = 0; gli < SME_SIP_ARCH.glossary.length; gli++) {
+      var g = SME_SIP_ARCH.glossary[gli];
+      glossaryHtml +=
+        '<div style="padding:12px 14px;background:var(--color-surface);border:1px solid var(--color-border);border-left:3px solid var(--teal);border-radius:0 var(--radius-button) var(--radius-button) 0;">' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">' +
+            '<span style="font-size:12px;font-weight:800;color:var(--navy);font-family:var(--font-family-mono);">' + g.term + '</span>' +
+            '<span style="font-size:10px;color:var(--color-text-tertiary);">' + g.full + '</span>' +
+          '</div>' +
+          '<div style="font-size:12px;color:var(--color-text-secondary);line-height:1.6;">' + g.plain + '</div>' +
+        '</div>';
+    }
+    glossaryHtml += '</div>';
+  }
+
   el.innerHTML =
-    smeMakeCollapsible('arch-systems', 'System Interaction Overview', systemsHtml, true) +
+    smeMakeCollapsible('arch-glossary', '&#x1F4D6; Jargon Buster — Technical Terms in Plain English (' + (SME_SIP_ARCH.glossary ? SME_SIP_ARCH.glossary.length : 0) + ' terms)', glossaryHtml, true) +
+    smeMakeCollapsible('arch-systems', 'System Interaction Overview', systemsHtml, false) +
     smeMakeCollapsible('arch-sequence', 'End-to-End Sequence (' + SME_SIP_ARCH.sequence.length + ' phases)', seqHtml, false) +
     smeMakeCollapsible('arch-security', 'Security &amp; Platform', secHtml, false);
 }
