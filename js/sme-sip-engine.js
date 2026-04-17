@@ -131,7 +131,20 @@ function smeRenderOverview() {
   }
   assumHtml += '</div>';
 
-  var html = metricsHtml +
+  /* ── v2.1 Changes Banner ── */
+  var changesHtml = '';
+  if (SME_SIP_OVERVIEW.v21Changes && SME_SIP_OVERVIEW.v21Changes.length) {
+    changesHtml =
+      '<div style="background:linear-gradient(135deg,var(--navy),#2B4B8A);border-radius:var(--radius-card);padding:16px 20px;margin-bottom:var(--space-section-gap);border-left:4px solid #D4A843;">' +
+        '<div style="font-size:12px;font-weight:700;color:#D4A843;margin-bottom:10px;letter-spacing:.5px;">Standards v2.1-final — Key Changes for SME SIP (DOF-2828)</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
+    for (var ci = 0; ci < SME_SIP_OVERVIEW.v21Changes.length; ci++) {
+      changesHtml += '<div style="font-size:11px;color:rgba(255,255,255,0.85);line-height:1.5;">&#x2713; ' + SME_SIP_OVERVIEW.v21Changes[ci] + '</div>';
+    }
+    changesHtml += '</div></div>';
+  }
+
+  var html = changesHtml + metricsHtml +
     smeMakeCollapsible('scope', 'Scope — In &amp; Out', scopeHtml, true) +
     smeMakeCollapsible('journey', '9-Step Customer Journey', journeyHtml, false) +
     smeMakeCollapsible('assumptions', 'Key Assumptions (' + SME_SIP_OVERVIEW.assumptions.length + ')', assumHtml, false);
@@ -572,6 +585,15 @@ function smeRenderGaps() {
   var el = document.getElementById('sme-gaps-content');
   if (!el || !SME_SIP_GAPS) return;
 
+  /* Resolved banner */
+  var resolvedBanner = '';
+  if (SME_SIP_GAPS.resolved && SME_SIP_GAPS.resolved.length) {
+    resolvedBanner =
+      '<div style="background:#F0FDF4;border:1px solid #A8D5BF;border-radius:var(--radius-card);padding:12px 16px;margin-bottom:var(--space-section-gap);font-size:12px;">' +
+        '<strong style="color:#15803D;">Resolved by DOF-2828 (v2.1 alignment):</strong> ';
+    resolvedBanner += SME_SIP_GAPS.resolved.join(' &middot; ');
+    resolvedBanner += '</div>';
+  }
   var sections = [
     {
       key: 'critical',
@@ -679,7 +701,7 @@ function smeRenderGaps() {
     html += cardHtml;
   }
 
-  el.innerHTML = html;
+  el.innerHTML = resolvedBanner + html;
 }
 
 /* =============================================================

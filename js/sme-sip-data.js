@@ -46,7 +46,7 @@ var SME_SIP_OVERVIEW = {
     { num: 2, step: 'App Installed Check',             who: 'TPP',  desc: 'Device checks if ProCash is installed. If not, redirects to App Store / Play Store.' },
     { num: 3, step: 'ProCash Login / Authentication',  who: 'ADCB', desc: 'Customer authenticates via Mobile Token, Hard Token, SMS OTP, or Face ID.' },
     { num: 4, step: 'Eligibility Check',               who: 'ADCB', desc: 'ADCB checks: Super User role, has eligible CASA accounts, within auth window.' },
-    { num: 5, step: 'Consent Details Screen',          who: 'ADCB', desc: 'AlTareq consent screen shows payee, amount, date, reference, account number.' },
+    { num: 5, step: 'Confirm Payment Details',          who: 'ADCB', desc: 'AlTareq consent screen shows payee, amount, date, reference, account number, and Payment Purpose (v2.1). TPP name and permission text displayed.' },
     { num: 6, step: 'Account Selection',               who: 'ADCB', desc: 'Customer selects debit account. If only one eligible account, pre-selected. TPP may pre-select.' },
     { num: 7, step: 'EFR / PIN Entry',                 who: 'ADCB', desc: 'Customer enters 6-digit PIN to authorise. Three failed attempts lock the session.' },
     { num: 8, step: 'LFI to TPP Redirect',             who: 'ADCB', desc: 'ADCB redirects customer back to TPP app with payment consent status.' },
@@ -56,8 +56,19 @@ var SME_SIP_OVERVIEW = {
   assumptions: [
     'Payment Frequency is NOT shown on the consent screen for SIP — it is a one-off payment by definition.',
     'Date of transaction defaults to today (T+0); no future-dated SIP in this scope.',
-    'Payment Purpose is captured in Nebras backend and is NOT displayed in the ProCash UI.',
+    '<strong>Payment Purpose</strong> <span style="background:#E8F5F0;color:#1A6B4A;padding:2px 6px;border-radius:3px;font-size:11px;font-weight:700;">v2.1 CHANGE</span> is now shown in the consent UI per Standards v2.1-final (DOF-2828). Previously captured in Nebras backend only. Shown alongside amount, payee, date, account number, and payment reference.',
     'All monetary values are displayed in Dirhams (AED) with the currency label "Dirhams".'
+  ],
+
+  v21Changes: [
+    'Payment Purpose now shown in consent UI (was Nebras-only in v2.0)',
+    'Screen title changed from "Authorize Consent" to "Confirm Payment Details"',
+    'TPP name + permission text added below AlTareq logo on consent screen',
+    'Redirect screen shows TPP app logo + name ("redirected back to [TPP]")',
+    'Account section variant labels updated per v2.1 wireframes',
+    'ConsentSchedule mandatory constraint removed across all flows',
+    'Creditor field: Domestic = IBAN only (ConfirmationOfPayeeResponse no longer required)',
+    'ReadParty API expanded for SME and Corporate entities'
   ]
 };
 
@@ -166,6 +177,7 @@ var SME_SIP_SCENARIOS = {
       '<div class="sme-at-header">' +
         '<div class="sme-at-logo">AlTareq</div>' +
       '</div>' +
+      '<div style="text-align:center;font-size:10px;color:#475569;padding:4px 14px 6px;line-height:1.4;"><strong style="color:#0F172A;">Noon Ltd</strong> needs your permission to make the payment below.</div>' +
       '<div class="sme-at-stepper">' +
         '<div class="sme-at-step sme-at-step-active"><span>1</span> Consent</div>' +
         '<div class="sme-at-step-line"></div>' +
@@ -174,12 +186,13 @@ var SME_SIP_SCENARIOS = {
         '<div class="sme-at-step"><span>3</span> Complete</div>' +
       '</div>' +
       '<div style="padding:12px 16px;">' +
-        '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:12px;">Review Payment Details</div>' +
+        '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:12px;">Confirm Payment Details</div>' +
         '<div class="sme-at-row"><span class="sme-at-row-k">Amount</span><span class="sme-at-row-v" style="color:#E31E24;font-weight:700;">100 Dirhams</span></div>' +
         '<div class="sme-at-row"><span class="sme-at-row-k">Payee</span><span class="sme-at-row-v">Noon</span></div>' +
         '<div class="sme-at-row"><span class="sme-at-row-k">Account Number</span><span class="sme-at-row-v" style="font-family:monospace;font-size:11px;">AE21 0610 0123 4567 8901 234</span></div>' +
         '<div class="sme-at-row"><span class="sme-at-row-k">Date</span><span class="sme-at-row-v">16 Apr 2026</span></div>' +
         '<div class="sme-at-row"><span class="sme-at-row-k">Reference</span><span class="sme-at-row-v">ORD-20260416-001</span></div>' +
+        '<div class="sme-at-row"><span class="sme-at-row-k">Payment Purpose</span><span class="sme-at-row-v" style="color:#0F766E;">Ride Payment <span style="background:#E8F5F0;border-radius:2px;padding:1px 4px;font-size:9px;font-weight:700;color:#1A6B4A;">v2.1</span></span></div>' +
         '<div style="margin-top:14px;padding:10px 12px;background:#F0FDFA;border:1px solid #99F6E4;border-radius:8px;">' +
           '<div style="font-size:11px;color:#0F766E;font-weight:700;margin-bottom:4px;">Account to Pay from</div>' +
           '<div style="font-size:13px;font-weight:700;color:#0F172A;">ADCB Current — **** 4521</div>' +
@@ -202,6 +215,7 @@ var SME_SIP_SCENARIOS = {
     title: 'Account Selection — 5 Accounts',
     screenHtml:
       '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
+      '<div style="text-align:center;font-size:10px;color:#475569;padding:4px 14px 6px;line-height:1.4;"><strong style="color:#0F172A;">Noon Ltd</strong> needs your permission to make the payment below.</div>' +
       '<div class="sme-at-stepper">' +
         '<div class="sme-at-step sme-at-step-active"><span>1</span> Consent</div>' +
         '<div class="sme-at-step-line"></div>' +
@@ -238,6 +252,7 @@ var SME_SIP_SCENARIOS = {
     title: 'Account Selected — Highlighted',
     screenHtml:
       '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
+      '<div style="text-align:center;font-size:10px;color:#475569;padding:4px 14px 6px;line-height:1.4;"><strong style="color:#0F172A;">Noon Ltd</strong> needs your permission to make the payment below.</div>' +
       '<div class="sme-at-stepper">' +
         '<div class="sme-at-step sme-at-step-active"><span>1</span> Consent</div>' +
         '<div class="sme-at-step-line"></div>' +
@@ -306,12 +321,14 @@ var SME_SIP_SCENARIOS = {
     screenHtml:
       '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,#0F766E 0%,#1C2B4A 100%);padding:30px 20px;text-align:center;">' +
         '<div style="width:56px;height:56px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sme-spin 1s linear infinite;margin-bottom:20px;"></div>' +
-        '<div style="color:#fff;font-size:16px;font-weight:700;margin-bottom:8px;">AlTareq</div>' +
-        '<div style="color:rgba(255,255,255,.8);font-size:13px;line-height:1.6;">Payment authorised successfully.<br/>You\'ll be redirected back to TPP.</div>' +
-        '<div style="margin-top:24px;padding:10px 16px;background:rgba(255,255,255,.12);border-radius:8px;">' +
-          '<div style="color:rgba(255,255,255,.6);font-size:10px;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">Consent Status</div>' +
-          '<div style="color:#fff;font-size:13px;font-weight:700;">Authorised</div>' +
+        '<div style="background:rgba(255,255,255,.15);border-radius:12px;padding:12px 16px;text-align:center;margin-bottom:12px;">' +
+          '<div style="font-size:24px;margin-bottom:6px;">&#x1F6D2;</div>' +
+          '<div style="font-size:13px;font-weight:700;color:white;">Noon Ltd</div>' +
         '</div>' +
+        '<div style="color:#fff;font-size:14px;font-weight:600;margin-bottom:6px;">You\'ll be redirected back to<br/><strong>Noon Ltd</strong></div>' +
+        '<div style="color:rgba(255,255,255,.7);font-size:11px;">don\'t close the window.</div>' +
+        '<div style="margin-top:40px;color:rgba(255,255,255,.5);font-size:10px;">Powered by</div>' +
+        '<div style="color:#fff;font-size:14px;font-weight:700;letter-spacing:2px;margin-top:4px;">ALTAREQ</div>' +
       '</div>',
     apisHtml:
       '<div class="sme-dev-section">' +
@@ -433,7 +450,7 @@ var SME_SIP_SCENARIOS = {
     screenHtml:
       '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
       '<div style="padding:12px 16px;">' +
-        '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:8px;">Review Payment Details</div>' +
+        '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:8px;">Confirm Payment Details</div>' +
         '<div class="sme-at-row"><span class="sme-at-row-k">Amount</span><span class="sme-at-row-v" style="color:#E31E24;font-weight:700;">100 Dirhams</span></div>' +
         '<div class="sme-at-row"><span class="sme-at-row-k">Payee</span><span class="sme-at-row-v">Noon</span></div>' +
         '<div style="margin-top:12px;padding:10px 12px;background:#F0FDFA;border:1px solid #99F6E4;border-radius:8px;display:flex;align-items:center;gap:10px;">' +
@@ -461,7 +478,7 @@ var SME_SIP_SCENARIOS = {
     screenHtml:
       '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
       '<div style="padding:12px 16px;">' +
-        '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:8px;">Review Payment Details</div>' +
+        '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:8px;">Confirm Payment Details</div>' +
         '<div class="sme-at-row"><span class="sme-at-row-k">Amount</span><span class="sme-at-row-v" style="color:#E31E24;font-weight:700;">100 Dirhams</span></div>' +
         '<div class="sme-at-row"><span class="sme-at-row-k">Payee</span><span class="sme-at-row-v">Noon</span></div>' +
         '<div style="margin-top:12px;padding:10px 12px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;">' +
@@ -486,7 +503,7 @@ var SME_SIP_SCENARIOS = {
     screenHtml:
       '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
       '<div style="padding:12px 16px;">' +
-        '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:8px;">Review Payment Details</div>' +
+        '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:8px;">Confirm Payment Details</div>' +
         '<div class="sme-at-row"><span class="sme-at-row-k">Amount</span><span class="sme-at-row-v" style="color:#E31E24;font-weight:700;">100 Dirhams</span></div>' +
         '<div class="sme-at-row"><span class="sme-at-row-k">Payee</span><span class="sme-at-row-v">Noon</span></div>' +
         '<button class="sme-at-btn-primary" style="margin-top:14px;opacity:0.5;">Pay using AlTareq</button>' +
@@ -990,6 +1007,78 @@ var SME_SIP_ACS = [
         ]
       }
     ]
+  },
+  {
+    id: 'DOF-2828',
+    title: 'SME SIP Frontend — Align UI to Standards v2.1',
+    prereq: 'Customer authenticated and passed eligibility. v2.1 standards active.',
+    acs: [
+      {
+        id: 'AC-01',
+        title: 'Account selected at TPP — consent screen layout',
+        given: [
+          'TPP has pre-selected the debtor account in consent initiation',
+          'Standards v2.1-final is active'
+        ],
+        when: ['Customer is shown the consent screen'],
+        then: [
+          'Heading: "Confirm Payment Details"',
+          'Subtitle: "[TPP name] needs your permission to make the payment below."',
+          'Payment fields: Amount, Payee Name, Account Number, Date, Reference, Payment Purpose',
+          'Section: "Account selected for the payment at [TPP name]"',
+          'Pre-selected account shown with ADCB red play icon',
+          'Buttons: "Pay using AlTareq" + "Cancel"'
+        ]
+      },
+      {
+        id: 'AC-02',
+        title: 'Account selected at Bank — consent screen layout',
+        given: [
+          'No account pre-selected by TPP',
+          'Customer has more than 1 eligible account'
+        ],
+        when: ['Customer is shown the consent screen'],
+        then: [
+          'Heading: "Confirm Payment Details"',
+          'Subtitle: "[TPP name] needs your permission..."',
+          'Payment fields including Payment Purpose',
+          'Section: "Please select the account to pay from"',
+          'All eligible accounts shown as radio button list with balances',
+          'Buttons: "Pay using AlTareq" + "Cancel"'
+        ]
+      },
+      {
+        id: 'AC-03',
+        title: 'Only 1 account available — consent screen layout',
+        given: [
+          'Customer has exactly 1 eligible CASA account'
+        ],
+        when: ['Customer is shown the consent screen'],
+        then: [
+          'Heading: "Confirm Payment Details"',
+          'Section: "Account to pay from" (no radio button, auto-shown)',
+          'Account shown with ADCB red play icon + balance',
+          'Payment Purpose displayed',
+          'Buttons: "Pay using AlTareq" + "Cancel"'
+        ]
+      },
+      {
+        id: 'AC-04',
+        title: 'Redirection screen — TPP branding',
+        given: [
+          'Customer has confirmed consent and passed EFR/PIN'
+        ],
+        when: ['Redirect to TPP is triggered'],
+        then: [
+          'Background: AlTareq teal to dark blue gradient',
+          'TPP app icon (logo from TPP registration) is displayed',
+          'TPP name shown prominently (e.g. "Noon Ltd")',
+          'Text: "You\'ll be redirected back to [TPP name], don\'t close the window."',
+          'Spinner animation',
+          '"Powered by AlTareq" at bottom'
+        ]
+      }
+    ]
   }
 ];
 
@@ -1087,7 +1176,7 @@ var SME_SIP_APIS = [
     id: 'get-consent',
     method: 'GET',
     path: '/payment-consents/{ConsentId}',
-    desc: 'Retrieve the current state and details of a payment consent. Called by ProCash to display the consent details screen.',
+    desc: 'Retrieve the current state and details of a payment consent. Called by ProCash to display the consent details screen. <span style="background:#E8F5F0;color:#1A6B4A;padding:2px 6px;border-radius:3px;font-size:11px;font-weight:700;">v2.1:</span> paymentPurpose now shown in ProCash consent UI if provided by TPP.',
     requestHtml:
       '<pre class="sme-code-block"><span class="sme-ck">// Required Headers\n</span><span class="sme-cv">Authorization: </span><span class="sme-cs">Bearer {access_token}\n</span><span class="sme-cv">x-fapi-auth-date: </span><span class="sme-cs">Thu, 16 Apr 2026 10:00:00 GMT\n</span><span class="sme-cv">x-fapi-customer-ip-address: </span><span class="sme-cs">192.168.1.1\n</span><span class="sme-cv">x-fapi-interaction-id: </span><span class="sme-cs">550e8400-e29b</span></pre>',
     responseHtml:
@@ -1183,6 +1272,13 @@ var SME_SIP_APIS = [
 
 var SME_SIP_GAPS = {
 
+  resolved: [
+    'G-10 (Payment Purpose now shown in UI) — resolved by DOF-2828',
+    'G-13 (AlTareq CX mandates Payment Purpose on consent screen) — confirmed by v2.1 wireframes',
+    'Screen title updated to "Confirm Payment Details" — resolved by DOF-2828',
+    'TPP name and permission text now present on consent screen — resolved by DOF-2828'
+  ],
+
   critical: [
     {
       id: 'G-01',
@@ -1211,6 +1307,13 @@ var SME_SIP_GAPS = {
       issue: 'SIP delivery instructions for SME not differentiated from retail SIP',
       why: 'The AC states "follows the same retail delivery" but SME accounts may have different IPS routing, daily limits, or velocity controls compared to retail customers.',
       question: 'Are there any SME-specific IPS/UAEFTS routing rules, limits, or velocity checks distinct from retail SIP?'
+    },
+    {
+      id: 'G-04b',
+      story: 'DOF-2828 v2.1 Alignment',
+      issue: 'TPP name and app icon source not defined',
+      why: 'v2.1 consent screen and redirect screen show the TPP\'s display name and app icon. No story defines where ProCash fetches these from.',
+      question: 'Where does ProCash get the TPP display name and logo? Consent object, Nebras participant directory, or hardcoded? Needs to be confirmed before frontend development.'
     }
   ],
 
@@ -1246,10 +1349,16 @@ var SME_SIP_GAPS = {
       question: 'If all CASA accounts are in foreign currency (e.g. USD), should the "No Accounts" screen cite the currency ineligibility reason?'
     },
     {
+      id: 'G-09b',
+      story: 'DOF-2828 v2.1 Alignment',
+      issue: 'Payment Purpose display rule not defined — if TPP doesn\'t pass a value, should the field be hidden or show a placeholder?',
+      question: 'Is Payment Purpose only shown when passed by TPP (same rule as Payment Reference)? What if it is blank?'
+    },
+    {
       id: 'G-10',
       story: 'DOF-2070 Cancel',
-      issue: 'Android back button behaviour not explicitly covered — treated as Cancel or as abandonment?',
-      question: 'Should the Android back button trigger the Cancel flow (PATCH Rejected: CustomerCancelled) or silently abandon the session?'
+      issue: '<strong style="color:#15803D;">RESOLVED by DOF-2828.</strong> Android back button behaviour now covered — treated as Cancel (PATCH Rejected).',
+      question: 'Resolved — confirmed by v2.1-final alignment.'
     }
   ],
 
@@ -1269,8 +1378,8 @@ var SME_SIP_GAPS = {
     {
       id: 'G-13',
       area: 'CoP',
-      observation: 'For SME SIP, CoP is initiated by the TPP before the payment consent. No AC covers what happens if the SME\'s payee IBAN has a PartialMatch result — whether the SME user sees the CoP warning in ProCash.',
-      reference: 'CBUAE CoP Standards — TPP Obligations'
+      observation: '<strong style="color:#15803D;">PARTIALLY RESOLVED by DOF-2828.</strong> Payment Purpose confirmed on consent screen. CoP PartialMatch display remains open — no AC covers whether the SME user sees the CoP warning in ProCash.',
+      reference: 'CBUAE CoP Standards — TPP Obligations / v2.1-final'
     },
     {
       id: 'G-14',
@@ -1305,6 +1414,21 @@ var SME_SIP_GAPS = {
       id: 'G-19',
       gap: 'Non-SME customer accidentally lands on SME SIP flow — no story',
       action: 'Add a story for what happens when a retail (non-SME) ProCash customer is redirected via a TPP that sent an SME SIP consent. Is the error the same as "Access Restricted"?'
+    },
+    {
+      id: 'G-20',
+      gap: 'v2.1 Creditor field — domestic payments now IBAN only, existing test data may use plain account numbers',
+      action: 'Verify all SIP test scenarios use IBAN format for CreditorAccount.Identification. Update test data that uses plain account number format.'
+    },
+    {
+      id: 'G-21',
+      gap: 'v2.1 file upload grant changed from Authorization Code to Client Credentials — check if SME SIP file upload tests exist',
+      action: 'Update to Client Credentials grant per v2.1 if file upload scenarios are in scope for SME.'
+    },
+    {
+      id: 'G-22',
+      gap: 'DOF-2828 changes consent screens — may require CX re-certification with Nebras before go-live',
+      action: 'Has CX re-certification been submitted to Nebras for the v2.1 screen changes? Nebras must validate before production.'
     }
   ]
 };
