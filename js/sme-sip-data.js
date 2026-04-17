@@ -427,12 +427,13 @@ var SME_SIP_SCENARIOS = {
     title: 'Error — Access Restricted',
     desc: '<strong>What\'s happening:</strong> The customer logged in successfully but is NOT a Super User or Sole Owner (e.g. they are a Maker or Checker in the SME hierarchy). ADCB blocks the consent flow. <strong>Next:</strong> Consent is PATCH\'d to "Rejected" with reason "NotSuperUser". Customer is redirected back to the TPP, which receives the rejection.',
     screenHtml:
-      '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;"><div style="display:flex;align-items:center;gap:6px;"><div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">&#x25B6;</div><div style="font-size:13px;font-weight:700;">Confirm Payment Details</div></div><div style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;">&#x2715;</div></div>' +
+      '<div style="text-align:center;padding:10px;"><div style="font-size:13px;color:#0D3349;">&#x0627;&#x0644;&#x0637;&#x0627;&#x0631;&#x0642;</div><div style="font-size:16px;font-weight:700;color:#0D3349;letter-spacing:2px;">ALTAREQ</div></div>' +
       '<div style="padding:30px 20px;text-align:center;">' +
         '<div style="width:56px;height:56px;border-radius:50%;background:#FEE2E2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px;">&#x2716;</div>' +
         '<div style="font-size:16px;font-weight:700;color:#0F172A;margin-bottom:8px;">Access Restricted</div>' +
         '<div style="font-size:13px;color:#475569;line-height:1.6;margin-bottom:20px;">Only Super Admin users have access to authorise payments. Please contact your account administrator.</div>' +
-        '<button class="sme-at-btn-cancel" style="width:auto;padding:10px 24px;">Return to App</button>' +
+        '<button style="background:white;color:#0F172A;border:1px solid #E2E8F0;border-radius:24px;padding:11px 24px;font-size:13px;font-weight:600;cursor:pointer;">Close</button>' +
       '</div>',
     apisHtml:
       '<div class="sme-dev-section">' +
@@ -449,12 +450,13 @@ var SME_SIP_SCENARIOS = {
     title: 'Error — No Accounts Available',
     desc: '<strong>What\'s happening:</strong> The customer is a Super User but has zero eligible AED CASA accounts. Non-AED and non-CASA accounts are filtered out. <strong>Next:</strong> Consent is rejected, customer is redirected to the TPP. The TPP sees the rejection and can advise the customer to link an eligible account.',
     screenHtml:
-      '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;"><div style="display:flex;align-items:center;gap:6px;"><div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">&#x25B6;</div><div style="font-size:13px;font-weight:700;">Confirm Payment Details</div></div><div style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;">&#x2715;</div></div>' +
+      '<div style="text-align:center;padding:10px;"><div style="font-size:13px;color:#0D3349;">&#x0627;&#x0644;&#x0637;&#x0627;&#x0631;&#x0642;</div><div style="font-size:16px;font-weight:700;color:#0D3349;letter-spacing:2px;">ALTAREQ</div></div>' +
       '<div style="padding:30px 20px;text-align:center;">' +
         '<div style="width:56px;height:56px;border-radius:50%;background:#FEE2E2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px;">&#x2716;</div>' +
         '<div style="font-size:16px;font-weight:700;color:#0F172A;margin-bottom:8px;">No Accounts Available for Payment</div>' +
         '<div style="font-size:13px;color:#475569;line-height:1.6;margin-bottom:20px;">There are no eligible CASA accounts linked to your ProCash profile for this payment.</div>' +
-        '<button class="sme-at-btn-cancel" style="width:auto;padding:10px 24px;">Return to App</button>' +
+        '<button style="background:white;color:#0F172A;border:1px solid #E2E8F0;border-radius:24px;padding:11px 24px;font-size:13px;font-weight:600;cursor:pointer;">Close</button>' +
       '</div>',
     apisHtml:
       '<div class="sme-dev-section">' +
@@ -471,12 +473,13 @@ var SME_SIP_SCENARIOS = {
     title: 'Error — Authorisation Expired',
     desc: '<strong>What\'s happening:</strong> The 10-minute authorisation window has elapsed. The customer took too long to complete the consent journey (e.g. got distracted, left the app). <strong>Next:</strong> Consent is rejected with "AuthWindowExpired". Customer must go back to the TPP and start a new payment request from scratch.',
     screenHtml:
-      '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;"><div style="display:flex;align-items:center;gap:6px;"><div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">&#x25B6;</div><div style="font-size:13px;font-weight:700;">Confirm Payment Details</div></div><div style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;">&#x2715;</div></div>' +
+      '<div style="text-align:center;padding:10px;"><div style="font-size:13px;color:#0D3349;">&#x0627;&#x0644;&#x0637;&#x0627;&#x0631;&#x0642;</div><div style="font-size:16px;font-weight:700;color:#0D3349;letter-spacing:2px;">ALTAREQ</div></div>' +
       '<div style="padding:30px 20px;text-align:center;">' +
         '<div style="width:56px;height:56px;border-radius:50%;background:#FEF3C7;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px;">&#x23F0;</div>' +
         '<div style="font-size:16px;font-weight:700;color:#0F172A;margin-bottom:8px;">Authorisation Expired</div>' +
         '<div style="font-size:13px;color:#475569;line-height:1.6;margin-bottom:20px;">Your 10-minute authorisation window has expired. Please return to the TPP app and try again.</div>' +
-        '<button class="sme-at-btn-cancel" style="width:auto;padding:10px 24px;">Return to App</button>' +
+        '<button style="background:white;color:#0F172A;border:1px solid #E2E8F0;border-radius:24px;padding:11px 24px;font-size:13px;font-weight:600;cursor:pointer;">Close</button>' +
       '</div>',
     apisHtml:
       '<div class="sme-dev-section">' +
@@ -492,12 +495,13 @@ var SME_SIP_SCENARIOS = {
     title: 'Error — Unsuccessful',
     desc: '<strong>What\'s happening:</strong> Either the customer entered the wrong PIN 3 times (MAX_AUTH_ATTEMPTS_EXCEEDED) or a system error occurred during EFR/PIN. The consent is irrecoverably rejected. <strong>Next:</strong> Customer must close ProCash, return to the TPP, and initiate a brand new payment.',
     screenHtml:
-      '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;"><div style="display:flex;align-items:center;gap:6px;"><div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">&#x25B6;</div><div style="font-size:13px;font-weight:700;">Confirm Payment Details</div></div><div style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;">&#x2715;</div></div>' +
+      '<div style="text-align:center;padding:10px;"><div style="font-size:13px;color:#0D3349;">&#x0627;&#x0644;&#x0637;&#x0627;&#x0631;&#x0642;</div><div style="font-size:16px;font-weight:700;color:#0D3349;letter-spacing:2px;">ALTAREQ</div></div>' +
       '<div style="padding:30px 20px;text-align:center;">' +
         '<div style="width:56px;height:56px;border-radius:50%;background:#FEE2E2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px;">&#x2716;</div>' +
         '<div style="font-size:16px;font-weight:700;color:#0F172A;margin-bottom:4px;">Unsuccessful</div>' +
         '<div style="font-size:13px;color:#475569;margin-bottom:20px;">Something went wrong. Please try again.</div>' +
-        '<button class="sme-at-btn-cancel" style="width:auto;padding:10px 24px;">Return to App</button>' +
+        '<button style="background:white;color:#0F172A;border:1px solid #E2E8F0;border-radius:24px;padding:11px 24px;font-size:13px;font-weight:600;cursor:pointer;">Close</button>' +
       '</div>',
     apisHtml:
       '<div class="sme-dev-section">' +
@@ -513,13 +517,14 @@ var SME_SIP_SCENARIOS = {
     title: 'Account Variant — 2 Accounts',
     desc: '<strong>What\'s happening:</strong> Customer has exactly 2 eligible CASA accounts. Both are shown directly — no search bar, no "View All". Neither is pre-selected. <strong>Next:</strong> Customer taps one to select it, then proceeds with "Pay using AlTareq" to the PIN screen.',
     screenHtml:
-      '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;"><div style="display:flex;align-items:center;gap:6px;"><div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">&#x25B6;</div><div style="font-size:13px;font-weight:700;">Confirm Payment Details</div></div><div style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;">&#x2715;</div></div>' +
+      '<div style="text-align:center;padding:10px;"><div style="font-size:13px;color:#0D3349;">&#x0627;&#x0644;&#x0637;&#x0627;&#x0631;&#x0642;</div><div style="font-size:16px;font-weight:700;color:#0D3349;letter-spacing:2px;">ALTAREQ</div></div>' +
       '<div style="padding:12px 16px;">' +
         '<div style="font-size:12px;font-weight:700;color:#0F172A;margin-bottom:8px;">Select Account to Pay from</div>' +
-        '<div class="sme-at-acct-item"><input type="radio" name="acct2" /><div><div style="font-size:12px;font-weight:700;">ADCB Current — **** 4521</div><div style="font-size:10px;color:#475569;">AED 24,500.00</div></div></div>' +
-        '<div class="sme-at-acct-item"><input type="radio" name="acct2" /><div><div style="font-size:12px;font-weight:700;">ADCB Savings — **** 8834</div><div style="font-size:10px;color:#475569;">AED 12,300.50</div></div></div>' +
-        '<button class="sme-at-btn-primary" style="margin-top:12px;">Continue</button>' +
-        '<button class="sme-at-btn-cancel">Cancel</button>' +
+        '<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #f5f5f5;"><div style="width:16px;height:16px;border-radius:50%;border:2px solid #ccc;"></div><div style="flex:1;"><div style="font-size:11px;font-weight:600;">ADCB Current — **** 4521</div><div style="font-size:10px;color:#475569;">AED 24,500.00</div></div></div>' +
+        '<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #f5f5f5;"><div style="width:16px;height:16px;border-radius:50%;border:2px solid #ccc;"></div><div style="flex:1;"><div style="font-size:11px;font-weight:600;">ADCB Savings — **** 8834</div><div style="font-size:10px;color:#475569;">AED 12,300.50</div></div></div>' +
+        '<button style="background:linear-gradient(135deg,#00B4C8,#005f6b);color:white;border:none;border-radius:24px;padding:12px;width:calc(100% - 28px);margin:12px 14px 8px;font-size:13px;font-weight:600;cursor:pointer;">&#x1F512; Pay using AlTareq</button>' +
+        '<button style="background:white;color:#0F172A;border:1px solid #E2E8F0;border-radius:24px;padding:11px;width:calc(100% - 28px);margin:0 14px 12px;font-size:13px;font-weight:600;cursor:pointer;">Cancel</button>' +
       '</div>',
     apisHtml:
       '<div class="sme-dev-section">' +
@@ -535,11 +540,12 @@ var SME_SIP_SCENARIOS = {
     title: 'Account Variant — 1 Account (Pre-selected)',
     desc: '<strong>What\'s happening:</strong> Customer has only 1 eligible CASA account. It\'s shown as "Account to Pay from" with a red play icon — no radio button, no selection needed. <strong>Next:</strong> Customer reviews the details and taps "Pay using AlTareq" to proceed directly to PIN.',
     screenHtml:
-      '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;"><div style="display:flex;align-items:center;gap:6px;"><div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">&#x25B6;</div><div style="font-size:13px;font-weight:700;">Confirm Payment Details</div></div><div style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;">&#x2715;</div></div>' +
+      '<div style="text-align:center;padding:10px;"><div style="font-size:13px;color:#0D3349;">&#x0627;&#x0644;&#x0637;&#x0627;&#x0631;&#x0642;</div><div style="font-size:16px;font-weight:700;color:#0D3349;letter-spacing:2px;">ALTAREQ</div></div>' +
       '<div style="padding:12px 16px;">' +
         '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:8px;">Confirm Payment Details</div>' +
-        '<div class="sme-at-row"><span class="sme-at-row-k">Amount</span><span class="sme-at-row-v" style="color:#E31E24;font-weight:700;">100 Dirhams</span></div>' +
-        '<div class="sme-at-row"><span class="sme-at-row-k">Payee</span><span class="sme-at-row-v">Noon</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Amount</span><span style="font-weight:600;color:#0F172A;" style="color:#E31E24;font-weight:700;">100 Dirhams</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Payee</span><span style="font-weight:600;color:#0F172A;">Noon</span></div>' +
         '<div style="margin-top:12px;padding:10px 12px;background:#F0FDFA;border:1px solid #99F6E4;border-radius:8px;display:flex;align-items:center;gap:10px;">' +
           '<div style="width:28px;height:28px;border-radius:50%;background:#E31E24;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;flex-shrink:0;">&#x25BA;</div>' +
           '<div>' +
@@ -547,8 +553,8 @@ var SME_SIP_SCENARIOS = {
             '<div style="font-size:13px;font-weight:700;color:#0F172A;">ADCB Current — **** 4521</div>' +
           '</div>' +
         '</div>' +
-        '<button class="sme-at-btn-primary" style="margin-top:14px;">Pay using AlTareq</button>' +
-        '<button class="sme-at-btn-cancel">Cancel</button>' +
+        '<button style="background:linear-gradient(135deg,#00B4C8,#005f6b);color:white;border:none;border-radius:24px;padding:12px;width:calc(100% - 28px);margin:14px 14px 8px;font-size:13px;font-weight:600;cursor:pointer;">&#x1F512; Pay using AlTareq</button>' +
+        '<button style="background:white;color:#0F172A;border:1px solid #E2E8F0;border-radius:24px;padding:11px;width:calc(100% - 28px);margin:0 14px 12px;font-size:13px;font-weight:600;cursor:pointer;">Cancel</button>' +
       '</div>',
     apisHtml:
       '<div class="sme-dev-section">' +
@@ -564,18 +570,19 @@ var SME_SIP_SCENARIOS = {
     title: 'Account Variant — TPP Pre-selected',
     desc: '<strong>What\'s happening:</strong> The TPP pre-specified the DebtorAccount in the consent request. The account is shown as "Account selected for the payment at [TPP name]" with a red play icon — the customer cannot change it. <strong>Next:</strong> Customer reviews and taps "Pay using AlTareq" to proceed to PIN. No account selection step needed.',
     screenHtml:
-      '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;"><div style="display:flex;align-items:center;gap:6px;"><div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">&#x25B6;</div><div style="font-size:13px;font-weight:700;">Confirm Payment Details</div></div><div style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;">&#x2715;</div></div>' +
+      '<div style="text-align:center;padding:10px;"><div style="font-size:13px;color:#0D3349;">&#x0627;&#x0644;&#x0637;&#x0627;&#x0631;&#x0642;</div><div style="font-size:16px;font-weight:700;color:#0D3349;letter-spacing:2px;">ALTAREQ</div></div>' +
       '<div style="padding:12px 16px;">' +
         '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:8px;">Confirm Payment Details</div>' +
-        '<div class="sme-at-row"><span class="sme-at-row-k">Amount</span><span class="sme-at-row-v" style="color:#E31E24;font-weight:700;">100 Dirhams</span></div>' +
-        '<div class="sme-at-row"><span class="sme-at-row-k">Payee</span><span class="sme-at-row-v">Noon</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Amount</span><span style="font-weight:600;color:#0F172A;" style="color:#E31E24;font-weight:700;">100 Dirhams</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Payee</span><span style="font-weight:600;color:#0F172A;">Noon</span></div>' +
         '<div style="margin-top:12px;padding:10px 12px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;">' +
           '<div style="font-size:11px;color:#1E40AF;font-weight:700;margin-bottom:2px;">Connected Account (selected by TPP)</div>' +
           '<div style="font-size:13px;font-weight:700;color:#0F172A;">ADCB Current — **** 4521</div>' +
           '<div style="font-size:10px;color:#475569;margin-top:2px;">AED 24,500.00</div>' +
         '</div>' +
-        '<button class="sme-at-btn-primary" style="margin-top:14px;">Confirm Payment</button>' +
-        '<button class="sme-at-btn-cancel">Cancel</button>' +
+        '<button style="background:linear-gradient(135deg,#00B4C8,#005f6b);color:white;border:none;border-radius:24px;padding:12px;width:calc(100% - 28px);margin:14px 14px 8px;font-size:13px;font-weight:600;cursor:pointer;">&#x1F512; Pay using AlTareq</button>' +
+        '<button style="background:white;color:#0F172A;border:1px solid #E2E8F0;border-radius:24px;padding:11px;width:calc(100% - 28px);margin:0 14px 12px;font-size:13px;font-weight:600;cursor:pointer;">Cancel</button>' +
       '</div>',
     apisHtml:
       '<div class="sme-dev-section">' +
@@ -590,13 +597,14 @@ var SME_SIP_SCENARIOS = {
     title: 'Cancel — Consent Screen',
     desc: '<strong>What\'s happening:</strong> The customer is on the consent screen and decides to abandon the payment. They can tap either the "Cancel" button or the X in the top right corner — both have the same effect. <strong>Next:</strong> Consent is PATCH\'d to "Rejected" with reason "CustomerCancelled". Session ends. Customer is redirected back to the TPP with error=access_denied.',
     screenHtml:
-      '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;"><div style="display:flex;align-items:center;gap:6px;"><div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">&#x25B6;</div><div style="font-size:13px;font-weight:700;">Confirm Payment Details</div></div><div style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;">&#x2715;</div></div>' +
+      '<div style="text-align:center;padding:10px;"><div style="font-size:13px;color:#0D3349;">&#x0627;&#x0644;&#x0637;&#x0627;&#x0631;&#x0642;</div><div style="font-size:16px;font-weight:700;color:#0D3349;letter-spacing:2px;">ALTAREQ</div></div>' +
       '<div style="padding:12px 16px;">' +
         '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:8px;">Confirm Payment Details</div>' +
-        '<div class="sme-at-row"><span class="sme-at-row-k">Amount</span><span class="sme-at-row-v" style="color:#E31E24;font-weight:700;">100 Dirhams</span></div>' +
-        '<div class="sme-at-row"><span class="sme-at-row-k">Payee</span><span class="sme-at-row-v">Noon</span></div>' +
-        '<button class="sme-at-btn-primary" style="margin-top:14px;opacity:0.5;">Pay using AlTareq</button>' +
-        '<button class="sme-at-btn-cancel" style="border:2px solid #E31E24;color:#E31E24;font-weight:700;">Cancel</button>' +
+        '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Amount</span><span style="font-weight:600;color:#0F172A;" style="color:#E31E24;font-weight:700;">100 Dirhams</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Payee</span><span style="font-weight:600;color:#0F172A;">Noon</span></div>' +
+        '<button style="background:linear-gradient(135deg,#00B4C8,#005f6b);color:white;border:none;border-radius:24px;padding:12px;width:calc(100% - 28px);margin:14px 14px 8px;font-size:13px;font-weight:600;cursor:pointer;opacity:0.5;">&#x1F512; Pay using AlTareq</button>' +
+        '<button style="background:white;color:#E31E24;border:2px solid #E31E24;border-radius:24px;padding:11px;width:calc(100% - 28px);margin:0 14px 12px;font-size:13px;font-weight:700;cursor:pointer;">Cancel &#x2014; Customer taps this</button>' +
         '<div style="text-align:center;margin-top:10px;font-size:11px;color:#475569;">Tapping Cancel will return you to the merchant app.</div>' +
       '</div>',
     apisHtml:
@@ -685,18 +693,19 @@ var SME_SIP_SCENARIOS = {
     title: 'Confirm Payment — Pay Button Active',
     desc: '<strong>What\'s happening:</strong> Customer has reviewed all payment details and selected an account. The "Pay using AlTareq" button is now active. If NO account is selected, the button is disabled or shows inline validation. <strong>Next:</strong> Tapping "Pay using AlTareq" sends PATCH (AccountSelected) and directs the customer to ProCash MFA (PIN/biometric).',
     screenHtml:
-      '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;"><div style="display:flex;align-items:center;gap:6px;"><div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">&#x25B6;</div><div style="font-size:13px;font-weight:700;">Confirm Payment Details</div></div><div style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;">&#x2715;</div></div>' +
+      '<div style="text-align:center;padding:10px;"><div style="font-size:13px;color:#0D3349;">&#x0627;&#x0644;&#x0637;&#x0627;&#x0631;&#x0642;</div><div style="font-size:16px;font-weight:700;color:#0D3349;letter-spacing:2px;">ALTAREQ</div></div>' +
       '<div style="padding:12px 16px;">' +
         '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:8px;">Confirm Payment</div>' +
-        '<div class="sme-at-row"><span class="sme-at-row-k">Amount</span><span class="sme-at-row-v" style="color:#E31E24;font-weight:700;">100 Dirhams</span></div>' +
-        '<div class="sme-at-row"><span class="sme-at-row-k">Payee</span><span class="sme-at-row-v">Noon</span></div>' +
-        '<div class="sme-at-row"><span class="sme-at-row-k">Date</span><span class="sme-at-row-v">16 Apr 2026</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Amount</span><span style="font-weight:600;color:#0F172A;" style="color:#E31E24;font-weight:700;">100 Dirhams</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Payee</span><span style="font-weight:600;color:#0F172A;">Noon</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Date</span><span style="font-weight:600;color:#0F172A;">16 Apr 2026</span></div>' +
         '<div style="margin-top:10px;padding:10px 12px;background:#F0FDFA;border:1px solid #99F6E4;border-radius:8px;">' +
           '<div style="font-size:11px;color:#0F766E;font-weight:700;margin-bottom:2px;">Pay from</div>' +
           '<div style="font-size:13px;font-weight:700;color:#0F172A;">ADCB Current — **** 4521 &#x2713;</div>' +
         '</div>' +
-        '<button class="sme-at-btn-primary" style="margin-top:14px;box-shadow:0 4px 12px rgba(14,118,110,.35);">Confirm &amp; Pay AED 100</button>' +
-        '<button class="sme-at-btn-cancel">Cancel</button>' +
+        '<button style="background:linear-gradient(135deg,#00B4C8,#005f6b);color:white;border:none;border-radius:24px;padding:12px;width:calc(100% - 28px);margin:14px 14px 8px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(14,118,110,.35);">&#x1F512; Confirm &amp; Pay AED 100</button>' +
+        '<button style="background:white;color:#0F172A;border:1px solid #E2E8F0;border-radius:24px;padding:11px;width:calc(100% - 28px);margin:0 14px 12px;font-size:13px;font-weight:600;cursor:pointer;">Cancel</button>' +
       '</div>',
     apisHtml:
       '<div class="sme-dev-section">' +
@@ -736,14 +745,15 @@ var SME_SIP_SCENARIOS = {
     title: 'System Error / Session Timeout',
     desc: '<strong>What\'s happening:</strong> Either a technical error occurred during the consent journey, or the customer\'s ProCash session timed out after 10 minutes of inactivity on the Consent Detail Screen. <strong>Next:</strong> Consent is rejected. Customer must return to the TPP app and initiate a new payment request.',
     screenHtml:
-      '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;"><div style="display:flex;align-items:center;gap:6px;"><div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">&#x25B6;</div><div style="font-size:13px;font-weight:700;">Confirm Payment Details</div></div><div style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;">&#x2715;</div></div>' +
+      '<div style="text-align:center;padding:10px;"><div style="font-size:13px;color:#0D3349;">&#x0627;&#x0644;&#x0637;&#x0627;&#x0631;&#x0642;</div><div style="font-size:16px;font-weight:700;color:#0D3349;letter-spacing:2px;">ALTAREQ</div></div>' +
       '<div style="padding:30px 20px;text-align:center;">' +
         '<div style="width:56px;height:56px;border-radius:50%;background:#FEF3C7;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px;">&#x26A0;</div>' +
         '<div style="font-size:16px;font-weight:700;color:#0F172A;margin-bottom:4px;">Technical Error</div>' +
         '<div style="font-size:13px;color:#475569;margin-bottom:8px;">We encountered a problem processing your request.</div>' +
         '<div style="font-size:11px;color:#94A3B8;margin-bottom:20px;">Error code: ADCB-OF-5001</div>' +
-        '<button class="sme-at-btn-primary" style="width:auto;padding:10px 24px;margin-bottom:8px;">Try Again</button>' +
-        '<button class="sme-at-btn-cancel" style="width:auto;padding:10px 24px;">Return to App</button>' +
+        '<button style="background:linear-gradient(135deg,#00B4C8,#005f6b);color:white;border:none;border-radius:24px;padding:11px 24px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:8px;">Try Again</button>' +
+        '<button style="background:white;color:#0F172A;border:1px solid #E2E8F0;border-radius:24px;padding:11px 24px;font-size:13px;font-weight:600;cursor:pointer;">Close</button>' +
       '</div>',
     apisHtml:
       '<div class="sme-dev-section">' +
