@@ -459,6 +459,29 @@ function sipProtoInit() {
   sipUpdateProtoUI();
 }
 
+/* ── Shared header + field row helpers ── */
+function sipHdr(title, showBack) {
+  return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;">' +
+    '<div style="display:flex;align-items:center;gap:6px;">' +
+      (showBack ? '<span style="cursor:pointer;font-size:16px;color:#475569;" onclick="sipProtoPrev()">\u2190</span>' : '<div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">\u25B6</div>') +
+      '<div style="font-size:13px;font-weight:700;">' + title + '</div>' +
+    '</div>' +
+    '<div style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;">\u2715</div>' +
+  '</div>';
+}
+function sipRow(k, v, extra) {
+  return '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">' + k + '</span><span style="font-weight:600;color:#0F172A;' + (extra||'') + '">' + v + '</span></div>';
+}
+function sipBtn(label, onclick, style) {
+  return '<button style="background:linear-gradient(135deg,#00B4C8,#005f6b);color:white;border:none;border-radius:24px;padding:12px;width:calc(100% - 28px);margin:14px 14px 8px;font-size:13px;font-weight:600;cursor:pointer;' + (style||'') + '" onclick="' + onclick + '">' + label + '</button>';
+}
+function sipBtnSec(label, onclick) {
+  return '<button style="background:white;color:#0F172A;border:1px solid #E2E8F0;border-radius:24px;padding:11px;width:calc(100% - 28px);margin:0 14px 12px;font-size:13px;font-weight:600;cursor:pointer;" onclick="' + onclick + '">' + label + '</button>';
+}
+function sipLogo() {
+  return '<div style="text-align:center;padding:10px;"><div style="font-size:13px;color:#0D3349;">\u0627\u0644\u0637\u0627\u0631\u0642</div><div style="font-size:16px;font-weight:700;color:#0D3349;letter-spacing:2px;">ALTAREQ</div></div>';
+}
+
 function sipRenderScreen() {
   var display = document.getElementById('sip-proto-display');
   if (!display) return;
@@ -466,79 +489,88 @@ function sipRenderScreen() {
   var html = '';
 
   if (n === 1) {
-    html = '<div class="sip-proto-app-header"><h2>Pay by Bank</h2></div>' +
-      '<div class="sip-proto-content">' +
-        '<div class="sip-proto-amount"><div class="curr">AED</div><div class="val">250.00</div></div>' +
-        '<div class="sip-proto-field-row"><span class="sip-proto-field-label">Payee</span><span class="sip-proto-field-value">Ahmed Al Maktoum</span></div>' +
-        '<div class="sip-proto-field-row"><span class="sip-proto-field-label">IBAN</span><span class="sip-proto-field-value">AE21 0610 **** 1234</span></div>' +
-        '<div class="sip-proto-field-row"><span class="sip-proto-field-label">Purpose</span><span class="sip-proto-field-value">Invoice Payment</span></div>' +
-        '<div class="sip-proto-field-row" style="border:none"><span class="sip-proto-field-label">Reference</span><span class="sip-proto-field-value">INV-2026-0042</span></div>' +
-        '<button class="sip-proto-btn sip-proto-btn-primary" onclick="sipProtoNext()">Continue to Bank Selection</button>' +
-      '</div>';
+    html = sipHdr('Pay by Bank') + sipLogo() +
+      '<div style="text-align:center;padding:8px 14px;">' +
+        '<div style="font-size:11px;color:#475569;">Amount</div>' +
+        '<div style="font-size:28px;font-weight:800;color:#0F172A;">AED 250.00</div>' +
+      '</div>' +
+      '<div style="font-size:13px;font-weight:700;text-align:center;padding:8px 14px 4px;">Payment Details</div>' +
+      sipRow('Payee', 'Ahmed Al Maktoum') +
+      sipRow('IBAN', 'AE21 0610 **** 1234') +
+      sipRow('Purpose', 'Invoice Payment') +
+      sipRow('Reference', 'INV-2026-0042') +
+      sipBtn('\u27A1 Continue to Bank Selection', 'sipProtoNext()');
   } else if (n === 2) {
-    html = '<div class="sip-proto-app-header"><span style="cursor:pointer" onclick="sipProtoPrev()">\u2190</span><h2>Select Your Bank</h2></div>' +
-      '<div class="sip-proto-content">' +
-        '<p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:16px">Choose which bank to pay from:</p>' +
-        '<div class="sip-bank-option selected"><div class="sip-bank-icon" style="background:var(--color-primary)">A</div><div><div style="font-weight:600">ADCB</div><div style="font-size:11px;color:var(--color-text-secondary)">Abu Dhabi Commercial Bank</div></div></div>' +
-        '<div class="sip-bank-option"><div class="sip-bank-icon" style="background:#1A237E">E</div><div><div style="font-weight:600">Emirates NBD</div><div style="font-size:11px;color:var(--color-text-secondary)">Emirates National Bank of Dubai</div></div></div>' +
-        '<div class="sip-bank-option"><div class="sip-bank-icon" style="background:#00695C">M</div><div><div style="font-weight:600">Mashreq</div><div style="font-size:11px;color:var(--color-text-secondary)">Mashreq Bank</div></div></div>' +
-        '<button class="sip-proto-btn sip-proto-btn-primary" onclick="sipProtoNext()">Verify Payee & Continue</button>' +
-      '</div>';
+    html = sipHdr('Select Your Bank', true) +
+      '<div style="padding:14px;">' +
+        '<p style="font-size:12px;color:#475569;margin-bottom:12px;">Choose which bank to pay from:</p>' +
+        '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:2px solid #E31E24;border-radius:10px;margin-bottom:8px;background:#FFF8F9;cursor:pointer;"><div style="width:36px;height:36px;border-radius:8px;background:#E31E24;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;">A</div><div><div style="font-weight:600;font-size:13px;">ADCB</div><div style="font-size:10px;color:#475569;">Abu Dhabi Commercial Bank</div></div></div>' +
+        '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #E2E8F0;border-radius:10px;margin-bottom:8px;cursor:pointer;"><div style="width:36px;height:36px;border-radius:8px;background:#1A237E;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;">E</div><div><div style="font-weight:600;font-size:13px;">Emirates NBD</div><div style="font-size:10px;color:#475569;">Emirates National Bank of Dubai</div></div></div>' +
+        '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #E2E8F0;border-radius:10px;cursor:pointer;"><div style="width:36px;height:36px;border-radius:8px;background:#00695C;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;">M</div><div><div style="font-weight:600;font-size:13px;">Mashreq</div><div style="font-size:10px;color:#475569;">Mashreq Bank</div></div></div>' +
+      '</div>' +
+      sipBtn('\u2713 Verify Payee & Continue', 'sipProtoNext()');
   } else if (n === 3) {
-    html = '<div class="sip-proto-app-header"><h2>Verifying Payee</h2></div>' +
-      '<div class="sip-proto-content">' +
-        '<div class="sip-loading-spinner"><div class="sip-spinner-ring"></div><div style="font-size:13px;color:var(--color-text-secondary)">Checking payee details...</div></div>' +
-        '<div style="margin-top:24px;padding:16px;background:var(--color-surface-secondary);border-radius:12px">' +
-          '<div class="sip-proto-field-row" style="border:none;padding:4px 0"><span class="sip-proto-field-label">Payee</span><span class="sip-proto-field-value">Ahmed Al Maktoum</span></div>' +
-          '<div class="sip-proto-field-row" style="border:none;padding:4px 0"><span class="sip-proto-field-label">IBAN</span><span class="sip-proto-field-value">AE21 0610 **** 1234</span></div>' +
-        '</div>' +
-        '<button class="sip-proto-btn sip-proto-btn-primary" disabled>Please wait...</button>' +
+    html = sipHdr('Verifying Payee') +
+      '<div style="padding:40px 14px;text-align:center;">' +
+        '<div style="width:48px;height:48px;border:3px solid #E2E8F0;border-top-color:#00B4C8;border-radius:50%;animation:sme-spin 1s linear infinite;margin:0 auto 16px;"></div>' +
+        '<div style="font-size:14px;font-weight:600;color:#0F172A;margin-bottom:4px;">Checking payee details...</div>' +
+        '<div style="font-size:11px;color:#475569;">Verifying name against bank records</div>' +
+      '</div>' +
+      '<div style="margin:0 14px;padding:12px;background:#F8FAFC;border-radius:8px;">' +
+        sipRow('Payee', 'Ahmed Al Maktoum') +
+        sipRow('IBAN', 'AE21 0610 **** 1234') +
       '</div>';
     setTimeout(function() { if (sipCurrentScreen === 3) { sipCurrentScreen = 4; sipRenderScreen(); sipUpdateProtoUI(); } }, 1500);
   } else if (n === 4) {
     html = sipRenderCopResultScreen();
   } else if (n === 5) {
-    html = '<div class="sip-proto-app-header"><span style="cursor:pointer" onclick="sipProtoPrev()">\u2190</span><h2>Review Payment</h2></div>' +
-      '<div class="sip-proto-content">' +
-        '<div class="sip-proto-amount"><div class="curr">AED</div><div class="val">250.00</div></div>' +
-        '<div id="sip-review-badge" style="text-align:center;margin-bottom:12px">' + sipGetBadgeHtml() + '</div>' +
-        '<div class="sip-proto-field-row"><span class="sip-proto-field-label">Payee</span><span class="sip-proto-field-value">Ahmed Al Maktoum</span></div>' +
-        '<div class="sip-proto-field-row"><span class="sip-proto-field-label">IBAN</span><span class="sip-proto-field-value">AE21 0610 **** 1234</span></div>' +
-        '<div class="sip-proto-field-row"><span class="sip-proto-field-label">From</span><span class="sip-proto-field-value">ADCB Savings ****5678</span></div>' +
-        '<div class="sip-proto-field-row"><span class="sip-proto-field-label">Purpose</span><span class="sip-proto-field-value">Invoice Payment</span></div>' +
-        '<div class="sip-proto-field-row" style="border:none"><span class="sip-proto-field-label">Reference</span><span class="sip-proto-field-value">INV-2026-0042</span></div>' +
-        '<button class="sip-proto-btn sip-proto-btn-primary" onclick="sipProtoNext()">Pay Now \u2014 AED 250.00</button>' +
-        '<p style="text-align:center;font-size:11px;color:var(--color-text-tertiary);margin-top:8px">You will be redirected to your bank to authorise</p>' +
-      '</div>';
+    html = sipHdr('Review Payment', true) + sipLogo() +
+      '<div style="text-align:center;padding:4px 14px;">' +
+        '<div style="font-size:11px;color:#475569;">AED</div>' +
+        '<div style="font-size:28px;font-weight:800;color:#0F172A;">250.00</div>' +
+        '<div style="margin-top:4px;">' + sipGetBadgeHtml() + '</div>' +
+      '</div>' +
+      '<div style="font-size:13px;font-weight:700;text-align:center;padding:8px 14px 4px;">Payment Details</div>' +
+      sipRow('Payee', 'Ahmed Al Maktoum') +
+      sipRow('IBAN', 'AE21 0610 **** 1234') +
+      sipRow('From', 'ADCB Savings ****5678') +
+      sipRow('Purpose', 'Invoice Payment') +
+      sipRow('Reference', 'INV-2026-0042') +
+      sipBtn('\uD83D\uDD12 Pay Now \u2014 AED 250.00', 'sipProtoNext()') +
+      '<p style="text-align:center;font-size:11px;color:#94A3B8;margin:0 0 12px;">You will be redirected to your bank to authorise</p>';
   } else if (n === 6) {
-    html = '<div class="sip-proto-app-header" style="background:#1A237E"><span>\uD83D\uDD12</span><h2>Bank Authorisation</h2></div>' +
-      '<div class="sip-proto-content" style="text-align:center">' +
-        '<div style="font-size:40px;margin:16px 0 8px">\uD83C\uDFE6</div>' +
-        '<p style="font-size:15px;font-weight:600">ADCB Secure Login</p>' +
-        '<p style="font-size:12px;color:var(--color-text-secondary);margin-top:4px">Authorise payment of AED 250.00</p>' +
-        '<div style="padding:12px;background:#F0F4FF;border-radius:10px;margin:12px 0;text-align:left">' +
-          '<div class="sip-proto-field-row" style="border:none;padding:4px 0"><span class="sip-proto-field-label">To</span><span class="sip-proto-field-value">Ahmed Al Maktoum</span></div>' +
-          '<div class="sip-proto-field-row" style="border:none;padding:4px 0"><span class="sip-proto-field-label">Amount</span><span class="sip-proto-field-value" style="color:var(--color-primary);font-size:16px">AED 250.00</span></div>' +
+    html = '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#1C2B4A;">' +
+        '<div style="display:flex;align-items:center;gap:6px;"><span style="color:white;font-size:14px;">\uD83D\uDD12</span><div style="font-size:13px;font-weight:700;color:white;">Bank Authorisation</div></div>' +
+      '</div>' +
+      '<div style="padding:20px 14px;text-align:center;">' +
+        '<img src="assets/images/adcb-logo.svg" alt="ADCB" style="height:24px;margin-bottom:8px;" />' +
+        '<div style="font-size:14px;font-weight:700;color:#0F172A;">ADCB Secure Login</div>' +
+        '<div style="font-size:11px;color:#475569;margin-top:4px;">Authorise payment of AED 250.00</div>' +
+        '<div style="padding:12px;background:#F0F4FF;border-radius:10px;margin:14px 0;text-align:left;">' +
+          sipRow('To', 'Ahmed Al Maktoum') +
+          sipRow('Amount', 'AED 250.00', 'color:#E31E24;font-size:14px;') +
         '</div>' +
-        '<div style="background:var(--color-success-light);padding:12px;border-radius:10px;margin:12px 0;font-size:12px;color:var(--color-success-dark)">\uD83D\uDD12 Secure connection \u2022 2-Factor Authentication</div>' +
-        '<button class="sip-proto-btn" style="background:#1A237E;color:#fff;margin-top:16px" onclick="sipProtoNext()">Authorise Payment</button>' +
-        '<button class="sip-proto-btn sip-proto-btn-secondary" style="margin-top:8px" onclick="sipProtoPrev()">Cancel</button>' +
-      '</div>';
+        '<div style="background:#F0FDF4;padding:10px;border-radius:8px;margin-bottom:14px;font-size:11px;color:#15803D;">\uD83D\uDD12 Secure connection \u2022 2-Factor Authentication</div>' +
+      '</div>' +
+      '<button style="background:#1C2B4A;color:white;border:none;border-radius:24px;padding:12px;width:calc(100% - 28px);margin:0 14px 8px;font-size:13px;font-weight:600;cursor:pointer;" onclick="sipProtoNext()">Authorise Payment</button>' +
+      sipBtnSec('Cancel', 'sipProtoPrev()');
   } else if (n === 7) {
-    html = '<div class="sip-proto-app-header" style="background:var(--color-success-dark)"><h2 style="width:100%;text-align:center">Payment Complete</h2></div>' +
-      '<div class="sip-proto-content" style="text-align:center">' +
-        '<div style="font-size:56px;margin:16px 0 8px">\u2705</div>' +
-        '<div style="font-size:20px;font-weight:700;color:var(--color-success-dark)">Payment Accepted</div>' +
-        '<div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px">Transaction ID: TXN-2026-AF82K9</div>' +
-        '<div class="sip-proto-amount" style="padding:16px 0"><div class="curr">AED</div><div class="val" style="color:var(--color-success-dark)">250.00</div></div>' +
-        '<div style="text-align:left;padding:12px 16px;background:var(--color-surface-secondary);border-radius:12px">' +
-          '<div class="sip-proto-field-row"><span class="sip-proto-field-label">Payee</span><span class="sip-proto-field-value">Ahmed Al Maktoum</span></div>' +
-          '<div class="sip-proto-field-row"><span class="sip-proto-field-label">Date</span><span class="sip-proto-field-value">9 Apr 2026, 14:32</span></div>' +
-          '<div class="sip-proto-field-row"><span class="sip-proto-field-label">Status</span><span class="sip-proto-field-value" style="color:var(--color-success-dark)">Accepted \u2705</span></div>' +
-          '<div class="sip-proto-field-row" style="border:none"><span class="sip-proto-field-label">Method</span><span class="sip-proto-field-value">Aani (IPP)</span></div>' +
+    html = '<div style="display:flex;align-items:center;justify-content:center;padding:10px 14px;background:#15803D;">' +
+        '<div style="font-size:13px;font-weight:700;color:white;">Payment Complete</div>' +
+      '</div>' +
+      '<div style="padding:20px 14px;text-align:center;">' +
+        '<div style="width:56px;height:56px;border-radius:50%;border:3px solid #15803D;display:flex;align-items:center;justify-content:center;font-size:24px;color:#15803D;margin:8px auto 12px;">\u2713</div>' +
+        '<div style="font-size:18px;font-weight:700;color:#15803D;">Payment Accepted</div>' +
+        '<div style="font-size:11px;color:#475569;margin-top:4px;">Transaction ID: TXN-2026-AF82K9</div>' +
+        '<div style="padding:12px 0;"><div style="font-size:11px;color:#475569;">AED</div><div style="font-size:28px;font-weight:800;color:#15803D;">250.00</div></div>' +
+        '<div style="text-align:left;padding:12px;background:#F8FAFC;border-radius:10px;">' +
+          sipRow('Payee', 'Ahmed Al Maktoum') +
+          sipRow('Date', '9 Apr 2026, 14:32') +
+          sipRow('Status', 'Accepted \u2713', 'color:#15803D;') +
+          sipRow('Method', 'Aani (IPP)') +
         '</div>' +
-        '<button class="sip-proto-btn sip-proto-btn-primary" onclick="sipCurrentScreen=1;sipRenderScreen();sipUpdateProtoUI()">Make Another Payment</button>' +
-      '</div>';
+      '</div>' +
+      sipBtn('Make Another Payment', 'sipCurrentScreen=1;sipRenderScreen();sipUpdateProtoUI()');
   }
 
   display.innerHTML = html;
@@ -576,21 +608,24 @@ function sipRenderCopResultScreen() {
   };
   var cfg = configs[sc] || configs.exact;
 
-  var h = '<div class="sip-proto-app-header"><span style="cursor:pointer" onclick="sipProtoPrev()">\u2190</span><h2>Payee Verification</h2></div>' +
-    '<div class="sip-proto-content">' +
-      '<div style="padding:14px 16px;background:var(--color-surface-secondary);border-radius:12px;margin-bottom:16px">' +
-        '<div class="sip-proto-field-row" style="border:none;padding:2px 0"><span class="sip-proto-field-label">Payee</span><span class="sip-proto-field-value">Ahmed Al Maktoum</span></div>' +
-        '<div class="sip-proto-field-row" style="border:none;padding:2px 0"><span class="sip-proto-field-label">IBAN</span><span class="sip-proto-field-value">AE21 0610 **** 1234</span></div>' +
+  var bannerColors = {exact:'#F0FDF4;border:1px solid #86EFAC',partial:'#FFFBEB;border:1px solid #FDE68A',none:'#FEF2F2;border:1px solid #FECACA',unavailable:'#F0F4FF;border:1px solid #BFDBFE'};
+  var bannerBg = bannerColors[sc] || bannerColors.exact;
+
+  var h = sipHdr('Payee Verification', true) +
+    '<div style="padding:14px;">' +
+      '<div style="padding:10px 12px;background:#F8FAFC;border-radius:8px;margin-bottom:14px;">' +
+        sipRow('Payee', 'Ahmed Al Maktoum') +
+        sipRow('IBAN', 'AE21 0610 **** 1234') +
       '</div>' +
-      '<div class="sip-cop-banner ' + cfg.cls + '"><span class="cop-icon">' + cfg.icon + '</span><div><div style="font-weight:700;margin-bottom:2px">' + cfg.title + '</div><div style="font-size:12px">' + cfg.desc + '</div></div></div>';
+      '<div style="display:flex;gap:10px;padding:12px;border-radius:10px;background:' + bannerBg + ';margin-bottom:14px;"><span style="font-size:20px;flex-shrink:0;">' + cfg.icon + '</span><div><div style="font-weight:700;font-size:12px;margin-bottom:2px;">' + cfg.title + '</div><div style="font-size:11px;color:#475569;">' + cfg.desc + '</div></div></div>';
 
   if (cfg.checkbox) {
     h += '<label class="sip-confirm-checkbox' + (cfg.danger ? ' danger-bg' : '') + '">' +
       '<input type="checkbox" onchange="sipUpdateCopProceed()"> <span>' + cfg.checkLabel + '</span></label>';
   }
 
-  h += '<button class="sip-proto-btn sip-proto-btn-primary" id="sip-cop-proceed" ' + (cfg.canProceed ? '' : 'disabled') + ' onclick="sipHandleCopProceed()">' + cfg.btnText + '</button>' +
-    '<button class="sip-proto-btn sip-proto-btn-secondary" style="margin-top:8px" onclick="sipProtoPrev()">Go Back \u2014 Edit Details</button>' +
+  h += '<button id="sip-cop-proceed" style="background:linear-gradient(135deg,#00B4C8,#005f6b);color:white;border:none;border-radius:24px;padding:12px;width:100%;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;' + (cfg.canProceed ? '' : 'opacity:0.5;pointer-events:none;') + '" onclick="sipHandleCopProceed()">' + cfg.btnText + '</button>' +
+    '<button style="background:white;color:#0F172A;border:1px solid #E2E8F0;border-radius:24px;padding:11px;width:100%;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;" onclick="sipProtoPrev()">Go Back \u2014 Edit Details</button>' +
   '</div>';
 
   return h;
