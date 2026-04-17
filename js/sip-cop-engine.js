@@ -423,6 +423,66 @@ function sipRenderGaps() {
 /* ─────────────────────────────────────────────
    7. PHONE PROTOTYPE
    ───────────────────────────────────────────── */
+/* ── Screen descriptions (one-liner context) ── */
+var SIP_SCREEN_DESCS = {
+  1:  'Customer fills in payment details at the TPP checkout. Selects "Pay by bank using AlTareq" as payment method.',
+  2:  'Customer chooses to select an existing account or pick a new bank from the LFI directory.',
+  3:  'TPP shows the AlTareq consent screen with full payment details. Customer reviews before being redirected.',
+  4:  'Customer is being redirected from the TPP to their bank (LFI) for authentication. Do not close this window.',
+  5:  'The bank verifies the customer\'s identity. This happens automatically before the consent screens load.',
+  6:  'The bank sends a CoP query to check if the payee name matches the account holder on that IBAN.',
+  7:  'CoP result is shown. Exact match = green. Partial = amber warning. No match = red risk. Unavailable = info.',
+  8:  'Customer sees payment details on the bank side and selects which account to pay from. Only one can be selected.',
+  9:  'Customer authenticates with Touch ID, Face ID, or PIN to authorise the payment.',
+  10: 'Payment is authorised. Customer is being redirected back to the TPP. Do not close this window.',
+  11: 'Payment is confirmed. The TPP shows a receipt with transaction details.'
+};
+
+/* ── API calls per screen ── */
+var SIP_SCREEN_APIS = {
+  1: {title:'TPP CHECKOUT', html:
+    '<p style="font-size:11px;color:#8B949E;margin-bottom:10px;">No API calls yet \u2014 this is the TPP\'s own checkout page. The payment details (amount, IBAN, payee name) are collected here and will be sent to the OF Hub in Step 3.</p>'},
+  2: {title:'BANK / ACCOUNT SELECTION', html:
+    '<div style="margin-bottom:12px;"><div style="color:#56D364;font-size:10px;font-weight:600;margin-bottom:4px;">GET \u2014 LFI Directory</div>' +
+    '<pre class="sme-code-block"><span class="sme-ck">// TPP fetches registered LFIs from OF Hub\n</span><span class="sme-cv">GET /api/v2.0/participants\n\n// Response: list of banks\n[\n  { "name": "ADCB", "bic": "ADCBAEAA" },\n  { "name": "Emirates NBD", "bic": "ABORAEAA" },\n  ...\n]</span></pre></div>'},
+  3: {title:'CONSENT INITIATION (PAR + RAR)', html:
+    '<div style="margin-bottom:12px;"><div style="color:#58A6FF;font-size:10px;font-weight:600;margin-bottom:4px;">POST \u2014 Pushed Authorisation Request</div>' +
+    '<pre class="sme-code-block"><span class="sme-ck">// TPP sends PAR to OF Hub\n</span><span class="sme-cv">POST /as/par\n{\n  "response_type": "code",\n  "client_id": "tpp-client-001",\n  "scope": "payments openid",\n  "request": "&lt;signed-JAR-JWT&gt;",\n  "authorization_details": [{\n    "type": "payment_initiation",\n    "instructedAmount": { "amount": "1000", "currency": "AED" },\n    "creditorAccount": { "iban": "AE070331234567890123" },\n    "creditorName": "Ahmed Al Maktoum"\n  }]\n}\n\n// Response:\n{ "request_uri": "urn:adcb:bwc:1234", "expires_in": 90 }</span></pre></div>'},
+  4: {title:'REDIRECT TO LFI', html:
+    '<p style="font-size:11px;color:#8B949E;margin-bottom:10px;">OAuth2 redirect via OF Hub. The request_uri from PAR is used to construct the authorisation URL. Customer\'s browser/app is redirected to ADCB.</p>' +
+    '<pre class="sme-code-block"><span class="sme-ck">// Redirect URL:\n</span><span class="sme-cv">https://auth.adcb.ae/authorize\n  ?request_uri=urn:adcb:bwc:1234\n  &client_id=tpp-client-001</span></pre>'},
+  5: {title:'LFI AUTHENTICATION', html:
+    '<p style="font-size:11px;color:#8B949E;margin-bottom:10px;">Standard bank authentication flow (BAU). Not Open Finance specific. Customer logs in via ProCash credentials.</p>' +
+    '<pre class="sme-code-block"><span class="sme-ck">// Internal ADCB auth \u2014 not exposed to TPP\n</span><span class="sme-cv">POST /auth/verify\n{ "method": "face_id", "session": "..." }</span></pre>'},
+  6: {title:'CoP QUERY (MANDATORY)', html:
+    '<div style="margin-bottom:12px;"><div style="color:#F0883E;font-size:10px;font-weight:600;margin-bottom:4px;">POST \u2014 Confirmation of Payee</div>' +
+    '<pre class="sme-code-block"><span class="sme-ck">// LFI sends CoP query via OF Hub to payee\'s bank\n</span><span class="sme-cv">POST /api/v2.0/customers/action/cop-query\n{\n  "Name": { "fullName": "Ahmed Al Maktoum" },\n  "Account": {\n    "SchemeName": "IBAN",\n    "Identification": "AE070331234567890123"\n  }\n}\n\n// Response:\n{\n  "MatchResult": "ExactMatch",\n  "MatchedName": "Ahmed Al Maktoum",\n  "AccountStatus": "Active"\n}</span></pre></div>'},
+  7: {title:'CoP RESULT DISPLAY', html:
+    '<p style="font-size:11px;color:#8B949E;margin-bottom:10px;">The CoP result determines what the customer sees. The result badge carries through to the Review screen.</p>' +
+    '<pre class="sme-code-block"><span class="sme-ck">// Possible MatchResult values:\n</span><span class="sme-cs">"ExactMatch"</span><span class="sme-cv">    \u2192 \u2705 Green \u2014 proceed\n</span><span class="sme-cs">"PartialMatch"</span><span class="sme-cv">  \u2192 \u26A0 Amber \u2014 confirm checkbox\n</span><span class="sme-cs">"NoMatch"</span><span class="sme-cv">       \u2192 \u274C Red \u2014 risk acceptance required\n</span><span class="sme-cs">"Unavailable"</span><span class="sme-cv">   \u2192 \u2139 Blue \u2014 proceed with caution</span></pre>'},
+  8: {title:'CONSENT DETAILS + ACCOUNT SELECTION', html:
+    '<div style="margin-bottom:12px;"><div style="color:#56D364;font-size:10px;font-weight:600;margin-bottom:4px;">GET \u2014 Payment Consent</div>' +
+    '<pre class="sme-code-block"><span class="sme-cv">GET /payment-consents/{ConsentId}\n\n// Returns: amount, creditor, reference, purpose\n// Status: AwaitingAuthorisation</span></pre></div>' +
+    '<div style="margin-bottom:12px;"><div style="color:#56D364;font-size:10px;font-weight:600;margin-bottom:4px;">GET \u2014 Eligible Accounts</div>' +
+    '<pre class="sme-code-block"><span class="sme-cv">GET /accounts\n// Returns: eligible AED CASA accounts with balances</span></pre></div>' +
+    '<div><div style="color:#F0883E;font-size:10px;font-weight:600;margin-bottom:4px;">PATCH \u2014 Account Selected</div>' +
+    '<pre class="sme-code-block"><span class="sme-cv">PATCH /payment-consents/{ConsentId}\n{\n  "Data": {\n    "Action": "AccountSelected",\n    "DebtorAccount": {\n      "Identification": "AE071234524645234567895"\n    }\n  }\n}</span></pre></div>'},
+  9: {title:'SCA / PIN AUTHORISATION', html:
+    '<div style="margin-bottom:12px;"><div style="color:#F0883E;font-size:10px;font-weight:600;margin-bottom:4px;">PATCH \u2014 Consent Authorised</div>' +
+    '<pre class="sme-code-block"><span class="sme-cv">PATCH /payment-consents/{ConsentId}\n{\n  "Data": {\n    "Status": "Authorised",\n    "AuthorisationCode": "AUTH-XYZ-001"\n  }\n}</span></pre></div>' +
+    '<p style="font-size:11px;color:#8B949E;">3 PIN attempts max. After 3 failures \u2192 consent rejected.</p>'},
+  10:{title:'REDIRECT BACK TO TPP', html:
+    '<div style="margin-bottom:12px;"><div style="color:#C084FC;font-size:10px;font-weight:600;margin-bottom:4px;">OAUTH2 \u2014 Callback</div>' +
+    '<pre class="sme-code-block"><span class="sme-ck">// Redirect to TPP callback with auth code:\n</span><span class="sme-cv">{tpp_callback}?\n  code={authorization_code}\n  &state={original_state}</span></pre></div>' +
+    '<div><div style="color:#C084FC;font-size:10px;font-weight:600;margin-bottom:4px;">POST \u2014 Token Exchange</div>' +
+    '<pre class="sme-code-block"><span class="sme-cv">POST /as/token\ngrant_type=authorization_code\n&code={auth_code}\n&code_verifier={pkce_verifier}\n\n// Response:\n{ "access_token": "eyJ...", "expires_in": 3600 }</span></pre></div>'},
+  11:{title:'PAYMENT EXECUTION', html:
+    '<div style="margin-bottom:12px;"><div style="color:#58A6FF;font-size:10px;font-weight:600;margin-bottom:4px;">POST \u2014 Execute Payment</div>' +
+    '<pre class="sme-code-block"><span class="sme-cv">POST /domestic-payments\n{\n  "Data": {\n    "ConsentId": "pcon-001",\n    "Initiation": {\n      "InstructedAmount": { "Amount": "1000", "Currency": "AED" },\n      "CreditorAccount": { "Identification": "AE070331..." },\n      "DebtorAccount": { "Identification": "AE071234..." }\n    }\n  },\n  "Risk": { "PaymentContextCode": "EcommerceGoods" }\n}\n\n// Response: 201\n{ "DomesticPaymentId": "PAY-001", "Status": "Pending" }</span></pre></div>' +
+    '<div><div style="color:#56D364;font-size:10px;font-weight:600;margin-bottom:4px;">GET \u2014 Payment Status</div>' +
+    '<pre class="sme-code-block"><span class="sme-cv">GET /domestic-payments/PAY-001\n// Status: AcceptedSettlementCompleted</span></pre></div>'}
+};
+
 function sipProtoInit() {
   var el = document.getElementById('sip-proto-root');
   if (!el) return;
@@ -430,41 +490,48 @@ function sipProtoInit() {
   sipCurrentScreen = 1;
   sipCurrentScenario = 'exact';
 
-  var html = '<div class="sip-proto-layout">' +
-    '<div class="sip-proto-sidebar">' +
-      '<div class="sip-proto-sidebar-title">Choose a Scenario</div>' +
-      '<button class="sip-scenario-btn active" id="sip-scen-exact" onclick="sipSetScenario(\'exact\',this)"><span class="sip-sc-tag sip-sc-happy">HAPPY</span> Exact Name Match</button>' +
-      '<button class="sip-scenario-btn" id="sip-scen-partial" onclick="sipSetScenario(\'partial\',this)"><span class="sip-sc-tag sip-sc-warn">WARNING</span> Partial Name Match</button>' +
-      '<button class="sip-scenario-btn" id="sip-scen-none" onclick="sipSetScenario(\'none\',this)"><span class="sip-sc-tag sip-sc-danger">RISK</span> No Name Match</button>' +
-      '<button class="sip-scenario-btn" id="sip-scen-unavailable" onclick="sipSetScenario(\'unavailable\',this)"><span class="sip-sc-tag sip-sc-grey">FALLBACK</span> CoP Unavailable</button>' +
-      '<div class="sip-proto-sidebar-title" style="margin-top:20px">Flow Progress</div>' +
-      '<div id="sip-proto-step-list"></div>' +
+  var html =
+    /* Scenario picker */
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">' +
+      '<button class="sip-scenario-btn active" id="sip-scen-exact" onclick="sipSetScenario(\'exact\',this)" style="flex:1;min-width:120px;"><span class="sip-sc-tag sip-sc-happy">HAPPY</span> Exact Match</button>' +
+      '<button class="sip-scenario-btn" id="sip-scen-partial" onclick="sipSetScenario(\'partial\',this)" style="flex:1;min-width:120px;"><span class="sip-sc-tag sip-sc-warn">WARNING</span> Partial Match</button>' +
+      '<button class="sip-scenario-btn" id="sip-scen-none" onclick="sipSetScenario(\'none\',this)" style="flex:1;min-width:120px;"><span class="sip-sc-tag sip-sc-danger">RISK</span> No Match</button>' +
+      '<button class="sip-scenario-btn" id="sip-scen-unavailable" onclick="sipSetScenario(\'unavailable\',this)" style="flex:1;min-width:120px;"><span class="sip-sc-tag sip-sc-grey">FALLBACK</span> CoP Unavailable</button>' +
     '</div>' +
-    '<div class="sip-proto-phone-wrap">' +
-      '<div class="sip-proto-phone" id="sip-proto-phone">' +
-        '<div class="sip-proto-notch"></div>' +
-        '<div class="sip-proto-display" id="sip-proto-display">' +
-        '</div>' +
-        '<div class="sip-modal-overlay" id="sip-no-match-modal">' +
-          '<div class="sip-modal-box">' +
-            '<div style="font-size:40px;margin-bottom:8px">\u26A0\uFE0F</div>' +
-            '<h3>Are you sure?</h3>' +
-            '<p>The payee name does <strong>not match</strong> the bank account. Sending money to the wrong account is hard to reverse.</p>' +
-            '<div class="sip-modal-btns">' +
-              '<button style="background:#eee;color:#333" onclick="sipHideNoMatchModal()">Go Back</button>' +
-              '<button style="background:var(--color-error);color:#fff" onclick="sipHideNoMatchModal();sipProtoNext()">I Accept Risk</button>' +
+    /* Screen description */
+    '<div id="sip-screen-desc" style="padding:8px 14px;background:var(--color-surface-secondary);border:1px solid var(--color-border);border-radius:var(--radius-button);margin-bottom:12px;font-size:12px;color:var(--color-text-secondary);line-height:1.5;"></div>' +
+    /* Screen counter + step pills */
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;" id="sip-step-pills"></div>' +
+    /* Phone + API panel */
+    '<div style="display:flex;gap:16px;align-items:flex-start;">' +
+      '<div style="flex-shrink:0;">' +
+        '<div class="sip-proto-phone" id="sip-proto-phone" style="cursor:pointer;" onclick="sipProtoNext()">' +
+          '<div class="sip-proto-notch"></div>' +
+          '<div class="sip-proto-display" id="sip-proto-display"></div>' +
+          '<div class="sip-modal-overlay" id="sip-no-match-modal">' +
+            '<div class="sip-modal-box">' +
+              '<div style="font-size:40px;margin-bottom:8px">\u26A0\uFE0F</div>' +
+              '<h3>Are you sure?</h3>' +
+              '<p>The payee name does <strong>not match</strong> the bank account. Sending money to the wrong account is hard to reverse.</p>' +
+              '<div class="sip-modal-btns">' +
+                '<button style="background:#eee;color:#333" onclick="event.stopPropagation();sipHideNoMatchModal()">Go Back</button>' +
+                '<button style="background:var(--color-error);color:#fff" onclick="event.stopPropagation();sipHideNoMatchModal();sipProtoNext()">I Accept Risk</button>' +
+              '</div>' +
             '</div>' +
           '</div>' +
         '</div>' +
+        '<div style="text-align:center;margin-top:8px;font-size:11px;color:var(--color-text-tertiary);">Tap the screen to advance</div>' +
       '</div>' +
-      '<div class="sip-screen-label" id="sip-proto-screen-label"></div>' +
-      '<div class="sip-proto-nav-row">' +
-        '<button class="sip-proto-nav-btn" id="sip-proto-prev" onclick="sipProtoPrev()" disabled>\u2039 Back</button>' +
-        '<div class="sip-proto-dots" id="sip-proto-dots"></div>' +
-        '<button class="sip-proto-nav-btn" id="sip-proto-next" onclick="sipProtoNext()">Next \u203A</button>' +
+      '<div style="flex:1;min-width:0;max-height:700px;background:#0D1117;border-radius:var(--radius-card);border:1px solid #30363D;overflow:hidden;display:flex;flex-direction:column;">' +
+        '<div style="background:#161B22;border-bottom:1px solid #30363D;padding:10px 16px;font-size:12px;font-weight:700;color:#8B949E;text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:5px;flex-shrink:0;">' +
+          '<span style="width:8px;height:8px;border-radius:50%;background:#F85149;"></span>' +
+          '<span style="width:8px;height:8px;border-radius:50%;background:#E3B341;"></span>' +
+          '<span style="width:8px;height:8px;border-radius:50%;background:#56D364;"></span>' +
+          '<span id="sip-dev-title" style="margin-left:8px;">API Calls</span>' +
+        '</div>' +
+        '<div id="sip-dev-body" style="padding:14px;overflow-y:auto;flex:1;"></div>' +
       '</div>' +
-    '</div>' +
-  '</div>';
+    '</div>';
 
   el.innerHTML = html;
   sipRenderScreen();
@@ -786,6 +853,12 @@ function sipSetScenario(scenario, btn) {
   }
 }
 
+function sipGoToScreen(n) {
+  sipCurrentScreen = n;
+  sipRenderScreen();
+  sipUpdateProtoUI();
+}
+
 function sipProtoNext() {
   if (sipCurrentScreen < sipTotalScreens) {
     sipCurrentScreen++;
@@ -803,6 +876,42 @@ function sipProtoPrev() {
 }
 
 function sipUpdateProtoUI() {
+  /* Step pills */
+  var pillsEl = document.getElementById('sip-step-pills');
+  if (pillsEl) {
+    var owners = {1:'TPP',2:'TPP',3:'TPP',4:'Redirect',5:'LFI',6:'LFI',7:'LFI',8:'LFI',9:'LFI',10:'Redirect',11:'TPP'};
+    var ownerColors = {'TPP':'#00B4C8','LFI':'#0D9488','Redirect':'#64748B'};
+    var ph = '';
+    for (var pi = 1; pi <= sipTotalScreens; pi++) {
+      var active = pi === sipCurrentScreen;
+      var done = pi < sipCurrentScreen;
+      var ow = owners[pi] || 'TPP';
+      var bg = active ? (ownerColors[ow]||'#00B4C8') : done ? '#E2E8F0' : 'transparent';
+      var col = active ? '#fff' : done ? '#15803D' : '#94A3B8';
+      var bdr = active ? 'none' : '1px solid #E2E8F0';
+      ph += '<div onclick="sipGoToScreen(' + pi + ')" style="padding:4px 10px;border-radius:99px;font-size:10px;font-weight:600;background:' + bg + ';color:' + col + ';border:' + bdr + ';cursor:pointer;white-space:nowrap;">' + (done ? '\u2713 ' : '') + pi + '. ' + (SIP_SCREEN_NAMES[pi]||'').replace(/^(TPP|LFI|CoP|YOUR LFI): ?/,'') + '</div>';
+    }
+    pillsEl.innerHTML = ph;
+  }
+
+  /* Description */
+  var descEl = document.getElementById('sip-screen-desc');
+  if (descEl) {
+    var desc = SIP_SCREEN_DESCS[sipCurrentScreen] || '';
+    var owner = {1:'TPP',2:'TPP',3:'TPP',4:'OF Hub',5:'LFI',6:'LFI',7:'LFI',8:'LFI',9:'LFI',10:'OF Hub',11:'TPP'}[sipCurrentScreen] || '';
+    descEl.innerHTML = '<strong style="color:var(--navy);">Screen ' + sipCurrentScreen + '/' + sipTotalScreens + ' \u2014 ' + owner + ':</strong> ' + desc;
+  }
+
+  /* API panel */
+  var devBody = document.getElementById('sip-dev-body');
+  var devTitle = document.getElementById('sip-dev-title');
+  var api = SIP_SCREEN_APIS[sipCurrentScreen];
+  if (devBody && api) {
+    devBody.innerHTML = api.html;
+    if (devTitle) devTitle.textContent = api.title;
+  }
+
+  /* Old UI compat */
   var label = document.getElementById('sip-proto-screen-label');
   if (label) label.textContent = 'Screen ' + sipCurrentScreen + ' of ' + sipTotalScreens + ' \u2014 ' + SIP_SCREEN_NAMES[sipCurrentScreen];
 
