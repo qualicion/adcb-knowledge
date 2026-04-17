@@ -18,7 +18,14 @@
   </div>
 
   <div class="nav-section">
-    <div class="nav-group-label">TPP Project</div>
+    <div class="nav-group-label" style="cursor:pointer;" onclick="toggleProjectGroup('tpp')">
+      <span style="display:flex;align-items:center;justify-content:space-between;">
+        TPP Project
+        <span class="nav-group-chevron" id="tpp-group-chev" style="font-size:10px;transition:transform .2s;">&#x25BC;</span>
+      </span>
+    </div>
+    <div class="nav-group-desc" id="tpp-group-desc" style="padding:6px 22px 10px;font-size:10px;color:rgba(255,255,255,.5);line-height:1.4;display:none;">The TPP (Third Party Provider) side — how fintech apps connect to ADCB via the OF Hub to access customer data and initiate payments.</div>
+    <div class="nav-project-group open" id="group-tpp">
 
     <div class="nav-item nav-parent active expanded" onclick="toggleNav('overview')" id="nav-overview">
       <span style="display:flex;align-items:center;gap:10px;"><span class="nav-icon">&#x1F30D;</span> General Overview</span>
@@ -126,8 +133,16 @@
       </div>
     </div>
 
-    <div class="sp16"></div>
-    <div class="nav-group-label">LFI Project</div>
+    </div><!-- /group-tpp -->
+
+    <div class="nav-group-label" style="cursor:pointer;" onclick="toggleProjectGroup('lfi-proj')">
+      <span style="display:flex;align-items:center;justify-content:space-between;">
+        LFI Project
+        <span class="nav-group-chevron" id="lfi-proj-group-chev" style="font-size:10px;transition:transform .2s;">&#x25B6;</span>
+      </span>
+    </div>
+    <div class="nav-group-desc" id="lfi-proj-group-desc" style="padding:6px 22px 10px;font-size:10px;color:rgba(255,255,255,.5);line-height:1.4;display:none;">The LFI (Licensed Financial Institution) side — ADCB's own systems that hold accounts, validate consent, execute payments, and manage liability compliance.</div>
+    <div class="nav-project-group" id="group-lfi-proj" style="display:none;">
 
     <div class="nav-item nav-parent" onclick="toggleNav('lfi')" id="nav-lfi">
       <span style="display:flex;align-items:center;gap:10px;"><span class="nav-icon">&#x1F3E6;</span> Liability Validations &amp; Compliance</span>
@@ -176,6 +191,7 @@
         <span class="nav-icon">&#x26A0;&#xFE0F;</span> Gaps &amp; Questions
       </div>
     </div>
+    </div><!-- /group-lfi-proj -->
   </div>
 
   <div class="sidebar-footer">CBUAE Standards v2.0</div>
