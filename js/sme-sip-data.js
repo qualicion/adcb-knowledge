@@ -129,50 +129,67 @@ var SME_SIP_SCENARIOS = {
 
   /* ── LOGIN ─────────────────────────────────────────────── */
   'login': {
-    title: 'ProCash Login',
+    title: 'API CALLS — LOGIN / AUTHENTICATION',
+    desc: '<strong>What\'s happening:</strong> The customer has been redirected from the TPP app to ProCash. They need to authenticate using their preferred method (Mobile Token, Hard Token, SMS, or Face ID). <strong>Next:</strong> On successful login, the system checks if they\'re a Super User — then loads the consent details screen.',
     screenHtml:
-      '<div class="sme-at-header" style="background:#E31E24;padding:14px 16px;display:flex;align-items:center;gap:8px;">' +
-        '<span style="color:#fff;font-size:18px;">&#x2190;</span>' +
-        '<span style="color:#fff;font-size:15px;font-weight:700;">ProCash</span>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;">' +
+        '<div style="display:flex;align-items:center;gap:6px;">' +
+          '<div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">&#x25B6;</div>' +
+          '<div style="font-size:13px;font-weight:700;">Confirm Payment Details</div>' +
+        '</div>' +
+        '<div style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;">&#x2715;</div>' +
       '</div>' +
-      '<div style="padding:20px 16px;">' +
-        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">' +
-          '<div style="width:36px;height:36px;border-radius:50%;background:#1C2B4A;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;">MT</div>' +
-          '<div>' +
-            '<div style="font-size:13px;font-weight:700;color:#0F172A;">Welcome back</div>' +
-            '<div style="font-size:11px;color:#475569;">MERTTEST</div>' +
-          '</div>' +
+      '<div style="font-size:12px;color:#475569;text-align:center;padding:12px 14px 8px;">Please select your authentication method</div>' +
+      '<div style="display:flex;justify-content:center;gap:16px;padding:8px 14px;">' +
+        '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;">' +
+          '<div style="width:44px;height:44px;border-radius:50%;background:#1A6B4A;color:white;display:flex;align-items:center;justify-content:center;font-size:20px;">&#x1F4F1;</div>' +
+          '<div style="font-size:10px;color:#475569;">Mobile Token</div>' +
         '</div>' +
-        '<div style="font-size:12px;font-weight:600;color:#475569;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Select Authentication Method</div>' +
-        '<div class="sme-at-auth-opt sme-at-auth-active">&#x1F4F1; Mobile Token</div>' +
-        '<div class="sme-at-auth-opt">&#x1F511; Hard Token</div>' +
-        '<div class="sme-at-auth-opt">&#x1F4AC; SMS Token</div>' +
-        '<div style="margin-top:16px;">' +
-          '<div style="font-size:11px;color:#475569;margin-bottom:6px;">Enter Token</div>' +
-          '<input style="width:100%;padding:10px 12px;border:1.5px solid #E31E24;border-radius:8px;font-size:15px;letter-spacing:4px;text-align:center;box-sizing:border-box;outline:none;" placeholder="_ _ _ _ _ _" />' +
+        '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;">' +
+          '<div style="width:44px;height:44px;border-radius:50%;background:#f0f4f8;display:flex;align-items:center;justify-content:center;font-size:20px;">&#x1F511;</div>' +
+          '<div style="font-size:10px;color:#475569;">Hard Token</div>' +
         '</div>' +
-        '<button class="sme-at-btn-primary" style="margin-top:16px;">Login</button>' +
-        '<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;">' +
-          '<div style="height:1px;flex:1;background:#E2E8F0;"></div>' +
-          '<span style="font-size:11px;color:#475569;">or</span>' +
-          '<div style="height:1px;flex:1;background:#E2E8F0;"></div>' +
+        '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;">' +
+          '<div style="width:44px;height:44px;border-radius:50%;background:#f0f4f8;display:flex;align-items:center;justify-content:center;font-size:20px;">&#x1F4AC;</div>' +
+          '<div style="font-size:10px;color:#475569;">SMS Token</div>' +
         '</div>' +
-        '<button style="width:100%;padding:10px;border:1.5px solid #E2E8F0;border-radius:8px;background:#fff;font-size:13px;font-weight:600;color:#0F172A;margin-top:12px;cursor:pointer;">&#x1F60A; Use Face ID</button>' +
-      '</div>',
+      '</div>' +
+      '<div style="background:#1C2B4A;color:white;text-align:center;padding:6px 14px;font-size:12px;font-weight:700;letter-spacing:1px;margin:8px 14px;border-radius:4px;">MERTTEST</div>' +
+      '<div style="margin:6px 14px;border:1px solid #E2E8F0;border-radius:6px;padding:8px 10px;font-size:12px;color:#ccc;display:flex;align-items:center;justify-content:space-between;"><span>Enter Token</span><span style="color:#475569;font-size:11px;">&#x2139;</span></div>' +
+      '<button style="background:#1C2B4A;color:white;border:none;border-radius:8px;padding:12px;width:calc(100% - 28px);margin:8px 14px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">' +
+        '<div style="width:16px;height:16px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;">&#x25B6;</div> Login</button>' +
+      '<div style="display:flex;align-items:center;gap:8px;margin:8px 14px;font-size:11px;color:#475569;">' +
+        '<div style="flex:1;height:1px;background:#E2E8F0;"></div>or<div style="flex:1;height:1px;background:#E2E8F0;"></div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;font-size:11px;color:#475569;cursor:pointer;">&#x1FA78; Login with Face ID</div>' +
+      '<div style="text-align:center;font-size:11px;color:#475569;margin:4px 14px;border-top:1px solid #E2E8F0;padding-top:8px;">Generate Token</div>' +
+      '<div style="margin:6px 14px;border:1px solid #E2E8F0;border-radius:6px;padding:8px 10px;font-size:12px;color:#ccc;display:flex;align-items:center;gap:6px;">&#x1F512; Token</div>',
     apisHtml:
       '<div class="sme-dev-section">' +
-        '<div class="sme-dev-label">OAUTH2 — PAR Request</div>' +
+        '<div class="sme-dev-label">POST — /auth/token</div>' +
         '<div class="sme-api-badge sme-badge-post">POST</div>' +
-        '<code class="sme-dev-path">/as/par</code>' +
-        '<pre class="sme-code-block"><span class="sme-ck">// TPP sends PAR to obtain request_uri\n</span><span class="sme-cv">{\n  "response_type": </span><span class="sme-cs">"code"</span><span class="sme-cv">,\n  "client_id": </span><span class="sme-cs">"tpp-client-id-001"</span><span class="sme-cv">,\n  "redirect_uri": </span><span class="sme-cs">"https://tpp.example/callback"</span><span class="sme-cv">,\n  "scope": </span><span class="sme-cs">"payments openid"</span><span class="sme-cv">,\n  "request": </span><span class="sme-cs">"&lt;signed-JWT&gt;"</span>\n<span class="sme-cv">}</span></pre>' +
-        '<div class="sme-dev-label" style="margin-top:12px;">Response</div>' +
-        '<pre class="sme-code-block"><span class="sme-cv">{\n  "request_uri": </span><span class="sme-cs">"urn:adcb:bwc:1234abcd"</span><span class="sme-cv">,\n  "expires_in": </span><span class="sme-cn">90\n</span><span class="sme-cv">}</span></pre>' +
+        '<code class="sme-dev-path">/auth/token</code>' +
+        '<p style="font-size:11px;color:#8B949E;margin:8px 0;">Customer authenticates using mobile token, hard token or SMS OTP via the ProCash BAU authentication flow. This is standard ADCB authentication — not Open Finance specific.</p>' +
+        '<pre class="sme-code-block"><span class="sme-ck">Request Body:\n</span><span class="sme-cv">{\n  </span><span class="sme-cs">"username"</span><span class="sme-cv">: </span><span class="sme-cs">"MERTTEST"</span><span class="sme-cv">,\n  </span><span class="sme-cs">"token"</span><span class="sme-cv">: </span><span class="sme-cs">"&lt;otp_value&gt;"</span><span class="sme-cv">,\n  </span><span class="sme-cs">"tokenType"</span><span class="sme-cv">: </span><span class="sme-cs">"MOBILE"</span><span class="sme-cv">,\n  </span><span class="sme-cs">"consentId"</span><span class="sme-cv">: </span><span class="sme-cs">"&lt;consent_id_from_nebras&gt;"</span>\n<span class="sme-cv">}</span></pre>' +
+        '<div style="color:#56D364;font-size:10px;font-weight:600;margin:8px 0;">&#x2713; 200 SUCCESS</div>' +
+        '<pre class="sme-code-block"><span class="sme-cv">{\n  </span><span class="sme-cs">"sessionToken"</span><span class="sme-cv">: </span><span class="sme-cs">"eyJhbGci..."</span><span class="sme-cv">,\n  </span><span class="sme-cs">"userType"</span><span class="sme-cv">: </span><span class="sme-cs">"SUPER_USER"</span><span class="sme-cv">,\n  </span><span class="sme-cs">"eligible"</span><span class="sme-cv">: </span><span class="sme-cn">true</span>\n<span class="sme-cv">}</span></pre>' +
+        '<div style="color:#F85149;font-size:10px;font-weight:600;margin:8px 0;">&#x2717; 401 FAILED AUTH</div>' +
+        '<pre class="sme-code-block"><span class="sme-cv">{\n  </span><span class="sme-cs">"error"</span><span class="sme-cv">: </span><span class="sme-cs">"AUTHENTICATION_FAILED"</span><span class="sme-cv">,\n  </span><span class="sme-cs">"message"</span><span class="sme-cv">: </span><span class="sme-cs">"Invalid credentials"</span>\n<span class="sme-cv">}</span></pre>' +
+      '</div>' +
+      '<div class="sme-dev-section" style="margin-top:14px;">' +
+        '<div class="sme-dev-label">GET — /payment-consents/{ConsentId}</div>' +
+        '<div class="sme-api-badge sme-badge-get">GET</div>' +
+        '<code class="sme-dev-path">/payment-consents/{ConsentId}</code>' +
+        '<p style="font-size:11px;color:#8B949E;margin:8px 0;">After login, fetch the consent details from ADCB using the ConsentId passed from Nebras during the redirect. This populates the payment details screen.</p>' +
+        '<div style="color:#56D364;font-size:10px;font-weight:600;margin:8px 0;">&#x2713; 200 Consent Object</div>' +
+        '<pre class="sme-code-block"><span class="sme-cv">{\n  </span><span class="sme-cs">"consentId"</span><span class="sme-cv">: </span><span class="sme-cs">"CNSNT-20250101-001"</span><span class="sme-cv">,\n  </span><span class="sme-cs">"amount"</span><span class="sme-cv">: </span><span class="sme-cs">"100.00"</span><span class="sme-cv">,\n  </span><span class="sme-cs">"currency"</span><span class="sme-cv">: </span><span class="sme-cs">"AED"</span><span class="sme-cv">,\n  </span><span class="sme-cs">"payeeName"</span><span class="sme-cv">: </span><span class="sme-cs">"Noon"</span><span class="sme-cv">,\n  </span><span class="sme-cs">"status"</span><span class="sme-cv">: </span><span class="sme-cs">"AwaitingAuthorisation"</span>\n<span class="sme-cv">}</span></pre>' +
       '</div>'
   },
 
   /* ── CONSENT DETAILS (single account) ──────────────────── */
   'consent-details': {
     title: 'Consent Details — 1 Account (v2.1)',
+    desc: '<strong>What\'s happening:</strong> The customer has logged in and passed eligibility checks. They see the full payment details from the TPP — amount, payee, date, reference, and Payment Purpose (v2.1). They have only one eligible CASA account, so it\'s shown automatically. <strong>Next:</strong> Tapping "Pay using AlTareq" takes them to the PIN/EFR screen to authorise.',
     screenHtml:
       '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;">' +
         '<div style="display:flex;align-items:center;gap:6px;">' +
@@ -230,6 +247,7 @@ var SME_SIP_SCENARIOS = {
   /* ── ACCOUNT SELECT (5 accounts) ───────────────────────── */
   'account-select': {
     title: 'Account Selection — Multiple (v2.1)',
+    desc: '<strong>What\'s happening:</strong> The customer has multiple eligible CASA accounts. No account is pre-selected — they must pick one. Payment details are shown above the account list. "View All" appears if there are more than 10. <strong>Next:</strong> After selecting an account, the system sends a PATCH (AccountSelected) and the "Pay using AlTareq" button becomes active.',
     screenHtml:
       '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;">' +
         '<div style="display:flex;align-items:center;gap:6px;">' +
@@ -280,6 +298,7 @@ var SME_SIP_SCENARIOS = {
   /* ── ACCOUNT SELECTED ───────────────────────────────────── */
   'account-selected': {
     title: 'Account Selected (v2.1)',
+    desc: '<strong>What\'s happening:</strong> The customer has tapped on an account — the radio button fills teal. The PATCH /payment-consents call fires with the selected DebtorAccount. <strong>Next:</strong> Tapping "Pay using AlTareq" proceeds to the PIN/EFR authorisation screen.',
     screenHtml:
       '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;">' +
         '<div style="display:flex;align-items:center;gap:6px;">' +
@@ -326,6 +345,7 @@ var SME_SIP_SCENARIOS = {
   /* ── PIN ENTRY ──────────────────────────────────────────── */
   'pin': {
     title: 'EFR / PIN Entry (v2.1)',
+    desc: '<strong>What\'s happening:</strong> The customer confirmed the payment details and selected their account. Now they enter their 6-digit ProCash PIN to authorise. They have 3 attempts — after the 3rd failure the consent is rejected. Face ID / Touch ID is offered as an alternative. <strong>Next:</strong> On success, a PATCH sets the consent to "Authorised" and the customer is redirected back to the TPP.',
     screenHtml:
       '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;">' +
         '<div style="display:flex;align-items:center;gap:6px;">' +
@@ -378,6 +398,7 @@ var SME_SIP_SCENARIOS = {
   /* ── REDIRECT TO TPP ────────────────────────────────────── */
   'redirect': {
     title: 'LFI to TPP Redirect',
+    desc: '<strong>What\'s happening:</strong> PIN was correct — consent is now "Authorised". The customer sees the TPP app logo and name while the system prepares the OAuth2 redirect. The auth code is passed back to the TPP via the callback URL. <strong>Next:</strong> The TPP exchanges the auth code for an access token, then calls POST /domestic-payments to execute the payment.',
     screenHtml:
       '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,#0F766E 0%,#1C2B4A 100%);padding:30px 20px;text-align:center;">' +
         '<div style="width:56px;height:56px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sme-spin 1s linear infinite;margin-bottom:20px;"></div>' +
@@ -404,6 +425,7 @@ var SME_SIP_SCENARIOS = {
   /* ── ACCESS RESTRICTED ──────────────────────────────────── */
   'access-restricted': {
     title: 'Error — Access Restricted',
+    desc: '<strong>What\'s happening:</strong> The customer logged in successfully but is NOT a Super User or Sole Owner (e.g. they are a Maker or Checker in the SME hierarchy). ADCB blocks the consent flow. <strong>Next:</strong> Consent is PATCH\'d to "Rejected" with reason "NotSuperUser". Customer is redirected back to the TPP, which receives the rejection.',
     screenHtml:
       '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
       '<div style="padding:30px 20px;text-align:center;">' +
@@ -425,6 +447,7 @@ var SME_SIP_SCENARIOS = {
   /* ── NO ACCOUNTS ────────────────────────────────────────── */
   'no-accounts': {
     title: 'Error — No Accounts Available',
+    desc: '<strong>What\'s happening:</strong> The customer is a Super User but has zero eligible AED CASA accounts. Non-AED and non-CASA accounts are filtered out. <strong>Next:</strong> Consent is rejected, customer is redirected to the TPP. The TPP sees the rejection and can advise the customer to link an eligible account.',
     screenHtml:
       '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
       '<div style="padding:30px 20px;text-align:center;">' +
@@ -446,6 +469,7 @@ var SME_SIP_SCENARIOS = {
   /* ── AUTH EXPIRED ───────────────────────────────────────── */
   'auth-expired': {
     title: 'Error — Authorisation Expired',
+    desc: '<strong>What\'s happening:</strong> The 10-minute authorisation window has elapsed. The customer took too long to complete the consent journey (e.g. got distracted, left the app). <strong>Next:</strong> Consent is rejected with "AuthWindowExpired". Customer must go back to the TPP and start a new payment request from scratch.',
     screenHtml:
       '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
       '<div style="padding:30px 20px;text-align:center;">' +
@@ -466,6 +490,7 @@ var SME_SIP_SCENARIOS = {
   /* ── UNSUCCESSFUL ───────────────────────────────────────── */
   'unsuccessful': {
     title: 'Error — Unsuccessful',
+    desc: '<strong>What\'s happening:</strong> Either the customer entered the wrong PIN 3 times (MAX_AUTH_ATTEMPTS_EXCEEDED) or a system error occurred during EFR/PIN. The consent is irrecoverably rejected. <strong>Next:</strong> Customer must close ProCash, return to the TPP, and initiate a brand new payment.',
     screenHtml:
       '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
       '<div style="padding:30px 20px;text-align:center;">' +
@@ -486,6 +511,7 @@ var SME_SIP_SCENARIOS = {
   /* ── TWO ACCOUNTS ───────────────────────────────────────── */
   'two-accounts': {
     title: 'Account Variant — 2 Accounts',
+    desc: '<strong>What\'s happening:</strong> Customer has exactly 2 eligible CASA accounts. Both are shown directly — no search bar, no "View All". Neither is pre-selected. <strong>Next:</strong> Customer taps one to select it, then proceeds with "Pay using AlTareq" to the PIN screen.',
     screenHtml:
       '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
       '<div style="padding:12px 16px;">' +
@@ -507,6 +533,7 @@ var SME_SIP_SCENARIOS = {
   /* ── ONE ACCOUNT ────────────────────────────────────────── */
   'one-account': {
     title: 'Account Variant — 1 Account (Pre-selected)',
+    desc: '<strong>What\'s happening:</strong> Customer has only 1 eligible CASA account. It\'s shown as "Account to Pay from" with a red play icon — no radio button, no selection needed. <strong>Next:</strong> Customer reviews the details and taps "Pay using AlTareq" to proceed directly to PIN.',
     screenHtml:
       '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
       '<div style="padding:12px 16px;">' +
@@ -535,6 +562,7 @@ var SME_SIP_SCENARIOS = {
   /* ── TPP PRE-SELECTED ───────────────────────────────────── */
   'tpp-selected': {
     title: 'Account Variant — TPP Pre-selected',
+    desc: '<strong>What\'s happening:</strong> The TPP pre-specified the DebtorAccount in the consent request. The account is shown as "Account selected for the payment at [TPP name]" with a red play icon — the customer cannot change it. <strong>Next:</strong> Customer reviews and taps "Pay using AlTareq" to proceed to PIN. No account selection step needed.',
     screenHtml:
       '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
       '<div style="padding:12px 16px;">' +
@@ -560,6 +588,7 @@ var SME_SIP_SCENARIOS = {
   /* ── CANCEL CONSENT ─────────────────────────────────────── */
   'cancel-consent': {
     title: 'Cancel — Consent Screen',
+    desc: '<strong>What\'s happening:</strong> The customer is on the consent screen and decides to abandon the payment. They can tap either the "Cancel" button or the X in the top right corner — both have the same effect. <strong>Next:</strong> Consent is PATCH\'d to "Rejected" with reason "CustomerCancelled". Session ends. Customer is redirected back to the TPP with error=access_denied.',
     screenHtml:
       '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
       '<div style="padding:12px 16px;">' +
@@ -582,6 +611,7 @@ var SME_SIP_SCENARIOS = {
   /* ── TPP REDIRECT TO APP ────────────────────────────────── */
   'tpp-redirect-to-app': {
     title: 'TPP — Deep Link Decision',
+    desc: '<strong>What\'s happening:</strong> The TPP has initiated the payment and is redirecting the customer to ADCB. The device checks whether ProCash is installed. If yes — opens via deep link. If no — redirects to App Store (iOS) or Play Store (Android). <strong>Next:</strong> If ProCash opens, customer either unlocks (if logged in) or sees the login screen (if not).',
     screenHtml:
       '<div style="padding:16px;">' +
         '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:14px;text-align:center;">Deep Link Flow</div>' +
@@ -617,6 +647,7 @@ var SME_SIP_SCENARIOS = {
   /* ── IDENTIFY SUPERUSER ─────────────────────────────────── */
   'identify-superuser': {
     title: 'Eligibility — Superuser Check',
+    desc: '<strong>What\'s happening:</strong> Customer just logged in. ADCB checks their profile — are they a Super User or Sole Owner? This determines whether they can proceed. <strong>Next:</strong> If Super User → directed to the consent details screen. If NOT → "Access Restricted" error shown, consent rejected, customer redirected to TPP.',
     screenHtml:
       '<div style="padding:16px;">' +
         '<div style="font-size:12px;font-weight:700;color:#0F172A;margin-bottom:14px;">ADCB Superuser Eligibility Check</div>' +
@@ -652,6 +683,7 @@ var SME_SIP_SCENARIOS = {
   /* ── CONFIRM PAYMENT ────────────────────────────────────── */
   'confirm-payment': {
     title: 'Confirm Payment — Pay Button Active',
+    desc: '<strong>What\'s happening:</strong> Customer has reviewed all payment details and selected an account. The "Pay using AlTareq" button is now active. If NO account is selected, the button is disabled or shows inline validation. <strong>Next:</strong> Tapping "Pay using AlTareq" sends PATCH (AccountSelected) and directs the customer to ProCash MFA (PIN/biometric).',
     screenHtml:
       '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
       '<div style="padding:12px 16px;">' +
@@ -678,6 +710,7 @@ var SME_SIP_SCENARIOS = {
   /* ── PAYMENT EXECUTION ──────────────────────────────────── */
   'payment-execution': {
     title: 'Payment Execution — Processing',
+    desc: '<strong>What\'s happening:</strong> The consent was authorised and the customer was redirected to the TPP. The TPP has now called POST /domestic-payments to execute the actual payment via the IPS/UAEFTS rail. This screen shows the payment processing state. <strong>Next:</strong> The TPP polls GET /domestic-payments/{id} to check status — Pending → AcceptedSettlementCompleted or Rejected.',
     screenHtml:
       '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,#1C2B4A 0%,#0F766E 100%);padding:30px 20px;text-align:center;">' +
         '<div style="width:56px;height:56px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sme-spin 1s linear infinite;margin-bottom:20px;"></div>' +
@@ -701,6 +734,7 @@ var SME_SIP_SCENARIOS = {
   /* ── TIMEOUT ERROR ──────────────────────────────────────── */
   'timeout-error': {
     title: 'System Error / Session Timeout',
+    desc: '<strong>What\'s happening:</strong> Either a technical error occurred during the consent journey, or the customer\'s ProCash session timed out after 10 minutes of inactivity on the Consent Detail Screen. <strong>Next:</strong> Consent is rejected. Customer must return to the TPP app and initiate a new payment request.',
     screenHtml:
       '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
       '<div style="padding:30px 20px;text-align:center;">' +

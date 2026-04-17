@@ -286,8 +286,12 @@ function smeRenderPrototype() {
     '<div class="sme-proto-steps" id="sme-proto-steps"></div>' +
   '</div>';
 
+  /* Context description bar */
+  var descHtml = '<div id="sme-scenario-desc" style="padding:10px 14px;background:var(--color-surface-secondary);border:1px solid var(--color-border);border-radius:var(--radius-button);margin-bottom:14px;font-size:12px;color:var(--color-text-secondary);line-height:1.6;display:none;"></div>';
+
   /* Phone + Dev panel side by side */
   var mainHtml =
+    descHtml +
     '<div class="sme-prototype-main">' +
       '<div class="sme-phone-wrap">' +
         '<div class="sme-phone-frame">' +
@@ -347,6 +351,16 @@ function smeShowScenario(name, btn) {
 
   var devEl = document.getElementById('sme-dev-panel-body');
   if (devEl) devEl.innerHTML = data.apisHtml;
+
+  var descEl = document.getElementById('sme-scenario-desc');
+  if (descEl) {
+    if (data.desc) {
+      descEl.innerHTML = data.desc;
+      descEl.style.display = 'block';
+    } else {
+      descEl.style.display = 'none';
+    }
+  }
 
   var titleEl = document.getElementById('sme-dev-panel-title');
   if (titleEl) titleEl.textContent = data.title;
