@@ -1013,10 +1013,11 @@
   text-align:center;font-weight:600;
 }
 .sme-phone-frame{
-  width:280px;background:#F8FAFC;border-radius:32px;
+  width:280px;height:580px;background:#F8FAFC;border-radius:32px;
   border:7px solid #1C1C1E;overflow:hidden;
   display:flex;flex-direction:column;position:relative;
-  min-height:540px;flex-shrink:0;
+  flex-shrink:0;
+  box-shadow:0 8px 32px rgba(0,0,0,0.2),inset 0 0 0 1px rgba(255,255,255,0.05);
 }
 .sme-phone-notch{
   height:24px;background:#1C1C1E;border-radius:0 0 14px 14px;
@@ -1024,12 +1025,16 @@
 }
 .sme-phone-screen{
   flex:1;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
 }
-.sme-phone-screen::-webkit-scrollbar{display:none;}
+.sme-phone-screen::-webkit-scrollbar{width:3px;}
+.sme-phone-screen::-webkit-scrollbar-track{background:transparent;}
+.sme-phone-screen::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:3px;}
+.sme-phone-screen::-webkit-scrollbar-thumb:hover{background:#94A3B8;}
 
 /* ── SME DEV PANEL ── */
 .sme-dev-panel{
-  flex:1;min-width:0;background:#0D1117;border-radius:var(--radius-card);
+  flex:1;min-width:0;max-height:580px;background:#0D1117;border-radius:var(--radius-card);
   border:1px solid #30363D;overflow:hidden;display:flex;flex-direction:column;
 }
 .sme-dev-panel-header{
