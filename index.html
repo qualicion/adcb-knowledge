@@ -134,6 +134,44 @@
 
     </div><!-- /group-tpp -->
 
+    <div class="nav-group-label" style="cursor:pointer;" onclick="toggleProjectGroup('apiref')">
+      <span style="display:flex;align-items:center;justify-content:space-between;">
+        API Reference
+        <span class="nav-group-chevron" id="apiref-group-chev" style="font-size:10px;transition:transform .2s;">&#x25B6;</span>
+      </span>
+    </div>
+    <div class="nav-project-group" id="group-apiref" style="display:none;">
+
+    <div class="nav-item nav-parent" onclick="toggleNav('lfiapi')" id="nav-lfiapi">
+      <span style="display:flex;align-items:center;gap:10px;"><span class="nav-icon">&#x1F4E1;</span> LFI Endpoints</span>
+      <span class="nav-chevron">&#x25B6;</span>
+    </div>
+    <div class="nav-sub" id="sub-lfiapi">
+      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-overview')" id="nav-lfiapi-overview">
+        <span class="nav-icon">&#x1F4CA;</span> Overview
+      </div>
+      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-unconsented')" id="nav-lfiapi-unconsented">
+        <span class="nav-icon">&#x2705;</span> Unconsented GETs
+      </div>
+      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-datasharing')" id="nav-lfiapi-datasharing">
+        <span class="nav-icon">&#x1F512;</span> Bank Data Sharing
+      </div>
+      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-service')" id="nav-lfiapi-service">
+        <span class="nav-icon">&#x1F504;</span> Service Status
+      </div>
+      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-post')" id="nav-lfiapi-post">
+        <span class="nav-icon">&#x26A1;</span> POST / Mutating
+      </div>
+      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-matrix')" id="nav-lfiapi-matrix">
+        <span class="nav-icon">&#x1F50D;</span> Full Matrix
+      </div>
+      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-glossary')" id="nav-lfiapi-glossary">
+        <span class="nav-icon">&#x1F4D6;</span> Glossary
+      </div>
+    </div>
+
+    </div><!-- /group-apiref -->
+
     <div class="nav-group-label" style="cursor:pointer;" onclick="toggleProjectGroup('lfi-proj')">
       <span style="display:flex;align-items:center;justify-content:space-between;">
         LFI Project
@@ -158,35 +196,6 @@
       </div>
       <div class="nav-item" onclick="navigate('lfi','tab-lfi-tests')" id="nav-lfi-tests">
         <span class="nav-icon">&#x1F9EA;</span> Test Strategy
-      </div>
-    </div>
-
-    <div class="sp8"></div>
-    <div class="nav-item nav-parent" onclick="toggleNav('lfiapi')" id="nav-lfiapi">
-      <span style="display:flex;align-items:center;gap:10px;"><span class="nav-icon">&#x1F4E1;</span> LFI API Reference</span>
-      <span class="nav-chevron">&#x25B6;</span>
-    </div>
-    <div class="nav-sub" id="sub-lfiapi">
-      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-overview')" id="nav-lfiapi-overview">
-        <span class="nav-icon">&#x1F4CA;</span> Overview
-      </div>
-      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-unconsented')" id="nav-lfiapi-unconsented">
-        <span class="nav-icon">&#x2705;</span> Unconsented GETs
-      </div>
-      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-datasharing')" id="nav-lfiapi-datasharing">
-        <span class="nav-icon">&#x1F512;</span> Bank Data Sharing
-      </div>
-      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-service')" id="nav-lfiapi-service">
-        <span class="nav-icon">&#x1F504;</span> Service Status
-      </div>
-      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-post')" id="nav-lfiapi-post">
-        <span class="nav-icon">&#x26A1;</span> POST / Mutating
-      </div>
-      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-matrix')" id="nav-lfiapi-matrix">
-        <span class="nav-icon">&#x1F50D;</span> Full Matrix
-      </div>
-      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-glossary')" id="nav-lfiapi-glossary">
-        <span class="nav-icon">&#x1F4D6;</span> Glossary
       </div>
     </div>
 
