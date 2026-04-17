@@ -11,6 +11,13 @@ function toggleProjectGroup(groupId) {
   var isOpen = group.style.display !== 'none';
   group.style.display = isOpen ? 'none' : 'block';
   if (chev) chev.innerHTML = isOpen ? '&#x25B6;' : '&#x25BC;';
+
+  /* Navigate to landing page when expanding */
+  if (!isOpen) {
+    var landingMap = { tpp: 'tpp-home', 'lfi-proj': 'lfi-home', apiref: 'apiref-home' };
+    var landing = landingMap[groupId];
+    if (landing) navigateToRoute(landing, null);
+  }
 }
 
 /* ── TOGGLE NAV SECTIONS ── */
@@ -58,7 +65,7 @@ function navigateToRoute(section, anchor) {
   }
 
   // Update breadcrumb
-  var names = { overview: 'General Overview', consent: 'Consent & Scheduler', lfi: 'LFI Project', lfiapi: 'LFI API Reference', smesip: 'Single Instant Payment (SME)', sipcop: 'Single Instant Payment', cmi: 'CMI Dashboard' };
+  var names = { 'tpp-home': 'TPP Project', 'lfi-home': 'LFI Project', 'apiref-home': 'API Reference', overview: 'General Overview', consent: 'Consent & Scheduler', lfi: 'Liability Validations', lfiapi: 'LFI Endpoints', smesip: 'Single Instant Payment (SME)', sipcop: 'Single Instant Payment', cmi: 'CMI Dashboard' };
   document.getElementById('bc-current').textContent = names[section] || section;
 
   // Handle tab activation for overview

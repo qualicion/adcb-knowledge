@@ -134,44 +134,6 @@
 
     </div><!-- /group-tpp -->
 
-    <div class="nav-group-label" style="cursor:pointer;" onclick="toggleProjectGroup('apiref')">
-      <span style="display:flex;align-items:center;justify-content:space-between;">
-        API Reference
-        <span class="nav-group-chevron" id="apiref-group-chev" style="font-size:10px;transition:transform .2s;">&#x25B6;</span>
-      </span>
-    </div>
-    <div class="nav-project-group" id="group-apiref" style="display:none;">
-
-    <div class="nav-item nav-parent" onclick="toggleNav('lfiapi')" id="nav-lfiapi">
-      <span style="display:flex;align-items:center;gap:10px;"><span class="nav-icon">&#x1F4E1;</span> LFI Endpoints</span>
-      <span class="nav-chevron">&#x25B6;</span>
-    </div>
-    <div class="nav-sub" id="sub-lfiapi">
-      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-overview')" id="nav-lfiapi-overview">
-        <span class="nav-icon">&#x1F4CA;</span> Overview
-      </div>
-      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-unconsented')" id="nav-lfiapi-unconsented">
-        <span class="nav-icon">&#x2705;</span> Unconsented GETs
-      </div>
-      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-datasharing')" id="nav-lfiapi-datasharing">
-        <span class="nav-icon">&#x1F512;</span> Bank Data Sharing
-      </div>
-      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-service')" id="nav-lfiapi-service">
-        <span class="nav-icon">&#x1F504;</span> Service Status
-      </div>
-      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-post')" id="nav-lfiapi-post">
-        <span class="nav-icon">&#x26A1;</span> POST / Mutating
-      </div>
-      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-matrix')" id="nav-lfiapi-matrix">
-        <span class="nav-icon">&#x1F50D;</span> Full Matrix
-      </div>
-      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-glossary')" id="nav-lfiapi-glossary">
-        <span class="nav-icon">&#x1F4D6;</span> Glossary
-      </div>
-    </div>
-
-    </div><!-- /group-apiref -->
-
     <div class="nav-group-label" style="cursor:pointer;" onclick="toggleProjectGroup('lfi-proj')">
       <span style="display:flex;align-items:center;justify-content:space-between;">
         LFI Project
@@ -228,6 +190,42 @@
       </div>
     </div>
     </div><!-- /group-lfi-proj -->
+
+    <div class="nav-group-label" style="cursor:pointer;" onclick="toggleProjectGroup('apiref')">
+      <span style="display:flex;align-items:center;justify-content:space-between;">
+        API Reference
+        <span class="nav-group-chevron" id="apiref-group-chev" style="font-size:10px;transition:transform .2s;">&#x25B6;</span>
+      </span>
+    </div>
+    <div class="nav-project-group" id="group-apiref" style="display:none;">
+    <div class="nav-item nav-parent" onclick="toggleNav('lfiapi')" id="nav-lfiapi">
+      <span style="display:flex;align-items:center;gap:10px;"><span class="nav-icon">&#x1F4E1;</span> LFI Endpoints</span>
+      <span class="nav-chevron">&#x25B6;</span>
+    </div>
+    <div class="nav-sub" id="sub-lfiapi">
+      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-overview')" id="nav-lfiapi-overview">
+        <span class="nav-icon">&#x1F4CA;</span> Overview
+      </div>
+      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-unconsented')" id="nav-lfiapi-unconsented">
+        <span class="nav-icon">&#x2705;</span> Unconsented GETs
+      </div>
+      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-datasharing')" id="nav-lfiapi-datasharing">
+        <span class="nav-icon">&#x1F512;</span> Bank Data Sharing
+      </div>
+      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-service')" id="nav-lfiapi-service">
+        <span class="nav-icon">&#x1F504;</span> Service Status
+      </div>
+      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-post')" id="nav-lfiapi-post">
+        <span class="nav-icon">&#x26A1;</span> POST / Mutating
+      </div>
+      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-matrix')" id="nav-lfiapi-matrix">
+        <span class="nav-icon">&#x1F50D;</span> Full Matrix
+      </div>
+      <div class="nav-item" onclick="navigate('lfiapi','tab-lfiapi-glossary')" id="nav-lfiapi-glossary">
+        <span class="nav-icon">&#x1F4D6;</span> Glossary
+      </div>
+    </div>
+    </div><!-- /group-apiref -->
   </div>
 
   <div class="sidebar-footer">CBUAE Standards v2.0</div>
@@ -248,6 +246,74 @@
   <div class="content">
 
     <!-- ═══════════════════════════════════════════ -->
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- LANDING: TPP PROJECT                         -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="section" id="section-tpp-home">
+      <div class="hero-card">
+        <div class="hero-eyebrow">TPP Project · Third Party Provider</div>
+        <h1>TPP Project</h1>
+        <p>Everything needed to understand, design, and test ADCB's Open Finance integration as a Third Party Provider — from consent flows to live payment prototypes.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-item-gap);">
+        <div class="card" style="cursor:pointer;" onclick="navigate('overview')">
+          <div class="card-header">General Overview</div>
+          <p style="font:var(--font-body);color:var(--color-text-secondary);line-height:1.6;">The players, data sharing, SIP payment flow, and payment status — the full conceptual foundation.</p>
+        </div>
+        <div class="card" style="cursor:pointer;" onclick="navigate('consent')">
+          <div class="card-header">Consent &amp; Scheduler</div>
+          <p style="font:var(--font-body);color:var(--color-text-secondary);line-height:1.6;">System map, consent lifecycle, data scheduler, error scenarios, and testing.</p>
+        </div>
+        <div class="card" style="cursor:pointer;" onclick="navigate('sipcop')">
+          <div class="card-header">Single Instant Payment</div>
+          <p style="font:var(--font-body);color:var(--color-text-secondary);line-height:1.6;">Payment flow, CoP deep dive, user stories, prototype, RST scenarios, and design gaps.</p>
+        </div>
+        <div class="card" style="cursor:pointer;" onclick="navigate('cmi')">
+          <div class="card-header">CMI Dashboard</div>
+          <p style="font:var(--font-body);color:var(--color-text-secondary);line-height:1.6;">Consent management interface — screen-by-screen prototype with API endpoint mapping.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- LANDING: LFI PROJECT                         -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="section" id="section-lfi-home">
+      <div class="hero-card">
+        <div class="hero-eyebrow">LFI Project · Licensed Financial Institution · ADCB</div>
+        <h1>LFI Project</h1>
+        <p>ADCB's obligations as the bank in Open Finance — liability framework, compliance posture, SME payment implementation, and gap tracking.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-item-gap);">
+        <div class="card" style="cursor:pointer;" onclick="navigate('lfi')">
+          <div class="card-header">Liability Validations &amp; Compliance</div>
+          <p style="font:var(--font-body);color:var(--color-text-secondary);line-height:1.6;">CBUAE fine schedule, how ADCB protects against each liability, gap analysis, and test strategy.</p>
+        </div>
+        <div class="card" style="cursor:pointer;" onclick="navigate('smesip')">
+          <div class="card-header">Single Instant Payment (SME)</div>
+          <p style="font:var(--font-body);color:var(--color-text-secondary);line-height:1.6;">End-to-end flow, prototype, acceptance criteria, architecture, API reference, and open gaps.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- LANDING: API REFERENCE                       -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="section" id="section-apiref-home">
+      <div class="hero-card">
+        <div class="hero-eyebrow">API Reference · LFI Endpoints · Standards v2.1-final · API Hub v8</div>
+        <h1>API Reference</h1>
+        <p>The complete endpoint catalogue for the LFI-side Open Finance API — 35 endpoints grouped by access type, annotated with consent requirements and PII levels.</p>
+      </div>
+      <div class="box box-navy">
+        <p><strong>One section, seven views.</strong> Use the tabs inside LFI Endpoints to switch between the Overview, endpoint categories (Unconsented, Data Sharing, Service Status, POST/Mutating), the searchable Full Matrix, and the Glossary.</p>
+      </div>
+      <div class="card" style="cursor:pointer;" onclick="navigate('lfiapi')">
+        <div class="card-header">LFI Endpoints</div>
+        <p style="font:var(--font-body);color:var(--color-text-secondary);line-height:1.6;">All 35 endpoints with method badges, MIB consent status, PII levels, and filterable matrix. Includes plain-English glossary of every technical term.</p>
+      </div>
+    </div>
+
     <!-- SECTION 1: GENERAL OVERVIEW                 -->
     <!-- ═══════════════════════════════════════════ -->
     <div class="section active" id="section-overview">
