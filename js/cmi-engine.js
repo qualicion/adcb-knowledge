@@ -307,6 +307,7 @@ function cmiGoToScreen(id) {
 function cmiOpenPhone(page, scenario) {
   cmiCurrentPhonePage = page;
   document.getElementById('cmi-phoneModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
   var scenarios = CMI_SCENARIOS[page] || [];
   var strip = document.getElementById('cmi-scenarioStrip');
   strip.innerHTML = scenarios.map(function(s){
@@ -326,7 +327,7 @@ function cmiRunScenario(id, btn) {
   }
 }
 
-function cmiClosePhone() { document.getElementById('cmi-phoneModal').classList.remove('open'); }
+function cmiClosePhone() { document.getElementById('cmi-phoneModal').classList.remove('open'); document.body.style.overflow = ''; }
 
 function cmiUpdateDevPanel(scenario) {
   var key = cmiCurrentPhonePage + '|' + scenario;
