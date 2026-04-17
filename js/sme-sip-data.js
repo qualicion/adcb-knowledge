@@ -172,35 +172,52 @@ var SME_SIP_SCENARIOS = {
 
   /* ── CONSENT DETAILS (single account) ──────────────────── */
   'consent-details': {
-    title: 'Consent Details — Single Account',
+    title: 'Consent Details — 1 Account (v2.1)',
     screenHtml:
-      '<div class="sme-at-header">' +
-        '<div class="sme-at-logo">AlTareq</div>' +
-      '</div>' +
-      '<div style="text-align:center;font-size:10px;color:#475569;padding:4px 14px 6px;line-height:1.4;"><strong style="color:#0F172A;">Noon Ltd</strong> needs your permission to make the payment below.</div>' +
-      '<div class="sme-at-stepper">' +
-        '<div class="sme-at-step sme-at-step-active"><span>1</span> Consent</div>' +
-        '<div class="sme-at-step-line"></div>' +
-        '<div class="sme-at-step"><span>2</span> Authorize</div>' +
-        '<div class="sme-at-step-line"></div>' +
-        '<div class="sme-at-step"><span>3</span> Complete</div>' +
-      '</div>' +
-      '<div style="padding:12px 16px;">' +
-        '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:12px;">Confirm Payment Details</div>' +
-        '<div class="sme-at-row"><span class="sme-at-row-k">Amount</span><span class="sme-at-row-v" style="color:#E31E24;font-weight:700;">100 Dirhams</span></div>' +
-        '<div class="sme-at-row"><span class="sme-at-row-k">Payee</span><span class="sme-at-row-v">Noon</span></div>' +
-        '<div class="sme-at-row"><span class="sme-at-row-k">Account Number</span><span class="sme-at-row-v" style="font-family:monospace;font-size:11px;">AE21 0610 0123 4567 8901 234</span></div>' +
-        '<div class="sme-at-row"><span class="sme-at-row-k">Date</span><span class="sme-at-row-v">16 Apr 2026</span></div>' +
-        '<div class="sme-at-row"><span class="sme-at-row-k">Reference</span><span class="sme-at-row-v">ORD-20260416-001</span></div>' +
-        '<div class="sme-at-row"><span class="sme-at-row-k">Payment Purpose</span><span class="sme-at-row-v" style="color:#0F766E;">Ride Payment <span style="background:#E8F5F0;border-radius:2px;padding:1px 4px;font-size:9px;font-weight:700;color:#1A6B4A;">v2.1</span></span></div>' +
-        '<div style="margin-top:14px;padding:10px 12px;background:#F0FDFA;border:1px solid #99F6E4;border-radius:8px;">' +
-          '<div style="font-size:11px;color:#0F766E;font-weight:700;margin-bottom:4px;">Account to Pay from</div>' +
-          '<div style="font-size:13px;font-weight:700;color:#0F172A;">ADCB Current — **** 4521</div>' +
-          '<div style="font-size:11px;color:#475569;">Available: AED 24,500.00</div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;">' +
+        '<div style="display:flex;align-items:center;gap:6px;">' +
+          '<div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">&#x25B6;</div>' +
+          '<div style="font-size:13px;font-weight:700;">Confirm Payment Details</div>' +
         '</div>' +
-        '<button class="sme-at-btn-primary" style="margin-top:14px;">Pay using AlTareq</button>' +
-        '<button class="sme-at-btn-cancel">Cancel</button>' +
-      '</div>',
+        '<div style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;">&#x2715;</div>' +
+      '</div>' +
+      '<div style="text-align:center;padding:12px;">' +
+        '<div style="font-size:13px;color:#0D3349;">&#x0627;&#x0644;&#x0637;&#x0627;&#x0631;&#x0642;</div>' +
+        '<div style="font-size:16px;font-weight:700;color:#0D3349;letter-spacing:2px;">ALTAREQ</div>' +
+      '</div>' +
+      '<div style="text-align:center;font-size:10px;color:#475569;padding:0 14px 6px;line-height:1.4;"><strong style="color:#0F172A;">Noon Ltd</strong> needs your permission to make the payment below.</div>' +
+      '<div style="display:flex;align-items:center;justify-content:center;padding:8px 20px;gap:0;">' +
+        '<div style="display:flex;flex-direction:column;align-items:center;flex:1;">' +
+          '<div style="width:22px;height:22px;border-radius:50%;background:#00B4C8;color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">1</div>' +
+          '<div style="font-size:9px;color:#00B4C8;margin-top:2px;font-weight:600;">Consent</div>' +
+        '</div>' +
+        '<div style="flex:1;height:2px;background:#00B4C8;margin-top:-12px;"></div>' +
+        '<div style="display:flex;flex-direction:column;align-items:center;flex:1;">' +
+          '<div style="width:22px;height:22px;border-radius:50%;background:#00B4C8;color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">2</div>' +
+          '<div style="font-size:9px;color:#00B4C8;margin-top:2px;font-weight:600;">Authorize</div>' +
+        '</div>' +
+        '<div style="flex:1;height:2px;background:#e0e0e0;margin-top:-12px;"></div>' +
+        '<div style="display:flex;flex-direction:column;align-items:center;flex:1;">' +
+          '<div style="width:22px;height:22px;border-radius:50%;background:#e0e0e0;color:#999;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">3</div>' +
+          '<div style="font-size:9px;color:#999;margin-top:2px;">Complete</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="font-size:13px;font-weight:700;text-align:center;padding:8px 14px 4px;color:#0F172A;">Payment Details</div>' +
+      '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Amount</span><span style="font-weight:600;color:#0F172A;">100.00 AED</span></div>' +
+      '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Payee Name</span><span style="font-weight:600;color:#0F172A;">(Noon)</span></div>' +
+      '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Account Number</span><span style="font-weight:600;color:#0F172A;">12232145623</span></div>' +
+      '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Date of Payment</span><span style="font-weight:600;color:#0F172A;">(01 January 2025)</span></div>' +
+      '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Payment Reference</span><span style="font-weight:600;color:#0F172A;">(Noon Ltd)</span></div>' +
+      '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Payment Purpose</span><span style="font-weight:600;color:#0F766E;">(Ride Payment) <span style="background:#E8F5F0;border-radius:2px;padding:1px 4px;font-size:9px;font-weight:700;color:#1A6B4A;">v2.1</span></span></div>' +
+      '<div style="font-size:12px;font-weight:700;text-align:center;padding:8px 14px 4px;">Account to pay from</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #f5f5f5;">' +
+        '<div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">&#x25B6;</div>' +
+        '<div style="flex:1;"><div style="font-size:11px;font-weight:600;">ACDESC_317816102001</div><div style="font-size:10px;color:#475569;">317816102001</div></div>' +
+        '<div style="text-align:right;"><div style="font-size:11px;font-weight:600;">851,499,538.11</div><div style="font-size:10px;color:#475569;">AED</div></div>' +
+      '</div>' +
+      '<div style="height:12px;"></div>' +
+      '<button style="background:linear-gradient(135deg,#00B4C8,#005f6b);color:white;border:none;border-radius:24px;padding:12px;width:calc(100% - 28px);margin:0 14px 8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">&#x1F512; Pay using AlTareq</button>' +
+      '<button style="background:white;color:#0F172A;border:1px solid #E2E8F0;border-radius:24px;padding:11px;width:calc(100% - 28px);margin:0 14px 12px;font-size:13px;font-weight:600;cursor:pointer;">Cancel</button>',
     apisHtml:
       '<div class="sme-dev-section">' +
         '<div class="sme-dev-label">GET — Payment Consent</div>' +
@@ -212,32 +229,45 @@ var SME_SIP_SCENARIOS = {
 
   /* ── ACCOUNT SELECT (5 accounts) ───────────────────────── */
   'account-select': {
-    title: 'Account Selection — 5 Accounts',
+    title: 'Account Selection — Multiple (v2.1)',
     screenHtml:
-      '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
-      '<div style="text-align:center;font-size:10px;color:#475569;padding:4px 14px 6px;line-height:1.4;"><strong style="color:#0F172A;">Noon Ltd</strong> needs your permission to make the payment below.</div>' +
-      '<div class="sme-at-stepper">' +
-        '<div class="sme-at-step sme-at-step-active"><span>1</span> Consent</div>' +
-        '<div class="sme-at-step-line"></div>' +
-        '<div class="sme-at-step"><span>2</span> Authorize</div>' +
-        '<div class="sme-at-step-line"></div>' +
-        '<div class="sme-at-step"><span>3</span> Complete</div>' +
-      '</div>' +
-      '<div style="padding:10px 16px;">' +
-        '<div style="font-size:12px;font-weight:700;color:#0F172A;margin-bottom:8px;">Select Account to Pay from</div>' +
-        '<div style="display:flex;align-items:center;gap:6px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:7px 10px;margin-bottom:8px;">' +
-          '<span style="color:#475569;font-size:13px;">&#x1F50D;</span>' +
-          '<input style="border:none;background:transparent;font-size:12px;outline:none;flex:1;" placeholder="Search accounts..." />' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;">' +
+        '<div style="display:flex;align-items:center;gap:6px;">' +
+          '<div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">&#x25B6;</div>' +
+          '<div style="font-size:13px;font-weight:700;">Confirm Payment Details</div>' +
         '</div>' +
-        '<div class="sme-at-acct-item"><input type="radio" name="acct" /><div><div style="font-size:12px;font-weight:700;">ADCB Current — **** 4521</div><div style="font-size:10px;color:#475569;">AED 24,500.00</div></div></div>' +
-        '<div class="sme-at-acct-item"><input type="radio" name="acct" /><div><div style="font-size:12px;font-weight:700;">ADCB Savings — **** 8834</div><div style="font-size:10px;color:#475569;">AED 12,300.50</div></div></div>' +
-        '<div class="sme-at-acct-item"><input type="radio" name="acct" /><div><div style="font-size:12px;font-weight:700;">ADCB Current — **** 2210</div><div style="font-size:10px;color:#475569;">AED 6,000.00</div></div></div>' +
-        '<div class="sme-at-acct-item"><input type="radio" name="acct" /><div><div style="font-size:12px;font-weight:700;">ADCB Current — **** 9901</div><div style="font-size:10px;color:#475569;">AED 450.25</div></div></div>' +
-        '<div class="sme-at-acct-item"><input type="radio" name="acct" /><div><div style="font-size:12px;font-weight:700;">ADCB Savings — **** 3344</div><div style="font-size:10px;color:#475569;">AED 88,000.00</div></div></div>' +
-        '<div style="text-align:right;margin-top:6px;"><a style="font-size:11px;color:#0F766E;font-weight:600;">View All</a></div>' +
-        '<button class="sme-at-btn-primary" style="margin-top:12px;">Continue</button>' +
-        '<button class="sme-at-btn-cancel">Cancel</button>' +
-      '</div>',
+        '<div style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;">&#x2715;</div>' +
+      '</div>' +
+      '<div style="text-align:center;padding:12px;">' +
+        '<div style="font-size:13px;color:#0D3349;">&#x0627;&#x0644;&#x0637;&#x0627;&#x0631;&#x0642;</div>' +
+        '<div style="font-size:16px;font-weight:700;color:#0D3349;letter-spacing:2px;">ALTAREQ</div>' +
+      '</div>' +
+      '<div style="text-align:center;font-size:10px;color:#475569;padding:0 14px 6px;line-height:1.4;"><strong style="color:#0F172A;">Noon Ltd</strong> needs your permission to make the payment below.</div>' +
+      '<div style="display:flex;align-items:center;justify-content:center;padding:8px 20px;gap:0;">' +
+        '<div style="display:flex;flex-direction:column;align-items:center;flex:1;"><div style="width:22px;height:22px;border-radius:50%;background:#00B4C8;color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">1</div><div style="font-size:9px;color:#00B4C8;margin-top:2px;font-weight:600;">Consent</div></div>' +
+        '<div style="flex:1;height:2px;background:#00B4C8;margin-top:-12px;"></div>' +
+        '<div style="display:flex;flex-direction:column;align-items:center;flex:1;"><div style="width:22px;height:22px;border-radius:50%;background:#00B4C8;color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">2</div><div style="font-size:9px;color:#00B4C8;margin-top:2px;font-weight:600;">Authorize</div></div>' +
+        '<div style="flex:1;height:2px;background:#e0e0e0;margin-top:-12px;"></div>' +
+        '<div style="display:flex;flex-direction:column;align-items:center;flex:1;"><div style="width:22px;height:22px;border-radius:50%;background:#e0e0e0;color:#999;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">3</div><div style="font-size:9px;color:#999;margin-top:2px;">Complete</div></div>' +
+      '</div>' +
+      '<div style="font-size:13px;font-weight:700;text-align:center;padding:8px 14px 4px;color:#0F172A;">Payment Details</div>' +
+      '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Amount</span><span style="font-weight:600;">100.00 AED</span></div>' +
+      '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Payee Name</span><span style="font-weight:600;">(Noon)</span></div>' +
+      '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Account Number</span><span style="font-weight:600;">12232145623</span></div>' +
+      '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Date of Payment</span><span style="font-weight:600;">(01 Jan 2025)</span></div>' +
+      '<div style="font-size:12px;font-weight:700;text-align:center;padding:8px 14px 4px;">Please select the account to pay from</div>' +
+      '<div style="display:flex;gap:6px;padding:6px 14px;border-bottom:1px solid #f5f5f5;">' +
+        '<div style="flex:1;border:1px solid #E2E8F0;border-radius:6px;padding:6px 8px;font-size:11px;color:#475569;">Search by Account Number</div>' +
+        '<div style="padding:6px 8px;font-size:14px;color:#475569;">&#x1F50D;</div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #f5f5f5;"><div style="width:16px;height:16px;border-radius:50%;border:2px solid #ccc;"></div><div style="flex:1;"><div style="font-size:11px;font-weight:600;">ACDESC_317816102001</div><div style="font-size:10px;color:#475569;">317816102001</div></div><div style="text-align:right;"><div style="font-size:11px;font-weight:600;">851,499,538.11</div><div style="font-size:10px;color:#475569;">AED</div></div></div>' +
+      '<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #f5f5f5;"><div style="width:16px;height:16px;border-radius:50%;border:2px solid #ccc;"></div><div style="flex:1;"><div style="font-size:11px;font-weight:600;">ACDESC_317816102002</div><div style="font-size:10px;color:#475569;">317816102002</div></div><div style="text-align:right;"><div style="font-size:11px;font-weight:600;">851,499,538.11</div><div style="font-size:10px;color:#475569;">AED</div></div></div>' +
+      '<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #f5f5f5;"><div style="width:16px;height:16px;border-radius:50%;border:2px solid #ccc;"></div><div style="flex:1;"><div style="font-size:11px;font-weight:600;">ACDESC_317816102003</div><div style="font-size:10px;color:#475569;">317816102003</div></div><div style="text-align:right;"><div style="font-size:11px;font-weight:600;">851,499,538.11</div><div style="font-size:10px;color:#475569;">AED</div></div></div>' +
+      '<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #f5f5f5;"><div style="width:16px;height:16px;border-radius:50%;border:2px solid #ccc;"></div><div style="flex:1;"><div style="font-size:11px;font-weight:600;">ACDESC_317816102004</div><div style="font-size:10px;color:#475569;">317816102004</div></div><div style="text-align:right;"><div style="font-size:11px;font-weight:600;">851,499,538.11</div><div style="font-size:10px;color:#475569;">AED</div></div></div>' +
+      '<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #f5f5f5;"><div style="width:16px;height:16px;border-radius:50%;border:2px solid #ccc;"></div><div style="flex:1;"><div style="font-size:11px;font-weight:600;">ACDESC_317816102005</div><div style="font-size:10px;color:#475569;">317816102005</div></div><div style="text-align:right;"><div style="font-size:11px;font-weight:600;">851,499,538.11</div><div style="font-size:10px;color:#475569;">AED</div></div></div>' +
+      '<div style="text-align:center;padding:6px;font-size:11px;color:#00B4C8;font-weight:600;cursor:pointer;">View All</div>' +
+      '<button style="background:linear-gradient(135deg,#00B4C8,#005f6b);color:white;border:none;border-radius:24px;padding:12px;width:calc(100% - 28px);margin:0 14px 8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">&#x1F512; Pay using AlTareq</button>' +
+      '<button style="background:white;color:#0F172A;border:1px solid #E2E8F0;border-radius:24px;padding:11px;width:calc(100% - 28px);margin:0 14px 12px;font-size:13px;font-weight:600;cursor:pointer;">Cancel</button>',
     apisHtml:
       '<div class="sme-dev-section">' +
         '<div class="sme-dev-label">GET — Eligible Accounts</div>' +
@@ -249,25 +279,41 @@ var SME_SIP_SCENARIOS = {
 
   /* ── ACCOUNT SELECTED ───────────────────────────────────── */
   'account-selected': {
-    title: 'Account Selected — Highlighted',
+    title: 'Account Selected (v2.1)',
     screenHtml:
-      '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
-      '<div style="text-align:center;font-size:10px;color:#475569;padding:4px 14px 6px;line-height:1.4;"><strong style="color:#0F172A;">Noon Ltd</strong> needs your permission to make the payment below.</div>' +
-      '<div class="sme-at-stepper">' +
-        '<div class="sme-at-step sme-at-step-active"><span>1</span> Consent</div>' +
-        '<div class="sme-at-step-line"></div>' +
-        '<div class="sme-at-step"><span>2</span> Authorize</div>' +
-        '<div class="sme-at-step-line"></div>' +
-        '<div class="sme-at-step"><span>3</span> Complete</div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;">' +
+        '<div style="display:flex;align-items:center;gap:6px;">' +
+          '<div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">&#x25B6;</div>' +
+          '<div style="font-size:13px;font-weight:700;">Confirm Payment Details</div>' +
+        '</div>' +
+        '<div style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;">&#x2715;</div>' +
       '</div>' +
-      '<div style="padding:10px 16px;">' +
-        '<div style="font-size:12px;font-weight:700;color:#0F172A;margin-bottom:8px;">Select Account to Pay from</div>' +
-        '<div class="sme-at-acct-item sme-at-acct-selected"><input type="radio" name="acct" checked /><div><div style="font-size:12px;font-weight:700;">ADCB Current — **** 4521</div><div style="font-size:10px;color:#0F766E;font-weight:600;">AED 24,500.00 &#x2713;</div></div></div>' +
-        '<div class="sme-at-acct-item"><input type="radio" name="acct" /><div><div style="font-size:12px;font-weight:700;">ADCB Savings — **** 8834</div><div style="font-size:10px;color:#475569;">AED 12,300.50</div></div></div>' +
-        '<div class="sme-at-acct-item"><input type="radio" name="acct" /><div><div style="font-size:12px;font-weight:700;">ADCB Current — **** 2210</div><div style="font-size:10px;color:#475569;">AED 6,000.00</div></div></div>' +
-        '<button class="sme-at-btn-primary" style="margin-top:12px;">Confirm &amp; Pay</button>' +
-        '<button class="sme-at-btn-cancel">Cancel</button>' +
-      '</div>',
+      '<div style="text-align:center;padding:12px;"><div style="font-size:13px;color:#0D3349;">&#x0627;&#x0644;&#x0637;&#x0627;&#x0631;&#x0642;</div><div style="font-size:16px;font-weight:700;color:#0D3349;letter-spacing:2px;">ALTAREQ</div></div>' +
+      '<div style="display:flex;align-items:center;justify-content:center;padding:8px 20px;gap:0;">' +
+        '<div style="display:flex;flex-direction:column;align-items:center;flex:1;"><div style="width:22px;height:22px;border-radius:50%;background:#00B4C8;color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">1</div><div style="font-size:9px;color:#00B4C8;margin-top:2px;font-weight:600;">Consent</div></div>' +
+        '<div style="flex:1;height:2px;background:#00B4C8;margin-top:-12px;"></div>' +
+        '<div style="display:flex;flex-direction:column;align-items:center;flex:1;"><div style="width:22px;height:22px;border-radius:50%;background:#00B4C8;color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">2</div><div style="font-size:9px;color:#00B4C8;margin-top:2px;font-weight:600;">Authorize</div></div>' +
+        '<div style="flex:1;height:2px;background:#e0e0e0;margin-top:-12px;"></div>' +
+        '<div style="display:flex;flex-direction:column;align-items:center;flex:1;"><div style="width:22px;height:22px;border-radius:50%;background:#e0e0e0;color:#999;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">3</div><div style="font-size:9px;color:#999;margin-top:2px;">Complete</div></div>' +
+      '</div>' +
+      '<div style="font-size:13px;font-weight:700;text-align:center;padding:8px 14px 4px;color:#0F172A;">Payment Details</div>' +
+      '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Amount</span><span style="font-weight:600;">100.00 AED</span></div>' +
+      '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Payee Name</span><span style="font-weight:600;">(Noon)</span></div>' +
+      '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">Date of Payment</span><span style="font-weight:600;">(01 Jan 2025)</span></div>' +
+      '<div style="font-size:12px;font-weight:700;text-align:center;padding:8px 14px 4px;">Select Account</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #f5f5f5;">' +
+        '<div style="width:16px;height:16px;border-radius:50%;border:2px solid #00B4C8;background:#00B4C8;box-shadow:inset 0 0 0 3px white;"></div>' +
+        '<div style="flex:1;"><div style="font-size:11px;font-weight:600;">ACDESC_317816102001</div><div style="font-size:10px;color:#475569;">317816102001</div></div>' +
+        '<div style="text-align:right;"><div style="font-size:11px;font-weight:600;">851,499,538.11</div><div style="font-size:10px;color:#475569;">AED</div></div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #f5f5f5;">' +
+        '<div style="width:16px;height:16px;border-radius:50%;border:2px solid #ccc;"></div>' +
+        '<div style="flex:1;"><div style="font-size:11px;font-weight:600;">ACDESC_317816102002</div><div style="font-size:10px;color:#475569;">317816102002</div></div>' +
+        '<div style="text-align:right;"><div style="font-size:11px;font-weight:600;">851,499,538.11</div><div style="font-size:10px;color:#475569;">AED</div></div>' +
+      '</div>' +
+      '<div style="text-align:center;padding:6px;font-size:11px;color:#00B4C8;cursor:pointer;">View All</div>' +
+      '<button style="background:linear-gradient(135deg,#00B4C8,#005f6b);color:white;border:none;border-radius:24px;padding:12px;width:calc(100% - 28px);margin:8px 14px 8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">&#x1F512; Pay using AlTareq</button>' +
+      '<button style="background:white;color:#0F172A;border:1px solid #E2E8F0;border-radius:24px;padding:11px;width:calc(100% - 28px);margin:0 14px 12px;font-size:13px;font-weight:600;cursor:pointer;">Cancel</button>',
     apisHtml:
       '<div class="sme-dev-section">' +
         '<div class="sme-dev-label">PATCH — Account Selected</div>' +
@@ -279,28 +325,42 @@ var SME_SIP_SCENARIOS = {
 
   /* ── PIN ENTRY ──────────────────────────────────────────── */
   'pin': {
-    title: 'EFR / PIN Entry',
+    title: 'EFR / PIN Entry (v2.1)',
     screenHtml:
-      '<div class="sme-at-header"><div class="sme-at-logo">AlTareq</div></div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;">' +
+        '<div style="display:flex;align-items:center;gap:6px;">' +
+          '<div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">&#x25B6;</div>' +
+          '<div style="font-size:13px;font-weight:700;">Confirm Payment Details</div>' +
+        '</div>' +
+        '<div style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;">&#x2715;</div>' +
+      '</div>' +
       '<div style="padding:20px 16px;text-align:center;">' +
-        '<div style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:4px;">Enter your PIN</div>' +
-        '<div style="font-size:11px;color:#475569;margin-bottom:20px;">6-digit ProCash PIN to authorise payment</div>' +
-        '<div style="display:flex;justify-content:center;gap:10px;margin-bottom:24px;">' +
-          '<div style="width:12px;height:12px;border-radius:50%;background:#E31E24;border:2px solid #E31E24;"></div>' +
-          '<div style="width:12px;height:12px;border-radius:50%;background:#E31E24;border:2px solid #E31E24;"></div>' +
-          '<div style="width:12px;height:12px;border-radius:50%;background:#E31E24;border:2px solid #E31E24;"></div>' +
-          '<div style="width:12px;height:12px;border-radius:50%;background:transparent;border:2px solid #CBD5E1;"></div>' +
-          '<div style="width:12px;height:12px;border-radius:50%;background:transparent;border:2px solid #CBD5E1;"></div>' +
-          '<div style="width:12px;height:12px;border-radius:50%;background:transparent;border:2px solid #CBD5E1;"></div>' +
+        '<div style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:4px;">Confirm with your PIN</div>' +
+        '<div style="font-size:11px;color:#475569;margin-bottom:20px;">Please enter your ProCash PIN to authorise this payment</div>' +
+        '<div style="display:flex;justify-content:center;gap:12px;margin-bottom:20px;">' +
+          '<div style="width:14px;height:14px;border-radius:50%;background:#1C2B4A;border:2px solid #1C2B4A;"></div>' +
+          '<div style="width:14px;height:14px;border-radius:50%;background:#1C2B4A;border:2px solid #1C2B4A;"></div>' +
+          '<div style="width:14px;height:14px;border-radius:50%;background:#1C2B4A;border:2px solid #1C2B4A;"></div>' +
+          '<div style="width:14px;height:14px;border-radius:50%;border:2px solid #E2E8F0;"></div>' +
+          '<div style="width:14px;height:14px;border-radius:50%;border:2px solid #E2E8F0;"></div>' +
+          '<div style="width:14px;height:14px;border-radius:50%;border:2px solid #E2E8F0;"></div>' +
         '</div>' +
         '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:200px;margin:0 auto;">' +
-          '<div class="sme-pin-key">1</div><div class="sme-pin-key">2</div><div class="sme-pin-key">3</div>' +
-          '<div class="sme-pin-key">4</div><div class="sme-pin-key">5</div><div class="sme-pin-key">6</div>' +
-          '<div class="sme-pin-key">7</div><div class="sme-pin-key">8</div><div class="sme-pin-key">9</div>' +
-          '<div class="sme-pin-key" style="background:transparent;border:none;"></div>' +
-          '<div class="sme-pin-key">0</div>' +
-          '<div class="sme-pin-key" style="color:#E31E24;">&#x232B;</div>' +
+          '<div style="background:#F7F8FA;border:1px solid #E2E8F0;border-radius:8px;padding:12px;font-size:16px;font-weight:700;cursor:pointer;">1</div>' +
+          '<div style="background:#F7F8FA;border:1px solid #E2E8F0;border-radius:8px;padding:12px;font-size:16px;font-weight:700;cursor:pointer;">2</div>' +
+          '<div style="background:#F7F8FA;border:1px solid #E2E8F0;border-radius:8px;padding:12px;font-size:16px;font-weight:700;cursor:pointer;">3</div>' +
+          '<div style="background:#F7F8FA;border:1px solid #E2E8F0;border-radius:8px;padding:12px;font-size:16px;font-weight:700;cursor:pointer;">4</div>' +
+          '<div style="background:#F7F8FA;border:1px solid #E2E8F0;border-radius:8px;padding:12px;font-size:16px;font-weight:700;cursor:pointer;">5</div>' +
+          '<div style="background:#F7F8FA;border:1px solid #E2E8F0;border-radius:8px;padding:12px;font-size:16px;font-weight:700;cursor:pointer;">6</div>' +
+          '<div style="background:#F7F8FA;border:1px solid #E2E8F0;border-radius:8px;padding:12px;font-size:16px;font-weight:700;cursor:pointer;">7</div>' +
+          '<div style="background:#F7F8FA;border:1px solid #E2E8F0;border-radius:8px;padding:12px;font-size:16px;font-weight:700;cursor:pointer;">8</div>' +
+          '<div style="background:#F7F8FA;border:1px solid #E2E8F0;border-radius:8px;padding:12px;font-size:16px;font-weight:700;cursor:pointer;">9</div>' +
+          '<div style="background:#F7F8FA;border:1px solid #E2E8F0;border-radius:8px;padding:12px;font-size:16px;font-weight:700;cursor:pointer;">*</div>' +
+          '<div style="background:#F7F8FA;border:1px solid #E2E8F0;border-radius:8px;padding:12px;font-size:16px;font-weight:700;cursor:pointer;">0</div>' +
+          '<div style="background:#F7F8FA;border:1px solid #E2E8F0;border-radius:8px;padding:12px;font-size:16px;font-weight:700;cursor:pointer;">&#x232B;</div>' +
+          '<div style="grid-column:1/-1;background:#1C2B4A;color:white;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;">Confirm</div>' +
         '</div>' +
+        '<div style="font-size:10px;color:#475569;margin-top:8px;">Or use Face ID / Touch ID</div>' +
       '</div>',
     apisHtml:
       '<div class="sme-dev-section">' +
