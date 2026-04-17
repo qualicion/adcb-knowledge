@@ -60,7 +60,7 @@ function navigateToRoute(section, anchor) {
   }
 
   // Update breadcrumb
-  var names = { overview: 'General Overview', consent: 'Consent & Scheduler', lfi: 'LFI Project', smesip: 'Single Instant Payment (SME)', sipcop: 'Single Instant Payment', cmi: 'CMI Dashboard' };
+  var names = { overview: 'General Overview', consent: 'Consent & Scheduler', lfi: 'LFI Project', lfiapi: 'LFI API Reference', smesip: 'Single Instant Payment (SME)', sipcop: 'Single Instant Payment', cmi: 'CMI Dashboard' };
   document.getElementById('bc-current').textContent = names[section] || section;
 
   // Handle tab activation for overview
@@ -110,6 +110,28 @@ function navigateToRoute(section, anchor) {
 
     var lfiNavItem = document.getElementById('nav-' + lfiTabName);
     if (lfiNavItem) lfiNavItem.classList.add('active');
+  }
+
+  // Handle tab activation for LFI API
+  if (section === 'lfiapi' && anchor) {
+    var lfiApiTabName = anchor.replace('tab-', '');
+    document.querySelectorAll('#section-lfiapi .tab-btn').forEach(function(b) {
+      b.classList.remove('active');
+      if (b.getAttribute('data-tab') === lfiApiTabName) {
+        b.classList.add('active');
+      }
+    });
+    document.querySelectorAll('#section-lfiapi .tab-panel').forEach(function(p){ p.classList.remove('active'); });
+    var lfiApiPanel = document.getElementById('panel-' + lfiApiTabName);
+    if (lfiApiPanel) lfiApiPanel.classList.add('active');
+
+    var lfiApiNavItem = document.getElementById('nav-' + lfiApiTabName);
+    if (lfiApiNavItem) lfiApiNavItem.classList.add('active');
+
+    if (typeof lfiApiInit === 'function' && !window._lfiApiInitDone) {
+      lfiApiInit();
+      window._lfiApiInitDone = true;
+    }
   }
 
   // Handle SME SIP Portal navigation

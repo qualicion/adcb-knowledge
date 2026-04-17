@@ -11,6 +11,9 @@ var SLUG_TO_ID = {
   'data-scheduler': 'con-scheduler', 'error-scenarios': 'con-errors', 'testing': 'con-testing',
   'liability-fines': 'lfi-fines', 'how-it-works': 'lfi-how',
   'gap-analysis': 'lfi-gaps', 'test-strategy': 'lfi-tests',
+  'lfiapi-overview': 'lfiapi-overview', 'lfiapi-unconsented': 'lfiapi-unconsented',
+  'lfiapi-datasharing': 'lfiapi-datasharing', 'lfiapi-service': 'lfiapi-service',
+  'lfiapi-post': 'lfiapi-post', 'lfiapi-matrix': 'lfiapi-matrix', 'lfiapi-glossary': 'lfiapi-glossary',
   'overview': 'cmi-overview',
   'current-consents': 'cmi-cmi01', 'consent-history': 'cmi-cmi02',
   'filter-search': 'cmi-cmi03', 'consent-detail': 'cmi-cmi04',
@@ -47,7 +50,7 @@ function parseHash() {
 
   if (slug) {
     var id = SLUG_TO_ID[slug] || slug;
-    if (section === 'overview' || section === 'consent' || section === 'lfi' || section === 'cmi' || section === 'sipcop' || section === 'smesip') {
+    if (section === 'overview' || section === 'consent' || section === 'lfi' || section === 'lfiapi' || section === 'cmi' || section === 'sipcop' || section === 'smesip') {
       anchor = 'tab-' + id;
     }
   }
