@@ -349,6 +349,22 @@ function cmiRenderPhoneBody(scenario) {
   cmiPhoneCloseDet();
   cmiPhoneCloseFilter();
   cmiUpdateDevPanel(scenario);
+
+  /* Show context desc if available */
+  var descEl = document.getElementById('cmi-scenario-desc');
+  if (descEl) {
+    var scenarios = CMI_SCENARIOS[cmiCurrentPhonePage] || [];
+    var found = null;
+    for (var di = 0; di < scenarios.length; di++) {
+      if (scenarios[di].id === scenario) { found = scenarios[di]; break; }
+    }
+    if (found && found.desc) {
+      descEl.innerHTML = found.desc;
+      descEl.style.display = 'block';
+    } else {
+      descEl.style.display = 'none';
+    }
+  }
   var cnf = document.getElementById('cmi-pConfirm'); if (cnf) cnf.classList.remove('open');
 
   var isHistory = ['history','ac12','ac13'].indexOf(scenario) >= 0;
