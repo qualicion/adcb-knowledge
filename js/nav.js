@@ -7,12 +7,10 @@
 function toggleProjectGroup(groupId) {
   var group = document.getElementById('group-' + groupId);
   var chev = document.getElementById(groupId + '-group-chev');
-  var desc = document.getElementById(groupId + '-group-desc');
   if (!group) return;
   var isOpen = group.style.display !== 'none';
   group.style.display = isOpen ? 'none' : 'block';
   if (chev) chev.innerHTML = isOpen ? '&#x25B6;' : '&#x25BC;';
-  if (desc) desc.style.display = isOpen ? 'block' : 'none';
 }
 
 /* ── TOGGLE NAV SECTIONS ── */
