@@ -448,64 +448,64 @@ var SIP_SCREEN_API_CALLS = {
     title: 'BANK / ACCOUNT SELECTION',
     calls: [
       { method: 'GET', label: 'LFI Directory', caller: 'Amazon \u2192 OF Hub',
-        code: '// TPP fetches registered LFIs from the OF Hub\nGET /api/v2.0/participants\n\n// Response: list of banks\n[\n  { "name": "ADCB",        "bic": "ADCBAEAA" },\n  { "name": "Emirates NBD","bic": "ABORAEAA" },\n  { "name": "Mashreq",     "bic": "BOMLAEAD" },\n  { "name": "RAKBANK",     "bic": "NRAKAEAK" }\n]' }
+        code: '// TPP fetches registered LFIs from the OF Hub\nGET /api/v2.0/participants\n\n// Response\n[\n  { "name": "ADCB", "bic": "ADCBAEAA" },\n  { "name": "Emirates NBD", "bic": "ABORAEAA" },\n  { "name": "Mashreq", "bic": "BOMLAEAD" },\n  { "name": "RAKBANK", "bic": "NRAKAEAK" }\n]' }
     ]
   },
   3: {
     title: 'CoP QUERY + CONSENT INITIATION',
     calls: [
       { method: 'POST', label: 'Confirmation of Payee (mandatory pre-consent)', caller: 'Amazon \u2192 OF Hub \u2192 ADCB',
-        code: '// CBUAE requires a CoP check BEFORE the consent is created\nPOST /api/v2.0/customers/action/cop-query\n{\n  "Name":    { "fullName": "Ahmed Al Maktoum" },\n  "Account": { "SchemeName":     "IBAN",\n               "Identification": "AE070331234567890123" }\n}\n\n// Response:\n{ "MatchResult":   "ExactMatch",\n  "MatchedName":   "Ahmed Al Maktoum",\n  "AccountStatus": "Active" }' },
+        code: '// CBUAE requires a CoP check BEFORE the consent is created\nPOST /api/v2.0/customers/action/cop-query\n\n{\n  "Name": {\n    "fullName": "Ahmed Al Maktoum"\n  },\n  "Account": {\n    "SchemeName": "IBAN",\n    "Identification": "AE070331234567890123"\n  }\n}\n\n// Response\n{\n  "MatchResult": "ExactMatch",\n  "MatchedName": "Ahmed Al Maktoum",\n  "AccountStatus": "Active"\n}' },
       { method: 'POST', label: 'Payment Consent Initiate (carries CoP result)', caller: 'Amazon \u2192 OF Hub',
-        code: 'POST /api/v2.0/payment-consents/initiate\n{\n  "Data": {\n    "Initiation": {\n      "InstructedAmount": { "Amount": "1000", "Currency": "AED" },\n      "CreditorAccount":  { "Identification": "AE070331\u2026" },\n      "CreditorName":     "Ahmed Al Maktoum",\n      "RemittanceInformation": { "Reference": "INV-2026-0042" }\n    },\n    "CoPResult": {\n      "matchResult":    "ExactMatch",\n      "queryTimestamp": "2026-04-17T10:15:00Z"\n    }\n  },\n  "Risk": { "PaymentContextCode": "EcommerceGoods" }\n}' },
+        code: 'POST /api/v2.0/payment-consents/initiate\n\n{\n  "Data": {\n    "Initiation": {\n      "InstructedAmount": {\n        "Amount": "1000",\n        "Currency": "AED"\n      },\n      "CreditorAccount": {\n        "Identification": "AE070331234567890123"\n      },\n      "CreditorName": "Ahmed Al Maktoum",\n      "RemittanceInformation": {\n        "Reference": "INV-2026-0042"\n      }\n    },\n    "CoPResult": {\n      "matchResult": "ExactMatch",\n      "queryTimestamp": "2026-04-17T10:15:00Z"\n    }\n  },\n  "Risk": {\n    "PaymentContextCode": "EcommerceGoods"\n  }\n}' },
       { method: 'POST', label: 'Pushed Authorisation Request (PAR)', caller: 'Amazon \u2192 Al Tareq Hub',
-        code: 'POST /as/par\n{\n  "response_type": "code",\n  "client_id":    "tpp-client-001",\n  "scope":        "payments openid",\n  "request":      "<signed-JAR-JWT>"\n}\n\n// Response:\n{ "request_uri": "urn:adcb:bwc:1234", "expires_in": 90 }' }
+        code: 'POST /as/par\n\n{\n  "response_type": "code",\n  "client_id": "tpp-client-001",\n  "scope": "payments openid",\n  "request": "<signed-JAR-JWT>"\n}\n\n// Response\n{\n  "request_uri": "urn:adcb:bwc:1234",\n  "expires_in": 90\n}' }
     ]
   },
   4: {
     title: 'REDIRECT TO ADCB',
     calls: [
       { method: 'GET', label: 'OAuth2 Authorise (handover to ADCB)', caller: 'Browser \u2192 Al Tareq Hub',
-        code: '// OAuth2 redirect via the Al Tareq hub\nGET /as/authorize\n  ?request_uri=urn:adcb:bwc:1234\n  &client_id=tpp-client-001\n\n// 302 \u2192 https://auth.adcb.ae/mib/login' }
+        code: '// OAuth2 redirect via the Al Tareq hub\nGET /as/authorize\n  ?request_uri=urn:adcb:bwc:1234\n  &client_id=tpp-client-001\n\n// 302 -> https://auth.adcb.ae/mib/login' }
     ]
   },
   5: {
     title: 'ADCB AUTHENTICATION (INTERNAL)',
     calls: [
       { method: 'POST', label: 'ADCB session login (BAU, not exposed to TPP)', caller: 'Customer \u2192 ADCB',
-        code: '// Internal ADCB auth \u2014 customer logs in\nPOST /mib/auth/login\n{ "username": "****", "method": "password" }\n\n// Response:\n{ "sessionId": "sid-\u2026", "status": "AuthRequired" }' }
+        code: '// Internal ADCB auth - customer logs in\nPOST /mib/auth/login\n\n{\n  "username": "****",\n  "method": "password"\n}\n\n// Response\n{\n  "sessionId": "sid-xxxx",\n  "status": "AuthRequired"\n}' }
     ]
   },
   6: {
     title: 'CoP ECHO TO ADCB',
     calls: [
       { method: 'GET', label: 'Fetch pending consent + CoP result', caller: 'ADCB \u2192 Al Tareq Hub',
-        code: '// ADCB pulls the pending consent to render it\nGET /api/v2.0/payment-consents/{ConsentId}\n\n// Response (partial):\n{\n  "Status":    "AwaitingAuthorisation",\n  "CoPResult": { "matchResult": "ExactMatch" },\n  "Initiation": {\n    "InstructedAmount": { "Amount": "1000", "Currency": "AED" }\n  }\n}' }
+        code: '// ADCB pulls the pending consent to render it\nGET /api/v2.0/payment-consents/{ConsentId}\n\n// Response (partial)\n{\n  "Status": "AwaitingAuthorisation",\n  "CoPResult": {\n    "matchResult": "ExactMatch"\n  },\n  "Initiation": {\n    "InstructedAmount": {\n      "Amount": "1000",\n      "Currency": "AED"\n    }\n  }\n}' }
     ]
   },
   7: {
     title: 'CoP RESULT DISPLAY',
     calls: [
       { method: 'N/A', label: 'Client-side rendering of CoP outcome', caller: 'ADCB UI',
-        code: '// No network call \u2014 badge derived from consent.CoPResult\n"ExactMatch"    \u2192 \u2705 Green  \u2014 proceed automatically\n"PartialMatch"  \u2192 \u26A0 Amber  \u2014 checkbox required\n"NoMatch"       \u2192 \u274C Red    \u2014 explicit risk acceptance\n"Unavailable"   \u2192 \u2139 Blue   \u2014 proceed with caution' }
+        code: '// No network call - badge derived from consent.CoPResult\n\n// ExactMatch     -> Green   (proceed automatically)\n// PartialMatch  -> Amber   (checkbox required)\n// NoMatch       -> Red     (explicit risk acceptance)\n// Unavailable   -> Blue    (proceed with caution)' }
     ]
   },
   8: {
     title: 'CONFIRM DETAILS + ACCOUNT SELECTION',
     calls: [
       { method: 'GET', label: 'List eligible debtor accounts', caller: 'ADCB (internal)',
-        code: 'GET /mib/accounts\n// Returns: eligible AED CASA accounts with balances\n[\n  { "iban": "AE07 1234 5246 4523 4567 895",\n    "type": "Current", "balance": 44576.00, "currency": "AED" },\n  { "iban": "AE07 1255 3546 4523 4567 895",\n    "type": "Savings", "balance": 12034.00, "currency": "AED" }\n]' },
+        code: '// Returns eligible AED CASA accounts with balances\nGET /mib/accounts\n\n// Response\n[\n  {\n    "iban": "AE07 1234 5246 4523 4567 895",\n    "type": "Current",\n    "balance": 44576.00,\n    "currency": "AED"\n  },\n  {\n    "iban": "AE07 1255 3546 4523 4567 895",\n    "type": "Savings",\n    "balance": 12034.00,\n    "currency": "AED"\n  }\n]' },
       { method: 'PATCH', label: 'Record account selection on consent', caller: 'ADCB \u2192 Al Tareq Hub',
-        code: 'PATCH /api/v2.0/payment-consents/{ConsentId}\n{\n  "Data": {\n    "Action": "AccountSelected",\n    "DebtorAccount": {\n      "SchemeName":     "IBAN",\n      "Identification": "AE07 1234 5246 4523 4567 895"\n    }\n  }\n}' }
+        code: 'PATCH /api/v2.0/payment-consents/{ConsentId}\n\n{\n  "Data": {\n    "Action": "AccountSelected",\n    "DebtorAccount": {\n      "SchemeName": "IBAN",\n      "Identification": "AE07 1234 5246 4523 4567 895"\n    }\n  }\n}' }
     ]
   },
   9: {
     title: 'SCA AUTHORISATION',
     calls: [
       { method: 'POST', label: 'Strong Customer Auth (Touch ID / Face ID / PIN)', caller: 'Customer \u2192 ADCB',
-        code: 'POST /mib/auth/verify\n{\n  "consentId": "pcon-001",\n  "method":    "touch_id",   // or face_id / pin\n  "sessionId": "sid-\u2026"\n}\n\n// 3 attempts max before consent is rejected' },
+        code: 'POST /mib/auth/verify\n\n{\n  "consentId": "pcon-001",\n  "method": "touch_id",\n  "sessionId": "sid-xxxx"\n}\n\n// 3 attempts max before consent is rejected' },
       { method: 'PATCH', label: 'Mark consent Authorised', caller: 'ADCB \u2192 Al Tareq Hub',
-        code: 'PATCH /api/v2.0/payment-consents/{ConsentId}\n{\n  "Data": {\n    "Status":            "Authorised",\n    "AuthorisationCode": "AUTH-XYZ-001"\n  }\n}' }
+        code: 'PATCH /api/v2.0/payment-consents/{ConsentId}\n\n{\n  "Data": {\n    "Status": "Authorised",\n    "AuthorisationCode": "AUTH-XYZ-001"\n  }\n}' }
     ]
   },
   10: {
@@ -514,16 +514,16 @@ var SIP_SCREEN_API_CALLS = {
       { method: 'GET', label: 'OAuth2 callback with auth code', caller: 'Browser \u2192 Amazon',
         code: '// ADCB redirects back to Amazon\'s callback URI\nGET {tpp_callback}\n  ?code={authorization_code}\n  &state={original_state}' },
       { method: 'POST', label: 'Exchange code for access token (PKCE + private_key_jwt)', caller: 'Amazon \u2192 Al Tareq Hub',
-        code: 'POST /as/token\ngrant_type=authorization_code\n&code={auth_code}\n&code_verifier={pkce_verifier}\n&client_assertion_type=\u2026jwt-bearer\n&client_assertion={private_key_jwt}\n\n// Response:\n{ "access_token": "eyJ\u2026", "expires_in": 3600 }' }
+        code: 'POST /as/token\n\ngrant_type=authorization_code\n&code={auth_code}\n&code_verifier={pkce_verifier}\n&client_assertion_type=jwt-bearer\n&client_assertion={private_key_jwt}\n\n// Response\n{\n  "access_token": "eyJ...",\n  "expires_in": 3600\n}' }
     ]
   },
   11: {
     title: 'PAYMENT EXECUTION (PI-6) + STATUS (PI-8)',
     calls: [
       { method: 'POST', label: 'Execute payment (PI-6, signed JWT + idempotency key)', caller: 'Amazon \u2192 OF Hub \u2192 ADCB',
-        code: 'POST /api/v2.0/payments\nx-idempotency-key: 8f3a\u2026b7\nContent-Type: application/jose\n\n{\n  "Data": {\n    "ConsentId": "pcon-001",\n    "Initiation": {\n      "InstructedAmount": { "Amount": "1000", "Currency": "AED" },\n      "CreditorAccount":  { "Identification": "AE070331\u2026" },\n      "DebtorAccount":    { "Identification": "AE071234\u2026" }\n    }\n  },\n  "Risk": { "PaymentContextCode": "EcommerceGoods" }\n}\n\n// 201 Created\n{ "DomesticPaymentId": "PAY-001", "Status": "Pending" }' },
+        code: 'POST /api/v2.0/payments\nx-idempotency-key: 8f3a...b7\nContent-Type: application/jose\n\n{\n  "Data": {\n    "ConsentId": "pcon-001",\n    "Initiation": {\n      "InstructedAmount": {\n        "Amount": "1000",\n        "Currency": "AED"\n      },\n      "CreditorAccount": {\n        "Identification": "AE070331234567890123"\n      },\n      "DebtorAccount": {\n        "Identification": "AE071234524645234567895"\n      }\n    }\n  },\n  "Risk": {\n    "PaymentContextCode": "EcommerceGoods"\n  }\n}\n\n// 201 Created\n{\n  "DomesticPaymentId": "PAY-001",\n  "Status": "Pending"\n}' },
       { method: 'GET', label: 'Poll payment status (PI-8)', caller: 'Amazon \u2192 OF Hub',
-        code: 'GET /api/v2.0/payments/PAY-001\n\n// Terminal status reached:\n{ "DomesticPaymentId": "PAY-001",\n  "Status":            "AcceptedSettlementCompleted",\n  "CreationDateTime":  "2026-04-17T10:15:00Z" }' }
+        code: 'GET /api/v2.0/payments/PAY-001\n\n// Terminal status reached\n{\n  "DomesticPaymentId": "PAY-001",\n  "Status": "AcceptedSettlementCompleted",\n  "CreationDateTime": "2026-04-17T10:15:00Z"\n}' }
     ]
   }
 };
