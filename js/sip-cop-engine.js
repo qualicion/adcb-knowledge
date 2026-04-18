@@ -447,18 +447,18 @@ var SIP_SCREEN_API_CALLS = {
   2: {
     title: 'BANK / ACCOUNT SELECTION',
     calls: [
-      { method: 'GET', label: 'LFI Directory', caller: 'PayLink \u2192 OF Hub',
+      { method: 'GET', label: 'LFI Directory', caller: 'Amazon \u2192 OF Hub',
         code: '// TPP fetches registered LFIs from the OF Hub\nGET /api/v2.0/participants\n\n// Response: list of banks\n[\n  { "name": "ADCB",        "bic": "ADCBAEAA" },\n  { "name": "Emirates NBD","bic": "ABORAEAA" },\n  { "name": "Mashreq",     "bic": "BOMLAEAD" },\n  { "name": "RAKBANK",     "bic": "NRAKAEAK" }\n]' }
     ]
   },
   3: {
     title: 'CoP QUERY + CONSENT INITIATION',
     calls: [
-      { method: 'POST', label: 'Confirmation of Payee (mandatory pre-consent)', caller: 'PayLink \u2192 OF Hub \u2192 ADCB',
+      { method: 'POST', label: 'Confirmation of Payee (mandatory pre-consent)', caller: 'Amazon \u2192 OF Hub \u2192 ADCB',
         code: '// CBUAE requires a CoP check BEFORE the consent is created\nPOST /api/v2.0/customers/action/cop-query\n{\n  "Name":    { "fullName": "Ahmed Al Maktoum" },\n  "Account": { "SchemeName":     "IBAN",\n               "Identification": "AE070331234567890123" }\n}\n\n// Response:\n{ "MatchResult":   "ExactMatch",\n  "MatchedName":   "Ahmed Al Maktoum",\n  "AccountStatus": "Active" }' },
-      { method: 'POST', label: 'Payment Consent Initiate (carries CoP result)', caller: 'PayLink \u2192 OF Hub',
+      { method: 'POST', label: 'Payment Consent Initiate (carries CoP result)', caller: 'Amazon \u2192 OF Hub',
         code: 'POST /api/v2.0/payment-consents/initiate\n{\n  "Data": {\n    "Initiation": {\n      "InstructedAmount": { "Amount": "1000", "Currency": "AED" },\n      "CreditorAccount":  { "Identification": "AE070331\u2026" },\n      "CreditorName":     "Ahmed Al Maktoum",\n      "RemittanceInformation": { "Reference": "INV-2026-0042" }\n    },\n    "CoPResult": {\n      "matchResult":    "ExactMatch",\n      "queryTimestamp": "2026-04-17T10:15:00Z"\n    }\n  },\n  "Risk": { "PaymentContextCode": "EcommerceGoods" }\n}' },
-      { method: 'POST', label: 'Pushed Authorisation Request (PAR)', caller: 'PayLink \u2192 Al Tareq Hub',
+      { method: 'POST', label: 'Pushed Authorisation Request (PAR)', caller: 'Amazon \u2192 Al Tareq Hub',
         code: 'POST /as/par\n{\n  "response_type": "code",\n  "client_id":    "tpp-client-001",\n  "scope":        "payments openid",\n  "request":      "<signed-JAR-JWT>"\n}\n\n// Response:\n{ "request_uri": "urn:adcb:bwc:1234", "expires_in": 90 }' }
     ]
   },
@@ -511,18 +511,18 @@ var SIP_SCREEN_API_CALLS = {
   10: {
     title: 'REDIRECT BACK + TOKEN EXCHANGE',
     calls: [
-      { method: 'GET', label: 'OAuth2 callback with auth code', caller: 'Browser \u2192 PayLink',
-        code: '// ADCB redirects back to PayLink\'s callback URI\nGET {tpp_callback}\n  ?code={authorization_code}\n  &state={original_state}' },
-      { method: 'POST', label: 'Exchange code for access token (PKCE + private_key_jwt)', caller: 'PayLink \u2192 Al Tareq Hub',
+      { method: 'GET', label: 'OAuth2 callback with auth code', caller: 'Browser \u2192 Amazon',
+        code: '// ADCB redirects back to Amazon\'s callback URI\nGET {tpp_callback}\n  ?code={authorization_code}\n  &state={original_state}' },
+      { method: 'POST', label: 'Exchange code for access token (PKCE + private_key_jwt)', caller: 'Amazon \u2192 Al Tareq Hub',
         code: 'POST /as/token\ngrant_type=authorization_code\n&code={auth_code}\n&code_verifier={pkce_verifier}\n&client_assertion_type=\u2026jwt-bearer\n&client_assertion={private_key_jwt}\n\n// Response:\n{ "access_token": "eyJ\u2026", "expires_in": 3600 }' }
     ]
   },
   11: {
     title: 'PAYMENT EXECUTION (PI-6) + STATUS (PI-8)',
     calls: [
-      { method: 'POST', label: 'Execute payment (PI-6, signed JWT + idempotency key)', caller: 'PayLink \u2192 OF Hub \u2192 ADCB',
+      { method: 'POST', label: 'Execute payment (PI-6, signed JWT + idempotency key)', caller: 'Amazon \u2192 OF Hub \u2192 ADCB',
         code: 'POST /api/v2.0/payments\nx-idempotency-key: 8f3a\u2026b7\nContent-Type: application/jose\n\n{\n  "Data": {\n    "ConsentId": "pcon-001",\n    "Initiation": {\n      "InstructedAmount": { "Amount": "1000", "Currency": "AED" },\n      "CreditorAccount":  { "Identification": "AE070331\u2026" },\n      "DebtorAccount":    { "Identification": "AE071234\u2026" }\n    }\n  },\n  "Risk": { "PaymentContextCode": "EcommerceGoods" }\n}\n\n// 201 Created\n{ "DomesticPaymentId": "PAY-001", "Status": "Pending" }' },
-      { method: 'GET', label: 'Poll payment status (PI-8)', caller: 'PayLink \u2192 OF Hub',
+      { method: 'GET', label: 'Poll payment status (PI-8)', caller: 'Amazon \u2192 OF Hub',
         code: 'GET /api/v2.0/payments/PAY-001\n\n// Terminal status reached:\n{ "DomesticPaymentId": "PAY-001",\n  "Status":            "AcceptedSettlementCompleted",\n  "CreationDateTime":  "2026-04-17T10:15:00Z" }' }
     ]
   }
@@ -558,10 +558,13 @@ function sipRenderApiPanel(n) {
     var c = data.calls[i];
     var seq = String(i + 1).padStart(2, '0');
     var mc = SIP_METHOD_COLORS[c.method] || SIP_METHOD_COLORS.GET;
+    // Escape HTML, then syntax-colour: comments grey, strings blue
     var code = (c.code || '')
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+      .replace(/>/g, '&gt;')
+      .replace(/(\/\/[^\n]*)/g, '<span style="color:#8B949E;">$1</span>')
+      .replace(/("[^"\n]*")/g, '<span style="color:#A5D6FF;">$1</span>');
     html += '<div style="margin-bottom:' + (i === data.calls.length - 1 ? '0' : '14px') + ';">'
       + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
       +   '<span style="font-size:10px;font-weight:800;color:#6E7681;font-variant-numeric:tabular-nums;letter-spacing:.6px;">' + seq + '</span>'
@@ -569,7 +572,7 @@ function sipRenderApiPanel(n) {
       +   '<span style="font-size:10px;font-weight:700;color:#E6EDF3;">' + c.label + '</span>'
       + '</div>'
       + '<div style="font-size:10px;color:#8B949E;margin:0 0 6px 26px;">' + (c.caller || '') + '</div>'
-      + '<pre class="sme-code-block" style="margin-left:26px;">' + code + '</pre>'
+      + '<pre class="sme-code-block" style="margin-left:26px;color:#C9D1D9;">' + code + '</pre>'
       + '</div>';
   }
   body.innerHTML = html;
@@ -598,16 +601,27 @@ function sipProtoInit() {
     '<div style="display:flex;gap:16px;align-items:flex-start;">' +
       '<div style="flex-shrink:0;">' +
         '<div class="sip-proto-phone" id="sip-proto-phone" style="cursor:pointer;" onclick="sipProtoNext()">' +
-          '<div class="sip-proto-notch"></div>' +
-          '<div class="sip-proto-display" id="sip-proto-display"></div>' +
-          '<div class="sip-modal-overlay" id="sip-no-match-modal">' +
-            '<div class="sip-modal-box">' +
-              '<div style="font-size:40px;margin-bottom:8px">\u26A0\uFE0F</div>' +
-              '<h3>Are you sure?</h3>' +
-              '<p>The payee name does <strong>not match</strong> the bank account. Sending money to the wrong account is hard to reverse.</p>' +
-              '<div class="sip-modal-btns">' +
-                '<button style="background:#eee;color:#333" onclick="event.stopPropagation();sipHideNoMatchModal()">Go Back</button>' +
-                '<button style="background:var(--color-error);color:#fff" onclick="event.stopPropagation();sipHideNoMatchModal();sipProtoNext()">I Accept Risk</button>' +
+          '<div class="sip-proto-phone-inner">' +
+            '<div class="sip-proto-notch"></div>' +
+            '<div class="sip-proto-statusbar" id="sip-proto-statusbar">' +
+              '<div>9:41</div>' +
+              '<div class="sip-proto-statusbar-right">' +
+                '<svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="0.6"/><rect x="4.5" y="5" width="3" height="6" rx="0.6"/><rect x="9" y="2.5" width="3" height="8.5" rx="0.6"/><rect x="13.5" y="0" width="3" height="11" rx="0.6"/></svg>' +
+                '<svg width="15" height="11" viewBox="0 0 15 11" fill="currentColor"><path d="M7.5 3C9.6 3 11.5 3.8 13 5l1-1A9 9 0 000 4l1 1c1.5-1.2 3.4-2 5.5-2z" opacity="0.9"/><path d="M7.5 6c1.2 0 2.3.4 3.2 1.2l1-1A6 6 0 003.3 6.2l1 1c.9-.8 2-1.2 3.2-1.2z" opacity="0.9"/><circle cx="7.5" cy="9.5" r="1.3"/></svg>' +
+                '<svg width="25" height="11" viewBox="0 0 25 11"><rect x="0" y="0" width="22" height="11" rx="3" fill="none" stroke="currentColor" stroke-opacity="0.4"/><rect x="1.5" y="1.5" width="19" height="8" rx="1.5" fill="currentColor"/><rect x="23" y="3.5" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.4"/></svg>' +
+              '</div>' +
+            '</div>' +
+            '<div class="sip-proto-display" id="sip-proto-display"></div>' +
+            '<div class="sip-proto-home-ind"></div>' +
+            '<div class="sip-modal-overlay" id="sip-no-match-modal">' +
+              '<div class="sip-modal-box">' +
+                '<div style="font-size:40px;margin-bottom:8px">\u26A0\uFE0F</div>' +
+                '<h3>Are you sure?</h3>' +
+                '<p>The payee name does <strong>not match</strong> the bank account. Sending money to the wrong account is hard to reverse.</p>' +
+                '<div class="sip-modal-btns">' +
+                  '<button style="background:#eee;color:#333" onclick="event.stopPropagation();sipHideNoMatchModal()">Go Back</button>' +
+                  '<button style="background:var(--color-error);color:#fff" onclick="event.stopPropagation();sipHideNoMatchModal();sipProtoNext()">I Accept Risk</button>' +
+                '</div>' +
               '</div>' +
             '</div>' +
           '</div>' +
@@ -690,17 +704,18 @@ function sipAdcbLogo(inverted) {
   '</div>';
 }
 
-/* ── Owner label bar (purple for TPP, red for ADCB LFI, teal for Redirect) ── */
+/* ── Owner label bar (orange for Amazon TPP, red for ADCB LFI, teal for Redirect) ──
+   Top padding reserves 44px for the phone status bar that sits above it. */
 function sipOwnerBar(owner) {
   var colors = {
-    'PAYLINK':     'background:linear-gradient(135deg,#6D28D9,#4C1D95);',
-    'TPP':         'background:linear-gradient(135deg,#6D28D9,#4C1D95);',
+    'AMAZON':      'background:linear-gradient(135deg,#232F3E,#131921);',
+    'TPP':         'background:linear-gradient(135deg,#232F3E,#131921);',
     'ADCB':        'background:linear-gradient(135deg,#E31E24,#7F121C);',
     'YOUR LFI':    'background:linear-gradient(135deg,#E31E24,#7F121C);',
     'Redirection': 'background:linear-gradient(135deg,#0D9488,#1C2B4A);'
   };
-  var displayName = owner === 'YOUR LFI' ? 'ADCB' : (owner === 'TPP' ? 'PAYLINK' : owner);
-  return '<div style="' + (colors[owner]||colors.TPP) + 'color:white;padding:7px 14px;font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;display:flex;align-items:center;gap:6px;">' +
+  var displayName = owner === 'YOUR LFI' ? 'ADCB' : (owner === 'TPP' ? 'AMAZON' : owner);
+  return '<div style="' + (colors[owner]||colors.TPP) + 'color:white;padding:50px 14px 10px;font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;display:flex;align-items:center;gap:6px;flex-shrink:0;">' +
     '<span style="font-size:12px;">\u2190</span> ' + displayName + '</div>';
 }
 
@@ -734,9 +749,18 @@ function sipRenderScreen() {
   var n = sipCurrentScreen;
   var html = '';
 
-  /* ── SCREEN 1: PayLink — Fill in payment data ── */
+  /* Status-bar colour: light text over coloured owner bars / redirects,
+     dark text over light-bg screens (screen 5 = ADCB auth splash only) */
+  var statusBar = document.getElementById('sip-proto-statusbar');
+  if (statusBar) {
+    var lightBgScreens = { 5: true };
+    if (lightBgScreens[n]) statusBar.classList.remove('on-dark');
+    else statusBar.classList.add('on-dark');
+  }
+
+  /* ── SCREEN 1: Amazon — Fill in payment data ── */
   if (n === 1) {
-    html = sipOwnerBar('PAYLINK') + sipLogo() + sipStepper(0) +
+    html = sipOwnerBar('AMAZON') + sipLogo() + sipStepper(0) +
       '<div style="padding:12px 14px;background:#F8FAFC;">' +
         sipCard(
           '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">' +
@@ -769,9 +793,9 @@ function sipRenderScreen() {
         ) +
       '</div>';
 
-  /* ── SCREEN 2: PayLink — Choose bank / ADCB ── */
+  /* ── SCREEN 2: Amazon — Choose bank / ADCB ── */
   } else if (n === 2) {
-    html = sipOwnerBar('PAYLINK') + sipLogo() + sipStepper(0) +
+    html = sipOwnerBar('AMAZON') + sipLogo() + sipStepper(0) +
       '<div style="padding:12px 14px;background:#F8FAFC;">' +
         sipCard(
           '<div style="font-size:12px;font-weight:700;color:#0F172A;margin-bottom:10px;">Choose your option</div>' +
@@ -814,9 +838,9 @@ function sipRenderScreen() {
         ) +
       '</div>';
 
-  /* ── SCREEN 3: PayLink — Permission to pay (CoP status + payee/payer) ── */
+  /* ── SCREEN 3: Amazon — Permission to pay (CoP status + payee/payer) ── */
   } else if (n === 3) {
-    html = sipOwnerBar('PAYLINK') + sipLogo() + sipStepper(0) +
+    html = sipOwnerBar('AMAZON') + sipLogo() + sipStepper(0) +
       '<div style="padding:12px 14px;background:#F8FAFC;">' +
         sipCard(
           '<div style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:4px;">Permission to make a payment</div>' +
@@ -863,7 +887,7 @@ function sipRenderScreen() {
 
   /* ── SCREEN 4: Redirection to ADCB ── */
   } else if (n === 4) {
-    html = '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#0D9488 0%,#1C2B4A 55%,#0B1220 100%);padding:30px 20px;text-align:center;min-height:500px;">' +
+    html = '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#0D9488 0%,#1C2B4A 55%,#0B1220 100%);padding:70px 20px 30px;text-align:center;min-height:500px;">' +
         '<div style="font-size:12px;color:rgba(255,255,255,.85);margin-bottom:20px;">You\'ll be redirected to</div>' +
         '<div style="width:78px;height:78px;background:#fff;border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 12px 24px rgba(0,0,0,0.25);">' +
           '<svg width="40" height="40" viewBox="0 0 28 28">' +
@@ -884,7 +908,7 @@ function sipRenderScreen() {
 
   /* ── SCREEN 5: ADCB Authentication splash ── */
   } else if (n === 5) {
-    html = '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#F8FAFC;padding:30px 20px;text-align:center;min-height:500px;gap:18px;">' +
+    html = '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#F8FAFC;padding:70px 20px 30px;text-align:center;min-height:500px;gap:18px;">' +
         '<div style="width:72px;height:72px;border-radius:36px;background:linear-gradient(135deg,#E31E24,#A01820);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 28px rgba(227,30,36,0.3);">' +
           '<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="11" rx="2.5" stroke="#fff" stroke-width="1.8"/><path d="M8 10V7a4 4 0 018 0v3" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>' +
         '</div>' +
@@ -920,7 +944,7 @@ function sipRenderScreen() {
       '<div style="padding:12px 14px;background:#F8FAFC;">' +
         sipCard(
           '<div style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:4px;">Confirm Payment Details</div>' +
-          '<div style="font-size:11px;color:#64748B;margin-bottom:12px;"><b>PayLink</b> needs your permission to make the payment below.</div>' +
+          '<div style="font-size:11px;color:#64748B;margin-bottom:12px;"><b>Amazon</b> needs your permission to make the payment below.</div>' +
           '<div style="background:#F8FAFC;border-radius:10px;padding:10px;">' +
             sipRow('Amount', 'AED 1,000', 'color:#E31E24;font-weight:700;') +
             '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed #F1F5F9;font-size:11px;">' +
@@ -983,16 +1007,16 @@ function sipRenderScreen() {
         '</div>' +
       '</div>';
 
-  /* ── SCREEN 10: Redirection back to PayLink ── */
+  /* ── SCREEN 10: Redirection back to Amazon ── */
   } else if (n === 10) {
-    html = '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#0D9488 0%,#1C2B4A 55%,#0B1220 100%);padding:30px 20px;text-align:center;min-height:500px;">' +
+    html = '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#0D9488 0%,#1C2B4A 55%,#0B1220 100%);padding:70px 20px 30px;text-align:center;min-height:500px;">' +
         '<div style="font-size:12px;color:rgba(255,255,255,.85);margin-bottom:20px;">You\'ll be redirected back to</div>' +
-        '<div style="width:78px;height:78px;background:#fff;border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 12px 24px rgba(0,0,0,0.25);">' +
-          '<div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#8B5CF6,#6D28D9);display:flex;align-items:center;justify-content:center;">' +
-            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 15a4 4 0 010-6l2-2a4 4 0 016 0M15 9a4 4 0 010 6l-2 2a4 4 0 01-6 0" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>' +
+        '<div style="width:78px;height:78px;background:#fff;border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 12px 24px rgba(0,0,0,0.25);padding:0 8px;">' +
+          '<div style="font-family:Proxima Nova,system-ui;font-weight:800;font-size:22px;color:#131921;letter-spacing:-0.5px;line-height:1;position:relative;">amazon' +
+            '<svg width="44" height="8" viewBox="0 0 44 8" style="position:absolute;bottom:-4px;left:2px;"><path d="M2 4 Q22 8 42 4" stroke="#FF9900" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M38 2 L42 4 L38 6" stroke="#FF9900" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
           '</div>' +
         '</div>' +
-        '<div style="color:#fff;font-size:16px;font-weight:800;letter-spacing:0.2px;margin-bottom:4px;">PayLink</div>' +
+        '<div style="color:#fff;font-size:16px;font-weight:800;letter-spacing:0.2px;margin-bottom:4px;">Amazon</div>' +
         '<div style="color:rgba(255,255,255,.7);font-size:11px;">don\'t close this window</div>' +
         '<div style="width:40px;height:40px;border:3px solid rgba(255,255,255,.2);border-top-color:#0D9488;border-radius:50%;animation:sme-spin 0.9s linear infinite;margin:26px 0;"></div>' +
         '<div style="margin-top:auto;color:rgba(255,255,255,.55);font-size:9px;letter-spacing:1px;margin-bottom:6px;">POWERED BY</div>' +
@@ -1002,9 +1026,9 @@ function sipRenderScreen() {
         '</div>' +
       '</div>';
 
-  /* ── SCREEN 11: PayLink — Thank you ── */
+  /* ── SCREEN 11: Amazon — Thank you ── */
   } else if (n === 11) {
-    html = sipOwnerBar('PAYLINK') + sipLogo() + sipStepper(2) +
+    html = sipOwnerBar('AMAZON') + sipLogo() + sipStepper(2) +
       '<div style="padding:14px;background:#F8FAFC;">' +
         sipCard(
           '<div style="text-align:center;">' +

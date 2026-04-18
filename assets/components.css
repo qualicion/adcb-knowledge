@@ -1074,7 +1074,7 @@
   background:#0D1117;border:1px solid #30363D;border-radius:6px;
   padding:12px 14px;font-family:var(--font-family-mono);font-size:11px;
   line-height:1.6;white-space:pre-wrap;word-break:break-all;margin:0;
-  overflow-x:auto;
+  overflow-x:auto;color:#C9D1D9;
 }
 /* Syntax token colours */
 .sme-ck{color:#8B949E;}   /* comment */
@@ -1700,16 +1700,43 @@
 }
 .sip-proto-step-list li{padding:4px 0;}
 .sip-proto-phone-wrap{flex:1;display:flex;flex-direction:column;align-items:center;}
+/* iOS-style phone frame matching cop-prototype.html */
 .sip-proto-phone{
-  width:375px;height:700px;border:2px solid #ccc;border-radius:36px;
-  background:#fff;box-shadow:0 8px 40px rgba(0,0,0,.12),inset 0 0 0 1px rgba(0,0,0,.05);
-  overflow:hidden;position:relative;display:flex;flex-direction:column;
+  width:390px;height:820px;border-radius:48px;background:#000;padding:10px;
+  box-sizing:border-box;position:relative;
+  box-shadow:0 40px 80px rgba(15,23,42,0.25),0 0 0 1px rgba(0,0,0,0.15);
 }
-.sip-proto-notch{width:140px;height:28px;background:#222;border-radius:0 0 18px 18px;margin:0 auto;flex-shrink:0;}
-.sip-proto-display{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-.sip-proto-display::-webkit-scrollbar{width:3px;}
-.sip-proto-display::-webkit-scrollbar-track{background:transparent;}
-.sip-proto-display::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:3px;}
+.sip-proto-phone-inner{
+  width:100%;height:100%;border-radius:40px;overflow:hidden;
+  background:#F8FAFC;position:relative;
+}
+/* Dynamic Island */
+.sip-proto-notch{
+  position:absolute;top:8px;left:50%;transform:translateX(-50%);
+  width:110px;height:32px;border-radius:20px;background:#000;z-index:100;
+}
+/* Status bar (9:41, signal, wifi, battery) */
+.sip-proto-statusbar{
+  position:absolute;top:0;left:0;right:0;height:48px;z-index:90;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 28px 0;pointer-events:none;
+  font-family:-apple-system,"SF Pro",system-ui;
+  font-weight:600;font-size:14px;color:#0F172A;
+}
+.sip-proto-statusbar.on-dark{color:#fff;}
+.sip-proto-statusbar-right{display:flex;gap:5px;align-items:center;}
+/* Home indicator */
+.sip-proto-home-ind{
+  position:absolute;bottom:7px;left:50%;transform:translateX(-50%);
+  width:130px;height:5px;border-radius:3px;background:rgba(0,0,0,0.35);
+  z-index:100;pointer-events:none;
+}
+/* Scrollable display surface */
+.sip-proto-display{
+  position:absolute;inset:0;overflow:hidden;-webkit-overflow-scrolling:touch;
+  display:flex;flex-direction:column;
+}
+.sip-proto-display::-webkit-scrollbar{width:0;height:0;}
 .sip-proto-screen{animation:fadeIn .2s ease;}
 .sip-proto-nav-row{display:flex;align-items:center;gap:12px;margin-top:var(--space-section-gap);justify-content:center;}
 .sip-proto-nav-btn{
