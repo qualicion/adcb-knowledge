@@ -438,50 +438,142 @@ var SIP_SCREEN_DESCS = {
   11: 'Payment is confirmed. The TPP shows a receipt with transaction details.'
 };
 
-/* ── API calls per screen ── */
-var SIP_SCREEN_APIS = {
-  1: {title:'TPP CHECKOUT', html:
-    '<p style="font-size:11px;color:#8B949E;margin-bottom:10px;">No API calls yet \u2014 this is the TPP\'s own checkout page. The payment details (amount, IBAN, payee name) are collected here and will be sent to the OF Hub in Step 3.</p>'},
-  2: {title:'BANK / ACCOUNT SELECTION', html:
-    '<div style="margin-bottom:12px;"><div style="color:#56D364;font-size:10px;font-weight:600;margin-bottom:4px;">GET \u2014 LFI Directory</div>' +
-    '<pre class="sme-code-block"><span class="sme-ck">// TPP fetches registered LFIs from OF Hub\n</span><span class="sme-cv">GET /api/v2.0/participants\n\n// Response: list of banks\n[\n  { "name": "ADCB", "bic": "ADCBAEAA" },\n  { "name": "Emirates NBD", "bic": "ABORAEAA" },\n  ...\n]</span></pre></div>'},
-  3: {title:'CONSENT INITIATION (PAR + RAR)', html:
-    '<div style="margin-bottom:12px;"><div style="color:#58A6FF;font-size:10px;font-weight:600;margin-bottom:4px;">POST \u2014 Pushed Authorisation Request</div>' +
-    '<pre class="sme-code-block"><span class="sme-ck">// TPP sends PAR to OF Hub\n</span><span class="sme-cv">POST /as/par\n{\n  "response_type": "code",\n  "client_id": "tpp-client-001",\n  "scope": "payments openid",\n  "request": "&lt;signed-JAR-JWT&gt;",\n  "authorization_details": [{\n    "type": "payment_initiation",\n    "instructedAmount": { "amount": "1000", "currency": "AED" },\n    "creditorAccount": { "iban": "AE070331234567890123" },\n    "creditorName": "Ahmed Al Maktoum"\n  }]\n}\n\n// Response:\n{ "request_uri": "urn:adcb:bwc:1234", "expires_in": 90 }</span></pre></div>'},
-  4: {title:'REDIRECT TO LFI', html:
-    '<p style="font-size:11px;color:#8B949E;margin-bottom:10px;">OAuth2 redirect via OF Hub. The request_uri from PAR is used to construct the authorisation URL. Customer\'s browser/app is redirected to ADCB.</p>' +
-    '<pre class="sme-code-block"><span class="sme-ck">// Redirect URL:\n</span><span class="sme-cv">https://auth.adcb.ae/authorize\n  ?request_uri=urn:adcb:bwc:1234\n  &client_id=tpp-client-001</span></pre>'},
-  5: {title:'LFI AUTHENTICATION', html:
-    '<p style="font-size:11px;color:#8B949E;margin-bottom:10px;">Standard bank authentication flow (BAU). Not Open Finance specific. Customer logs in via ProCash credentials.</p>' +
-    '<pre class="sme-code-block"><span class="sme-ck">// Internal ADCB auth \u2014 not exposed to TPP\n</span><span class="sme-cv">POST /auth/verify\n{ "method": "face_id", "session": "..." }</span></pre>'},
-  6: {title:'CoP QUERY (MANDATORY)', html:
-    '<div style="margin-bottom:12px;"><div style="color:#F0883E;font-size:10px;font-weight:600;margin-bottom:4px;">POST \u2014 Confirmation of Payee</div>' +
-    '<pre class="sme-code-block"><span class="sme-ck">// LFI sends CoP query via OF Hub to payee\'s bank\n</span><span class="sme-cv">POST /api/v2.0/customers/action/cop-query\n{\n  "Name": { "fullName": "Ahmed Al Maktoum" },\n  "Account": {\n    "SchemeName": "IBAN",\n    "Identification": "AE070331234567890123"\n  }\n}\n\n// Response:\n{\n  "MatchResult": "ExactMatch",\n  "MatchedName": "Ahmed Al Maktoum",\n  "AccountStatus": "Active"\n}</span></pre></div>'},
-  7: {title:'CoP RESULT DISPLAY', html:
-    '<p style="font-size:11px;color:#8B949E;margin-bottom:10px;">The CoP result determines what the customer sees. The result badge carries through to the Review screen.</p>' +
-    '<pre class="sme-code-block"><span class="sme-ck">// Possible MatchResult values:\n</span><span class="sme-cs">"ExactMatch"</span><span class="sme-cv">    \u2192 \u2705 Green \u2014 proceed\n</span><span class="sme-cs">"PartialMatch"</span><span class="sme-cv">  \u2192 \u26A0 Amber \u2014 confirm checkbox\n</span><span class="sme-cs">"NoMatch"</span><span class="sme-cv">       \u2192 \u274C Red \u2014 risk acceptance required\n</span><span class="sme-cs">"Unavailable"</span><span class="sme-cv">   \u2192 \u2139 Blue \u2014 proceed with caution</span></pre>'},
-  8: {title:'CONSENT DETAILS + ACCOUNT SELECTION', html:
-    '<div style="margin-bottom:12px;"><div style="color:#56D364;font-size:10px;font-weight:600;margin-bottom:4px;">GET \u2014 Payment Consent</div>' +
-    '<pre class="sme-code-block"><span class="sme-cv">GET /payment-consents/{ConsentId}\n\n// Returns: amount, creditor, reference, purpose\n// Status: AwaitingAuthorisation</span></pre></div>' +
-    '<div style="margin-bottom:12px;"><div style="color:#56D364;font-size:10px;font-weight:600;margin-bottom:4px;">GET \u2014 Eligible Accounts</div>' +
-    '<pre class="sme-code-block"><span class="sme-cv">GET /accounts\n// Returns: eligible AED CASA accounts with balances</span></pre></div>' +
-    '<div><div style="color:#F0883E;font-size:10px;font-weight:600;margin-bottom:4px;">PATCH \u2014 Account Selected</div>' +
-    '<pre class="sme-code-block"><span class="sme-cv">PATCH /payment-consents/{ConsentId}\n{\n  "Data": {\n    "Action": "AccountSelected",\n    "DebtorAccount": {\n      "Identification": "AE071234524645234567895"\n    }\n  }\n}</span></pre></div>'},
-  9: {title:'SCA / PIN AUTHORISATION', html:
-    '<div style="margin-bottom:12px;"><div style="color:#F0883E;font-size:10px;font-weight:600;margin-bottom:4px;">PATCH \u2014 Consent Authorised</div>' +
-    '<pre class="sme-code-block"><span class="sme-cv">PATCH /payment-consents/{ConsentId}\n{\n  "Data": {\n    "Status": "Authorised",\n    "AuthorisationCode": "AUTH-XYZ-001"\n  }\n}</span></pre></div>' +
-    '<p style="font-size:11px;color:#8B949E;">3 PIN attempts max. After 3 failures \u2192 consent rejected.</p>'},
-  10:{title:'REDIRECT BACK TO TPP', html:
-    '<div style="margin-bottom:12px;"><div style="color:#C084FC;font-size:10px;font-weight:600;margin-bottom:4px;">OAUTH2 \u2014 Callback</div>' +
-    '<pre class="sme-code-block"><span class="sme-ck">// Redirect to TPP callback with auth code:\n</span><span class="sme-cv">{tpp_callback}?\n  code={authorization_code}\n  &state={original_state}</span></pre></div>' +
-    '<div><div style="color:#C084FC;font-size:10px;font-weight:600;margin-bottom:4px;">POST \u2014 Token Exchange</div>' +
-    '<pre class="sme-code-block"><span class="sme-cv">POST /as/token\ngrant_type=authorization_code\n&code={auth_code}\n&code_verifier={pkce_verifier}\n\n// Response:\n{ "access_token": "eyJ...", "expires_in": 3600 }</span></pre></div>'},
-  11:{title:'PAYMENT EXECUTION', html:
-    '<div style="margin-bottom:12px;"><div style="color:#58A6FF;font-size:10px;font-weight:600;margin-bottom:4px;">POST \u2014 Execute Payment</div>' +
-    '<pre class="sme-code-block"><span class="sme-cv">POST /domestic-payments\n{\n  "Data": {\n    "ConsentId": "pcon-001",\n    "Initiation": {\n      "InstructedAmount": { "Amount": "1000", "Currency": "AED" },\n      "CreditorAccount": { "Identification": "AE070331..." },\n      "DebtorAccount": { "Identification": "AE071234..." }\n    }\n  },\n  "Risk": { "PaymentContextCode": "EcommerceGoods" }\n}\n\n// Response: 201\n{ "DomesticPaymentId": "PAY-001", "Status": "Pending" }</span></pre></div>' +
-    '<div><div style="color:#56D364;font-size:10px;font-weight:600;margin-bottom:4px;">GET \u2014 Payment Status</div>' +
-    '<pre class="sme-code-block"><span class="sme-cv">GET /domestic-payments/PAY-001\n// Status: AcceptedSettlementCompleted</span></pre></div>'}
+/* ── Ordered API-call sequences per screen ──
+   Each screen lists the calls that fire while the user is on it, in the
+   exact order they happen. The panel renders them numbered 01, 02, 03\u2026
+*/
+var SIP_SCREEN_API_CALLS = {
+  1: { title: 'TPP CHECKOUT', calls: [] },
+  2: {
+    title: 'BANK / ACCOUNT SELECTION',
+    calls: [
+      { method: 'GET', label: 'LFI Directory', caller: 'PayLink \u2192 OF Hub',
+        code: '// TPP fetches registered LFIs from the OF Hub\nGET /api/v2.0/participants\n\n// Response: list of banks\n[\n  { "name": "ADCB",        "bic": "ADCBAEAA" },\n  { "name": "Emirates NBD","bic": "ABORAEAA" },\n  { "name": "Mashreq",     "bic": "BOMLAEAD" },\n  { "name": "RAKBANK",     "bic": "NRAKAEAK" }\n]' }
+    ]
+  },
+  3: {
+    title: 'CoP QUERY + CONSENT INITIATION',
+    calls: [
+      { method: 'POST', label: 'Confirmation of Payee (mandatory pre-consent)', caller: 'PayLink \u2192 OF Hub \u2192 ADCB',
+        code: '// CBUAE requires a CoP check BEFORE the consent is created\nPOST /api/v2.0/customers/action/cop-query\n{\n  "Name":    { "fullName": "Ahmed Al Maktoum" },\n  "Account": { "SchemeName":     "IBAN",\n               "Identification": "AE070331234567890123" }\n}\n\n// Response:\n{ "MatchResult":   "ExactMatch",\n  "MatchedName":   "Ahmed Al Maktoum",\n  "AccountStatus": "Active" }' },
+      { method: 'POST', label: 'Payment Consent Initiate (carries CoP result)', caller: 'PayLink \u2192 OF Hub',
+        code: 'POST /api/v2.0/payment-consents/initiate\n{\n  "Data": {\n    "Initiation": {\n      "InstructedAmount": { "Amount": "1000", "Currency": "AED" },\n      "CreditorAccount":  { "Identification": "AE070331\u2026" },\n      "CreditorName":     "Ahmed Al Maktoum",\n      "RemittanceInformation": { "Reference": "INV-2026-0042" }\n    },\n    "CoPResult": {\n      "matchResult":    "ExactMatch",\n      "queryTimestamp": "2026-04-17T10:15:00Z"\n    }\n  },\n  "Risk": { "PaymentContextCode": "EcommerceGoods" }\n}' },
+      { method: 'POST', label: 'Pushed Authorisation Request (PAR)', caller: 'PayLink \u2192 Al Tareq Hub',
+        code: 'POST /as/par\n{\n  "response_type": "code",\n  "client_id":    "tpp-client-001",\n  "scope":        "payments openid",\n  "request":      "<signed-JAR-JWT>"\n}\n\n// Response:\n{ "request_uri": "urn:adcb:bwc:1234", "expires_in": 90 }' }
+    ]
+  },
+  4: {
+    title: 'REDIRECT TO ADCB',
+    calls: [
+      { method: 'GET', label: 'OAuth2 Authorise (handover to ADCB)', caller: 'Browser \u2192 Al Tareq Hub',
+        code: '// OAuth2 redirect via the Al Tareq hub\nGET /as/authorize\n  ?request_uri=urn:adcb:bwc:1234\n  &client_id=tpp-client-001\n\n// 302 \u2192 https://auth.adcb.ae/mib/login' }
+    ]
+  },
+  5: {
+    title: 'ADCB AUTHENTICATION (INTERNAL)',
+    calls: [
+      { method: 'POST', label: 'ADCB session login (BAU, not exposed to TPP)', caller: 'Customer \u2192 ADCB',
+        code: '// Internal ADCB auth \u2014 customer logs in\nPOST /mib/auth/login\n{ "username": "****", "method": "password" }\n\n// Response:\n{ "sessionId": "sid-\u2026", "status": "AuthRequired" }' }
+    ]
+  },
+  6: {
+    title: 'CoP ECHO TO ADCB',
+    calls: [
+      { method: 'GET', label: 'Fetch pending consent + CoP result', caller: 'ADCB \u2192 Al Tareq Hub',
+        code: '// ADCB pulls the pending consent to render it\nGET /api/v2.0/payment-consents/{ConsentId}\n\n// Response (partial):\n{\n  "Status":    "AwaitingAuthorisation",\n  "CoPResult": { "matchResult": "ExactMatch" },\n  "Initiation": {\n    "InstructedAmount": { "Amount": "1000", "Currency": "AED" }\n  }\n}' }
+    ]
+  },
+  7: {
+    title: 'CoP RESULT DISPLAY',
+    calls: [
+      { method: 'N/A', label: 'Client-side rendering of CoP outcome', caller: 'ADCB UI',
+        code: '// No network call \u2014 badge derived from consent.CoPResult\n"ExactMatch"    \u2192 \u2705 Green  \u2014 proceed automatically\n"PartialMatch"  \u2192 \u26A0 Amber  \u2014 checkbox required\n"NoMatch"       \u2192 \u274C Red    \u2014 explicit risk acceptance\n"Unavailable"   \u2192 \u2139 Blue   \u2014 proceed with caution' }
+    ]
+  },
+  8: {
+    title: 'CONFIRM DETAILS + ACCOUNT SELECTION',
+    calls: [
+      { method: 'GET', label: 'List eligible debtor accounts', caller: 'ADCB (internal)',
+        code: 'GET /mib/accounts\n// Returns: eligible AED CASA accounts with balances\n[\n  { "iban": "AE07 1234 5246 4523 4567 895",\n    "type": "Current", "balance": 44576.00, "currency": "AED" },\n  { "iban": "AE07 1255 3546 4523 4567 895",\n    "type": "Savings", "balance": 12034.00, "currency": "AED" }\n]' },
+      { method: 'PATCH', label: 'Record account selection on consent', caller: 'ADCB \u2192 Al Tareq Hub',
+        code: 'PATCH /api/v2.0/payment-consents/{ConsentId}\n{\n  "Data": {\n    "Action": "AccountSelected",\n    "DebtorAccount": {\n      "SchemeName":     "IBAN",\n      "Identification": "AE07 1234 5246 4523 4567 895"\n    }\n  }\n}' }
+    ]
+  },
+  9: {
+    title: 'SCA AUTHORISATION',
+    calls: [
+      { method: 'POST', label: 'Strong Customer Auth (Touch ID / Face ID / PIN)', caller: 'Customer \u2192 ADCB',
+        code: 'POST /mib/auth/verify\n{\n  "consentId": "pcon-001",\n  "method":    "touch_id",   // or face_id / pin\n  "sessionId": "sid-\u2026"\n}\n\n// 3 attempts max before consent is rejected' },
+      { method: 'PATCH', label: 'Mark consent Authorised', caller: 'ADCB \u2192 Al Tareq Hub',
+        code: 'PATCH /api/v2.0/payment-consents/{ConsentId}\n{\n  "Data": {\n    "Status":            "Authorised",\n    "AuthorisationCode": "AUTH-XYZ-001"\n  }\n}' }
+    ]
+  },
+  10: {
+    title: 'REDIRECT BACK + TOKEN EXCHANGE',
+    calls: [
+      { method: 'GET', label: 'OAuth2 callback with auth code', caller: 'Browser \u2192 PayLink',
+        code: '// ADCB redirects back to PayLink\'s callback URI\nGET {tpp_callback}\n  ?code={authorization_code}\n  &state={original_state}' },
+      { method: 'POST', label: 'Exchange code for access token (PKCE + private_key_jwt)', caller: 'PayLink \u2192 Al Tareq Hub',
+        code: 'POST /as/token\ngrant_type=authorization_code\n&code={auth_code}\n&code_verifier={pkce_verifier}\n&client_assertion_type=\u2026jwt-bearer\n&client_assertion={private_key_jwt}\n\n// Response:\n{ "access_token": "eyJ\u2026", "expires_in": 3600 }' }
+    ]
+  },
+  11: {
+    title: 'PAYMENT EXECUTION (PI-6) + STATUS (PI-8)',
+    calls: [
+      { method: 'POST', label: 'Execute payment (PI-6, signed JWT + idempotency key)', caller: 'PayLink \u2192 OF Hub \u2192 ADCB',
+        code: 'POST /api/v2.0/payments\nx-idempotency-key: 8f3a\u2026b7\nContent-Type: application/jose\n\n{\n  "Data": {\n    "ConsentId": "pcon-001",\n    "Initiation": {\n      "InstructedAmount": { "Amount": "1000", "Currency": "AED" },\n      "CreditorAccount":  { "Identification": "AE070331\u2026" },\n      "DebtorAccount":    { "Identification": "AE071234\u2026" }\n    }\n  },\n  "Risk": { "PaymentContextCode": "EcommerceGoods" }\n}\n\n// 201 Created\n{ "DomesticPaymentId": "PAY-001", "Status": "Pending" }' },
+      { method: 'GET', label: 'Poll payment status (PI-8)', caller: 'PayLink \u2192 OF Hub',
+        code: 'GET /api/v2.0/payments/PAY-001\n\n// Terminal status reached:\n{ "DomesticPaymentId": "PAY-001",\n  "Status":            "AcceptedSettlementCompleted",\n  "CreationDateTime":  "2026-04-17T10:15:00Z" }' }
+    ]
+  }
 };
+
+/* Colour mapping for HTTP methods in the panel */
+var SIP_METHOD_COLORS = {
+  GET:    { bg: '#0B2948', fg: '#93C5FD' },
+  POST:   { bg: '#0B3524', fg: '#6EE7B7' },
+  PUT:    { bg: '#3F2B0A', fg: '#FCD34D' },
+  PATCH:  { bg: '#3F2B0A', fg: '#FCD34D' },
+  DELETE: { bg: '#3F1414', fg: '#FCA5A5' },
+  'N/A':  { bg: '#1F2937', fg: '#9CA3AF' }
+};
+
+/* Render the dark API panel for a screen, numbering calls in sequence */
+function sipRenderApiPanel(n) {
+  var body = document.getElementById('sip-dev-body');
+  var titleEl = document.getElementById('sip-dev-title');
+  var data = SIP_SCREEN_API_CALLS[n];
+  if (!body || !data) return;
+  if (titleEl) titleEl.textContent = data.title;
+
+  if (!data.calls || data.calls.length === 0) {
+    body.innerHTML = '<p style="font-size:11px;color:#8B949E;margin:0;line-height:1.6;">'
+      + 'No API calls yet \u2014 this is the TPP\u2019s own checkout page. Payment details (amount, IBAN, payee name) are collected client-side and will be sent to the OF Hub on the next screen.'
+      + '</p>';
+    return;
+  }
+
+  var html = '';
+  for (var i = 0; i < data.calls.length; i++) {
+    var c = data.calls[i];
+    var seq = String(i + 1).padStart(2, '0');
+    var mc = SIP_METHOD_COLORS[c.method] || SIP_METHOD_COLORS.GET;
+    var code = (c.code || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    html += '<div style="margin-bottom:' + (i === data.calls.length - 1 ? '0' : '14px') + ';">'
+      + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
+      +   '<span style="font-size:10px;font-weight:800;color:#6E7681;font-variant-numeric:tabular-nums;letter-spacing:.6px;">' + seq + '</span>'
+      +   '<span style="background:' + mc.bg + ';color:' + mc.fg + ';font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px;font-family:JetBrains Mono,Menlo,monospace;letter-spacing:.4px;">' + c.method + '</span>'
+      +   '<span style="font-size:10px;font-weight:700;color:#E6EDF3;">' + c.label + '</span>'
+      + '</div>'
+      + '<div style="font-size:10px;color:#8B949E;margin:0 0 6px 26px;">' + (c.caller || '') + '</div>'
+      + '<pre class="sme-code-block" style="margin-left:26px;">' + code + '</pre>'
+      + '</div>';
+  }
+  body.innerHTML = html;
+}
 
 function sipProtoInit() {
   var el = document.getElementById('sip-proto-root');
@@ -540,51 +632,96 @@ function sipProtoInit() {
 
 /* ── Shared header + field row helpers ── */
 function sipHdr(title, showBack) {
-  return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;">' +
-    '<div style="display:flex;align-items:center;gap:6px;">' +
-      (showBack ? '<span style="cursor:pointer;font-size:16px;color:#475569;" onclick="sipProtoPrev()">\u2190</span>' : '<div style="width:22px;height:22px;background:#E31E24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">\u25B6</div>') +
-      '<div style="font-size:13px;font-weight:700;">' + title + '</div>' +
+  return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #E2E8F0;background:#fff;">' +
+    '<div style="display:flex;align-items:center;gap:8px;">' +
+      (showBack ? '<span style="cursor:pointer;font-size:16px;color:#475569;" onclick="sipProtoPrev()">\u2190</span>' : '<div style="width:22px;height:22px;background:#0D9488;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:white;">\u25B6</div>') +
+      '<div style="font-size:13px;font-weight:700;color:#0F172A;">' + title + '</div>' +
     '</div>' +
-    '<div style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;">\u2715</div>' +
+    '<div style="width:22px;height:22px;border-radius:50%;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#64748B;">\u2715</div>' +
   '</div>';
 }
 function sipRow(k, v, extra) {
-  return '<div style="display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-bottom:1px solid #f5f5f5;"><span style="color:#475569;">' + k + '</span><span style="font-weight:600;color:#0F172A;' + (extra||'') + '">' + v + '</span></div>';
+  return '<div style="display:flex;justify-content:space-between;padding:7px 14px;font-size:11px;border-bottom:1px dashed #F1F5F9;"><span style="color:#64748B;">' + k + '</span><span style="font-weight:600;color:#0F172A;' + (extra||'') + '">' + v + '</span></div>';
+}
+
+/* Card wrapper used across screens */
+function sipCard(inner, style) {
+  return '<div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 2px rgba(15,23,42,0.04),0 4px 12px rgba(15,23,42,0.04);' + (style||'') + '">' + inner + '</div>';
+}
+
+/* Chip badge used on payee row */
+function sipBadge(label, color, bg) {
+  return '<span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:' + bg + ';color:' + color + ';">' + label + '</span>';
 }
 function sipBtn(label, onclick, style) {
-  return '<button style="background:linear-gradient(135deg,#00B4C8,#005f6b);color:white;border:none;border-radius:24px;padding:12px;width:calc(100% - 28px);margin:14px 14px 8px;font-size:13px;font-weight:600;cursor:pointer;' + (style||'') + '" onclick="' + onclick + '">' + label + '</button>';
+  return '<button style="background:linear-gradient(90deg,#0D9488,#1C2B4A);color:white;border:none;border-radius:24px;padding:12px;width:calc(100% - 28px);margin:14px 14px 8px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 6px 14px rgba(13,148,136,0.25);' + (style||'') + '" onclick="' + onclick + '">' + label + '</button>';
 }
 function sipBtnSec(label, onclick) {
-  return '<button style="background:white;color:#0F172A;border:1px solid #E2E8F0;border-radius:24px;padding:11px;width:calc(100% - 28px);margin:0 14px 12px;font-size:13px;font-weight:600;cursor:pointer;" onclick="' + onclick + '">' + label + '</button>';
-}
-function sipLogo() {
-  return '<div style="text-align:center;padding:10px;"><div style="font-size:13px;color:#0D3349;">\u0627\u0644\u0637\u0627\u0631\u0642</div><div style="font-size:16px;font-weight:700;color:#0D3349;letter-spacing:2px;">ALTAREQ</div></div>';
+  return '<button style="background:white;color:#0F172A;border:1.5px solid #E2E8F0;border-radius:24px;padding:11px;width:calc(100% - 28px);margin:0 14px 12px;font-size:13px;font-weight:600;cursor:pointer;" onclick="' + onclick + '">' + label + '</button>';
 }
 
-/* ── Owner label bar (TPP / LFI / Redirect) ── */
+/* Al Tareq logo \u2014 gradient disc + wordmark (matches cop-prototype.html) */
+function sipLogo() {
+  return '<div style="text-align:center;padding:12px 0 4px;">' +
+    '<div style="display:inline-flex;align-items:center;gap:7px;">' +
+      '<svg width="22" height="22" viewBox="0 0 32 32" style="display:block;">' +
+        '<defs><linearGradient id="sip-atg" x1="0" y1="0" x2="1" y2="1">' +
+          '<stop offset="0" stop-color="#0D9488"/><stop offset="1" stop-color="#1C2B4A"/>' +
+        '</linearGradient></defs>' +
+        '<circle cx="16" cy="16" r="15" fill="url(#sip-atg)"/>' +
+        '<path d="M10 16a6 6 0 1011 3.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/>' +
+        '<path d="M13 15.5l2.3 2.3L21 12" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</svg>' +
+      '<div style="font-weight:800;font-size:15px;color:#0F172A;letter-spacing:-0.3px;">Al <span style="color:#0D9488;">Tareq</span></div>' +
+    '</div>' +
+    '<div style="font-size:9px;color:#94A3B8;margin-top:2px;letter-spacing:1.5px;">\u0627\u0644\u0637\u0627\u0631\u0642</div>' +
+  '</div>';
+}
+
+/* ADCB shield logo \u2014 used on LFI screens */
+function sipAdcbLogo(inverted) {
+  var fg = inverted ? '#fff' : '#0F172A';
+  return '<div style="display:inline-flex;align-items:center;gap:7px;">' +
+    '<svg width="22" height="22" viewBox="0 0 28 28" style="display:block;">' +
+      '<path d="M14 2L3 6v8c0 6 4.5 10.5 11 12 6.5-1.5 11-6 11-12V6L14 2z" fill="#E31E24"/>' +
+      '<path d="M8 13l6-5 6 5-6 5-6-5z" fill="#fff"/>' +
+    '</svg>' +
+    '<div style="font-weight:800;font-size:15px;color:' + fg + ';letter-spacing:0.4px;">ADCB</div>' +
+  '</div>';
+}
+
+/* ── Owner label bar (purple for TPP, red for ADCB LFI, teal for Redirect) ── */
 function sipOwnerBar(owner) {
   var colors = {
-    'TPP': 'background:linear-gradient(135deg,#00B4C8,#0D3349);',
-    'YOUR LFI': 'background:linear-gradient(135deg,#0D9488,#1C2B4A);',
-    'Redirection': 'background:linear-gradient(135deg,#00B4C8,#0D3349);'
+    'PAYLINK':     'background:linear-gradient(135deg,#6D28D9,#4C1D95);',
+    'TPP':         'background:linear-gradient(135deg,#6D28D9,#4C1D95);',
+    'ADCB':        'background:linear-gradient(135deg,#E31E24,#7F121C);',
+    'YOUR LFI':    'background:linear-gradient(135deg,#E31E24,#7F121C);',
+    'Redirection': 'background:linear-gradient(135deg,#0D9488,#1C2B4A);'
   };
-  return '<div style="' + (colors[owner]||colors.TPP) + 'color:white;padding:6px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:6px;">' +
-    '<span style="font-size:12px;">\u2190</span> ' + owner + '</div>';
+  var displayName = owner === 'YOUR LFI' ? 'ADCB' : (owner === 'TPP' ? 'PAYLINK' : owner);
+  return '<div style="' + (colors[owner]||colors.TPP) + 'color:white;padding:7px 14px;font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;display:flex;align-items:center;gap:6px;">' +
+    '<span style="font-size:12px;">\u2190</span> ' + displayName + '</div>';
 }
 
-/* ── AlTareq stepper bar ── */
+/* ── Al Tareq stepper bar (Consent \u2192 Authorise \u2192 Complete) ── */
 function sipStepper(active) {
   var steps = ['Consent','Authorise','Complete'];
-  var h = '<div style="display:flex;align-items:center;justify-content:center;padding:8px 20px;gap:0;">';
+  var teal = '#0D9488';
+  var h = '<div style="display:flex;align-items:center;justify-content:center;padding:10px 20px 12px;gap:0;background:#fff;">';
   for (var i = 0; i < steps.length; i++) {
     var done = i < active;
     var cur = i === active;
-    var bg = done || cur ? '#00B4C8' : '#e0e0e0';
-    var col = done || cur ? 'white' : '#999';
-    var tc = done || cur ? '#00B4C8' : '#999';
-    h += '<div style="display:flex;flex-direction:column;align-items:center;flex:1;"><div style="width:22px;height:22px;border-radius:50%;background:' + bg + ';color:' + col + ';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">' + (done ? '\u2713' : (i+1)) + '</div><div style="font-size:9px;color:' + tc + ';margin-top:2px;font-weight:600;">' + steps[i] + '</div></div>';
+    var bg = done || cur ? teal : '#E2E8F0';
+    var col = done || cur ? 'white' : '#94A3B8';
+    var tc = done || cur ? '#0F172A' : '#94A3B8';
+    var ring = cur ? 'box-shadow:0 0 0 4px rgba(13,148,136,0.15);' : '';
+    h += '<div style="display:flex;flex-direction:column;align-items:center;flex:0 0 auto;z-index:1;">' +
+           '<div style="width:24px;height:24px;border-radius:50%;background:' + bg + ';color:' + col + ';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;' + ring + '">' + (done ? '\u2713' : (i+1)) + '</div>' +
+           '<div style="font-size:10px;color:' + tc + ';margin-top:4px;font-weight:' + (cur ? '700' : '500') + ';">' + steps[i] + '</div>' +
+         '</div>';
     if (i < 2) {
-      var lineBg = done ? '#00B4C8' : '#e0e0e0';
+      var lineBg = done ? teal : '#E2E8F0';
       h += '<div style="flex:1;height:2px;background:' + lineBg + ';margin-top:-12px;"></div>';
     }
   }
@@ -597,159 +734,295 @@ function sipRenderScreen() {
   var n = sipCurrentScreen;
   var html = '';
 
-  /* ── SCREEN 1: TPP — Fill in payment data ── */
+  /* ── SCREEN 1: PayLink — Fill in payment data ── */
   if (n === 1) {
-    html = sipOwnerBar('TPP') + sipLogo() + sipStepper(0) +
-      '<div style="padding:12px 14px;">' +
-        '<div style="font-size:11px;color:#475569;margin-bottom:4px;">Payment Total</div>' +
-        '<div style="font-size:11px;color:#475569;margin-bottom:12px;display:flex;align-items:center;gap:4px;"><span style="width:16px;height:16px;background:#00B4C8;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:white;font-size:9px;">\u25B6</span> 1,000</div>' +
-        '<div style="font-size:12px;font-weight:600;margin-bottom:8px;">Fill in with your data</div>' +
-        '<div style="border:1px solid #E2E8F0;border-radius:6px;padding:8px 10px;font-size:11px;color:#94A3B8;margin-bottom:6px;">Supplier & Ltd</div>' +
-        '<div style="border:1px solid #E2E8F0;border-radius:6px;padding:8px 10px;font-size:11px;color:#94A3B8;margin-bottom:12px;">AE07 0331 2345 6789 01234</div>' +
-        '<div style="font-size:12px;font-weight:600;margin-bottom:8px;">Select payment method</div>' +
-        '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #E2E8F0;border-radius:6px;margin-bottom:6px;"><span style="width:20px;height:14px;background:linear-gradient(90deg,#1A237E,#FFD700);border-radius:2px;"></span><span style="font-size:11px;">Credit/Debit Card</span></div>' +
-        '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #E2E8F0;border-radius:6px;margin-bottom:6px;"><span style="font-size:11px;">Paypal</span></div>' +
-        '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:2px solid #00B4C8;border-radius:6px;background:#F0FDFA;"><span style="width:16px;height:16px;background:#00B4C8;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:white;font-size:8px;">\u2713</span><span style="font-size:11px;font-weight:600;color:#00B4C8;">Pay by bank using AlTareq</span></div>' +
+    html = sipOwnerBar('PAYLINK') + sipLogo() + sipStepper(0) +
+      '<div style="padding:12px 14px;background:#F8FAFC;">' +
+        sipCard(
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">' +
+            '<div style="width:28px;height:28px;border-radius:14px;background:rgba(13,148,136,0.12);display:flex;align-items:center;justify-content:center;">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="3" stroke="#0D9488" stroke-width="1.8"/><path d="M3 10h18" stroke="#0D9488" stroke-width="1.8"/></svg>' +
+            '</div>' +
+            '<div style="flex:1;font-size:11px;font-weight:600;color:#0F172A;">Payment Total</div>' +
+            '<div style="font-size:13px;font-weight:800;color:#0F172A;">AED 1,000</div>' +
+          '</div>' +
+          sipRow('Payee Name', 'Ahmed Al Maktoum') +
+          sipRow('IBAN', 'AE07 0331 2345 6789 01234') +
+          sipRow('Reference', 'INV-2026-0042', 'border-bottom:none;'),
+          'margin-bottom:10px;'
+        ) +
+        sipCard(
+          '<div style="font-size:12px;font-weight:700;color:#0F172A;margin-bottom:10px;">Select payment method</div>' +
+            '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #E2E8F0;border-radius:10px;margin-bottom:6px;">' +
+              '<span style="width:22px;height:14px;background:linear-gradient(90deg,#1A237E,#FFD700);border-radius:2px;"></span>' +
+              '<span style="font-size:11px;color:#0F172A;">Credit / Debit Card</span>' +
+            '</div>' +
+            '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #E2E8F0;border-radius:10px;margin-bottom:8px;">' +
+              '<span style="width:16px;height:16px;background:#1E40AF;color:#fff;font-size:9px;font-weight:800;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;">P</span>' +
+              '<span style="font-size:11px;color:#0F172A;">PayPal</span>' +
+            '</div>' +
+            '<div style="display:flex;align-items:center;gap:8px;padding:10px;border-radius:12px;background:linear-gradient(90deg,#1C2B4A,#0D9488);">' +
+              '<span style="width:18px;height:18px;background:rgba(255,255,255,.2);border-radius:9px;display:inline-flex;align-items:center;justify-content:center;color:white;font-size:10px;">\u2713</span>' +
+              '<span style="flex:1;font-size:11px;font-weight:700;color:#fff;">Pay by bank using Al Tareq</span>' +
+              '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #fff;display:inline-flex;align-items:center;justify-content:center;"><span style="width:6px;height:6px;border-radius:3px;background:#fff;"></span></span>' +
+            '</div>'
+        ) +
       '</div>';
 
-  /* ── SCREEN 2: TPP — Choose your option ── */
+  /* ── SCREEN 2: PayLink — Choose bank / ADCB ── */
   } else if (n === 2) {
-    html = sipOwnerBar('TPP') + sipLogo() + sipStepper(0) +
-      '<div style="padding:12px 14px;">' +
-        '<div style="font-size:13px;font-weight:700;margin-bottom:10px;">Choose your option</div>' +
-        '<div style="border:1px solid #E2E8F0;border-radius:6px;padding:8px 10px;font-size:11px;color:#475569;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;border-radius:50%;border:2px solid #ccc;"></span> Select your account</div>' +
-        '<div style="border:2px solid #00B4C8;border-radius:6px;padding:8px 10px;font-size:11px;color:#0F172A;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:6px;background:#F0FDFA;"><span style="width:14px;height:14px;border-radius:50%;background:#00B4C8;border:2px solid #00B4C8;display:inline-flex;align-items:center;justify-content:center;color:white;font-size:8px;">\u2713</span> Select your bank</div>' +
-        '<div style="font-size:13px;font-weight:700;margin-bottom:8px;">Choose your bank</div>' +
-        '<div style="border:1px solid #E2E8F0;border-radius:6px;padding:8px 10px;font-size:11px;color:#94A3B8;margin-bottom:8px;">Enter account provider...</div>' +
-        '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f5f5f5;"><span style="font-size:11px;color:#475569;">Citibank UAE</span></div>' +
-        '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f5f5f5;font-weight:600;color:#E31E24;"><span style="width:8px;height:8px;border-radius:50%;background:#E31E24;"></span> ADCB</div>' +
-        '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f5f5f5;"><span style="font-size:11px;color:#475569;">Mashreq</span></div>' +
-        '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;"><span style="font-size:11px;color:#475569;">RAKBANK</span></div>' +
+    html = sipOwnerBar('PAYLINK') + sipLogo() + sipStepper(0) +
+      '<div style="padding:12px 14px;background:#F8FAFC;">' +
+        sipCard(
+          '<div style="font-size:12px;font-weight:700;color:#0F172A;margin-bottom:10px;">Choose your option</div>' +
+          '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F1F5F9;">' +
+            '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #CBD5E1;"></span>' +
+            '<span style="font-size:11px;color:#475569;">Select your account</span>' +
+          '</div>' +
+          '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;">' +
+            '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #0D9488;display:inline-flex;align-items:center;justify-content:center;"><span style="width:6px;height:6px;border-radius:3px;background:#0D9488;"></span></span>' +
+            '<span style="font-size:11px;color:#0F172A;font-weight:600;">Select your bank</span>' +
+          '</div>',
+          'margin-bottom:10px;'
+        ) +
+        sipCard(
+          '<div style="font-size:12px;font-weight:700;color:#0F172A;margin-bottom:10px;">Choose your bank</div>' +
+          '<div style="height:34px;border-radius:10px;background:#F8FAFC;border:1px solid #E2E8F0;display:flex;align-items:center;padding:0 10px;gap:6px;margin-bottom:4px;">' +
+            '<span style="font-size:11px;color:#94A3B8;flex:1;">Enter account provider\u2026</span>' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#94A3B8" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/></svg>' +
+          '</div>' +
+          '<div style="display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid #F1F5F9;">' +
+            '<span style="width:26px;height:26px;border-radius:6px;background:#E31E24;color:#fff;font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;">ADCB</span>' +
+            '<span style="flex:1;font-size:11px;font-weight:600;color:#0F172A;">Abu Dhabi Commercial Bank</span>' +
+            '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #0D9488;display:inline-flex;align-items:center;justify-content:center;"><span style="width:6px;height:6px;border-radius:3px;background:#0D9488;"></span></span>' +
+          '</div>' +
+          '<div style="display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid #F1F5F9;">' +
+            '<span style="width:26px;height:26px;border-radius:6px;background:#C8102E;color:#fff;font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;">ENBD</span>' +
+            '<span style="flex:1;font-size:11px;color:#475569;">Emirates NBD</span>' +
+            '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #CBD5E1;"></span>' +
+          '</div>' +
+          '<div style="display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid #F1F5F9;">' +
+            '<span style="width:26px;height:26px;border-radius:6px;background:#1D6FA4;color:#fff;font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;">FAB</span>' +
+            '<span style="flex:1;font-size:11px;color:#475569;">First Abu Dhabi Bank</span>' +
+            '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #CBD5E1;"></span>' +
+          '</div>' +
+          '<div style="display:flex;align-items:center;gap:10px;padding:9px 2px;">' +
+            '<span style="width:26px;height:26px;border-radius:6px;background:#F26522;color:#fff;font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;">MB</span>' +
+            '<span style="flex:1;font-size:11px;color:#475569;">Mashreq Bank</span>' +
+            '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #CBD5E1;"></span>' +
+          '</div>'
+        ) +
       '</div>';
 
-  /* ── SCREEN 3: TPP — Permission to make a payment ── */
+  /* ── SCREEN 3: PayLink — Permission to pay (CoP status + payee/payer) ── */
   } else if (n === 3) {
-    html = sipOwnerBar('TPP') + sipLogo() + sipStepper(0) +
-      '<div style="padding:12px 14px;">' +
-        '<div style="font-size:13px;font-weight:700;margin-bottom:4px;">Permission to make a payment</div>' +
-        '<div style="font-size:10px;color:#475569;margin-bottom:12px;line-height:1.4;">To make a payment from your bank, we need your permission to access the required information.</div>' +
-        '<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;"><span style="width:16px;height:16px;background:#00B4C8;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:white;font-size:8px;">\u25B6</span><span style="font-size:11px;font-weight:600;">Payment Total</span><span style="font-size:11px;color:#475569;margin-left:auto;">1,000</span></div>' +
-        sipRow('Payment Reference', 'INV-2026-0042') +
-        sipRow('Payment Purpose', 'Invoice Payment') +
-        '<div style="margin-top:10px;font-size:10px;font-weight:600;margin-bottom:6px;">Payee Information</div>' +
-        sipRow('Payee Name', 'Ahmed Al Maktoum') +
-        sipRow('Account', 'AE07 0331 2345 6789 01234') +
+    html = sipOwnerBar('PAYLINK') + sipLogo() + sipStepper(0) +
+      '<div style="padding:12px 14px;background:#F8FAFC;">' +
+        sipCard(
+          '<div style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:4px;">Permission to make a payment</div>' +
+          '<div style="font-size:11px;color:#64748B;margin-bottom:12px;line-height:1.4;">To make a payment from your bank, we need your permission to securely initiate the payment.</div>' +
+          '<div style="background:#F8FAFC;border-radius:10px;padding:10px;margin-bottom:12px;">' +
+            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">' +
+              '<div style="width:24px;height:24px;border-radius:12px;background:rgba(13,148,136,0.15);display:flex;align-items:center;justify-content:center;">' +
+                '<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="3" stroke="#0D9488" stroke-width="1.8"/><path d="M3 10h18" stroke="#0D9488" stroke-width="1.8"/></svg>' +
+              '</div>' +
+              '<div style="flex:1;font-size:11px;font-weight:600;color:#0F172A;">Payment Total</div>' +
+              '<div style="font-size:12px;font-weight:800;color:#0F172A;">AED 1,000</div>' +
+            '</div>' +
+            sipRow('Reference', 'INV-2026-0042') +
+            sipRow('Purpose', 'Invoice Payment', 'border-bottom:none;') +
+          '</div>' +
+          /* Payee accordion */
+          '<div style="border-top:1px solid #F1F5F9;padding-top:10px;margin-top:4px;">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
+              '<div style="font-size:12px;font-weight:700;color:#0D9488;">Payee information</div>' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#0D9488" stroke-width="2.2" stroke-linecap="round"/></svg>' +
+            '</div>' +
+            sipRow('IBAN', 'AE07 0331 2345 6789 01234') +
+            sipRow('Payee Name', 'Ahmed Al Maktoum') +
+            '<div style="display:flex;align-items:center;gap:6px;padding:8px 14px;margin:4px -14px 0;background:rgba(16,185,129,0.08);">' +
+              '<span style="width:16px;height:16px;border-radius:8px;background:#10B981;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;">\u2713</span>' +
+              '<span style="color:#047857;font-weight:700;font-size:11px;">CoP Confirmed</span>' +
+            '</div>' +
+          '</div>' +
+          /* Payer accordion */
+          '<div style="border-top:1px solid #F1F5F9;padding-top:10px;margin-top:10px;">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
+              '<div style="font-size:12px;font-weight:700;color:#0D9488;">Payer information</div>' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#0D9488" stroke-width="2.2" stroke-linecap="round"/></svg>' +
+            '</div>' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;">' +
+              '<span style="font-size:11px;color:#64748B;">Bank</span>' +
+              '<span style="display:inline-flex;align-items:center;gap:6px;">' + sipAdcbLogo(false) + '</span>' +
+            '</div>' +
+          '</div>'
+        ) +
       '</div>' +
-      sipBtn('\uD83D\uDD12 Pay using AlTareq', 'sipProtoNext()') +
-      '<div style="text-align:center;padding:4px 14px 8px;font-size:10px;color:#94A3B8;">By tapping you agree to the <span style="color:#00B4C8;">terms & conditions</span></div>' +
-      sipBtnSec('Cancel', 'sipProtoPrev()');
+      sipBtn('\uD83D\uDD12 Pay using Al Tareq', 'sipProtoNext()') +
+      '<div style="text-align:center;padding:2px 14px 6px;font-size:10px;color:#94A3B8;">We\'ll securely transfer you to <b style="color:#0F172A;">ADCB</b> to authorise the payment</div>';
 
-  /* ── SCREEN 4: Redirection to LFI ── */
+  /* ── SCREEN 4: Redirection to ADCB ── */
   } else if (n === 4) {
-    html = '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,#00B4C8 0%,#0D3349 100%);padding:30px 20px;text-align:center;min-height:500px;">' +
-        '<div style="font-size:12px;color:rgba(255,255,255,.7);margin-bottom:20px;">You\'ll be redirected to</div>' +
-        '<div style="width:56px;height:56px;background:rgba(255,255,255,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;"><img src="assets/images/adcb-logo.svg" alt="ADCB" style="height:20px;filter:brightness(0) invert(1);" /></div>' +
-        '<div style="color:#fff;font-size:16px;font-weight:700;margin-bottom:4px;">[Your LFI]</div>' +
-        '<div style="color:rgba(255,255,255,.6);font-size:11px;">don\'t close this window</div>' +
-        '<div style="width:48px;height:48px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sme-spin 1s linear infinite;margin:30px 0;"></div>' +
-        '<div style="margin-top:auto;color:rgba(255,255,255,.5);font-size:10px;">Powered by</div>' +
-        '<div style="color:#fff;font-size:14px;font-weight:700;letter-spacing:2px;margin-top:4px;">ALTAREQ</div>' +
+    html = '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#0D9488 0%,#1C2B4A 55%,#0B1220 100%);padding:30px 20px;text-align:center;min-height:500px;">' +
+        '<div style="font-size:12px;color:rgba(255,255,255,.85);margin-bottom:20px;">You\'ll be redirected to</div>' +
+        '<div style="width:78px;height:78px;background:#fff;border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 12px 24px rgba(0,0,0,0.25);">' +
+          '<svg width="40" height="40" viewBox="0 0 28 28">' +
+            '<path d="M14 2L3 6v8c0 6 4.5 10.5 11 12 6.5-1.5 11-6 11-12V6L14 2z" fill="#E31E24"/>' +
+            '<path d="M8 13l6-5 6 5-6 5-6-5z" fill="#fff"/>' +
+          '</svg>' +
+        '</div>' +
+        '<div style="color:#fff;font-size:16px;font-weight:800;letter-spacing:0.5px;margin-bottom:4px;">ADCB</div>' +
+        '<div style="color:rgba(255,255,255,.7);font-size:11px;">don\'t close this window</div>' +
+        '<div style="width:40px;height:40px;border:3px solid rgba(255,255,255,.2);border-top-color:#0D9488;border-radius:50%;animation:sme-spin 0.9s linear infinite;margin:26px 0;"></div>' +
+        '<div style="margin-top:auto;color:rgba(255,255,255,.55);font-size:9px;letter-spacing:1px;margin-bottom:6px;">POWERED BY</div>' +
+        '<div style="display:inline-flex;align-items:center;gap:6px;">' +
+          '<svg width="16" height="16" viewBox="0 0 32 32"><defs><linearGradient id="sip-r1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0D9488"/><stop offset="1" stop-color="#1C2B4A"/></linearGradient></defs><circle cx="16" cy="16" r="15" fill="url(#sip-r1)"/><path d="M10 16a6 6 0 1011 3.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M13 15.5l2.3 2.3L21 12" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+          '<div style="color:#fff;font-weight:800;font-size:12px;">Al <span style="color:#0D9488;">Tareq</span></div>' +
+        '</div>' +
       '</div>';
     setTimeout(function() { if (sipCurrentScreen === 4) { sipCurrentScreen = 5; sipRenderScreen(); sipUpdateProtoUI(); } }, 2000);
 
-  /* ── SCREEN 5: LFI Authentication ── */
+  /* ── SCREEN 5: ADCB Authentication splash ── */
   } else if (n === 5) {
-    html = '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#F8FAFC 0%,#E2E8F0 100%);padding:30px 20px;text-align:center;min-height:500px;">' +
-        '<div style="font-size:12px;color:#475569;margin-bottom:16px;">Authentication</div>' +
-        '<div style="width:72px;height:72px;background:#F0FDFA;border:2px solid #00B4C8;border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:32px;">\uD83C\uDFE6</div>' +
-        '<div style="font-size:14px;font-weight:700;color:#0F172A;">Verifying your identity</div>' +
-        '<div style="font-size:11px;color:#475569;margin-top:4px;">with your bank</div>' +
-        '<div style="width:40px;height:40px;border:3px solid #E2E8F0;border-top-color:#00B4C8;border-radius:50%;animation:sme-spin 1s linear infinite;margin:24px 0;"></div>' +
+    html = '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#F8FAFC;padding:30px 20px;text-align:center;min-height:500px;gap:18px;">' +
+        '<div style="width:72px;height:72px;border-radius:36px;background:linear-gradient(135deg,#E31E24,#A01820);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 28px rgba(227,30,36,0.3);">' +
+          '<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="11" rx="2.5" stroke="#fff" stroke-width="1.8"/><path d="M8 10V7a4 4 0 018 0v3" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>' +
+        '</div>' +
+        '<div style="font-size:17px;font-weight:800;color:#0F172A;">ADCB Authentication</div>' +
+        '<div style="font-size:11px;color:#64748B;">Securing your session\u2026</div>' +
+        '<div style="width:36px;height:36px;border:3px solid #E2E8F0;border-top-color:#E31E24;border-radius:50%;animation:sme-spin 0.9s linear infinite;"></div>' +
       '</div>';
     setTimeout(function() { if (sipCurrentScreen === 5) { sipCurrentScreen = 6; sipRenderScreen(); sipUpdateProtoUI(); } }, 1500);
 
-  /* ── SCREEN 6: CoP Verifying Payee ── */
+  /* ── SCREEN 6: ADCB — CoP Verifying Payee ── */
   } else if (n === 6) {
-    html = sipOwnerBar('YOUR LFI') + sipLogo() + sipStepper(0) +
-      '<div style="padding:40px 14px;text-align:center;">' +
-        '<div style="width:48px;height:48px;border:3px solid #E2E8F0;border-top-color:#00B4C8;border-radius:50%;animation:sme-spin 1s linear infinite;margin:0 auto 16px;"></div>' +
-        '<div style="font-size:14px;font-weight:600;color:#0F172A;margin-bottom:4px;">Checking payee details...</div>' +
-        '<div style="font-size:11px;color:#475569;">Verifying name against bank records</div>' +
+    html = sipOwnerBar('ADCB') + sipLogo() + sipStepper(0) +
+      '<div style="padding:30px 14px;text-align:center;background:#F8FAFC;">' +
+        '<div style="width:56px;height:56px;border:3px solid #E2E8F0;border-top-color:#0D9488;border-radius:50%;animation:sme-spin 0.9s linear infinite;margin:0 auto 18px;"></div>' +
+        '<div style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:4px;">Checking payee details\u2026</div>' +
+        '<div style="font-size:11px;color:#64748B;">Verifying name against bank records</div>' +
       '</div>' +
-      '<div style="margin:0 14px;padding:12px;background:#F8FAFC;border-radius:8px;">' +
-        sipRow('Payee', 'Ahmed Al Maktoum') +
-        sipRow('IBAN', 'AE21 0610 **** 1234') +
+      '<div style="margin:0 14px 14px;">' +
+        sipCard(
+          sipRow('Payee', 'Ahmed Al Maktoum') +
+          sipRow('IBAN', 'AE21 0610 **** 1234', 'border-bottom:none;')
+        ) +
       '</div>';
     setTimeout(function() { if (sipCurrentScreen === 6) { sipCurrentScreen = 7; sipRenderScreen(); sipUpdateProtoUI(); } }, 1500);
 
-  /* ── SCREEN 7: CoP Result ── */
+  /* ── SCREEN 7: ADCB — CoP Result (delegates to per-scenario renderer) ── */
   } else if (n === 7) {
     html = sipRenderCopResultScreen();
 
-  /* ── SCREEN 8: LFI — Confirm Payment Details ── */
+  /* ── SCREEN 8: ADCB — Confirm Payment Details + account select ── */
   } else if (n === 8) {
-    html = sipOwnerBar('YOUR LFI') + sipLogo() + sipStepper(1) +
-      '<div style="font-size:13px;font-weight:700;text-align:center;padding:8px 14px 4px;">Confirm Payment Details</div>' +
-      '<div style="text-align:center;font-size:10px;color:#475569;padding:0 14px 6px;line-height:1.4;">[TPP trading name] needs your permission to make the payment below.</div>' +
-      sipRow('Amount', '1,000 AED', 'color:#E31E24;font-weight:700;') +
-      sipRow('Payee Name', 'Ahmed Al Maktoum') +
-      sipRow('IBAN', 'AE21 0610 **** 1234') +
-      sipRow('Payment Purpose', 'Invoice Payment') +
-      sipRow('Payment Reference', 'INV-2026-0042') +
-      '<div style="font-size:12px;font-weight:700;text-align:center;padding:10px 14px 4px;">Please select the account to pay from</div>' +
-      '<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #f5f5f5;">' +
-        '<div style="width:16px;height:16px;border-radius:50%;border:2px solid #ccc;"></div>' +
-        '<div style="flex:1;"><div style="font-size:11px;font-weight:600;">Current Account</div><div style="font-size:10px;color:#475569;">AE07 1234 5246 4523 4567 895</div></div><div style="font-size:10px;color:#475569;">M 44,576</div></div>' +
-      '<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #f5f5f5;">' +
-        '<div style="width:16px;height:16px;border-radius:50%;border:2px solid #ccc;"></div>' +
-        '<div style="flex:1;"><div style="font-size:11px;font-weight:600;">Savings</div><div style="font-size:10px;color:#475569;">AE07 1255 3546 4523 4567 895</div></div><div style="font-size:10px;color:#475569;">M 12,034</div></div>' +
-      '<div style="text-align:center;font-size:10px;color:#E31E24;padding:6px;">*Select one option only</div>' +
-      sipBtn('\uD83D\uDD12 Pay using AlTareq', 'sipProtoNext()') +
+    html = sipOwnerBar('ADCB') + sipLogo() + sipStepper(1) +
+      '<div style="padding:12px 14px;background:#F8FAFC;">' +
+        sipCard(
+          '<div style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:4px;">Confirm Payment Details</div>' +
+          '<div style="font-size:11px;color:#64748B;margin-bottom:12px;"><b>PayLink</b> needs your permission to make the payment below.</div>' +
+          '<div style="background:#F8FAFC;border-radius:10px;padding:10px;">' +
+            sipRow('Amount', 'AED 1,000', 'color:#E31E24;font-weight:700;') +
+            '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed #F1F5F9;font-size:11px;">' +
+              '<span style="color:#64748B;">Payee Name</span>' +
+              '<span style="display:inline-flex;align-items:center;gap:5px;color:#0F172A;font-weight:600;">Ahmed Al Maktoum <span style="width:14px;height:14px;border-radius:7px;background:#10B981;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:9px;">\u2713</span></span>' +
+            '</div>' +
+            sipRow('IBAN', 'AE07 0331 2345 6789 01234') +
+            sipRow('Payee Bank', 'Supplier Bank') +
+            sipRow('Reference', 'INV-2026-0042') +
+            sipRow('Purpose', 'Invoice Payment', 'border-bottom:none;') +
+          '</div>',
+          'margin-bottom:12px;'
+        ) +
+        sipCard(
+          '<div style="font-size:12px;font-weight:700;color:#0F172A;margin-bottom:10px;">Select the account to pay from</div>' +
+          '<div style="padding:12px;border-radius:12px;border:1.5px solid #E31E24;background:rgba(227,30,36,0.04);margin-bottom:8px;">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
+              '<div style="font-size:12px;font-weight:700;color:#0F172A;">Current Account</div>' +
+              '<div style="font-size:12px;font-weight:700;color:#0F172A;">AED 44,576</div>' +
+            '</div>' +
+            '<div style="font-size:10px;color:#64748B;">AE07 1234 5246 4523 4567 895</div>' +
+            '<div style="font-size:10px;color:#64748B;">Overdraft: AED 1,500</div>' +
+          '</div>' +
+          '<div style="padding:12px;border-radius:12px;border:1.5px solid #E2E8F0;background:#fff;">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
+              '<div style="font-size:12px;font-weight:700;color:#0F172A;">Savings</div>' +
+              '<div style="font-size:12px;font-weight:700;color:#0F172A;">AED 12,034</div>' +
+            '</div>' +
+            '<div style="font-size:10px;color:#64748B;">AE07 1255 3546 4523 4567 895</div>' +
+          '</div>'
+        ) +
+      '</div>' +
+      sipBtn('\uD83D\uDD12 Pay using Al Tareq', 'sipProtoNext()') +
       sipBtnSec('Cancel', 'sipProtoPrev()');
 
-  /* ── SCREEN 9: LFI — Authentication (Touch ID / Face ID / PIN) ── */
+  /* ── SCREEN 9: ADCB — SCA (Touch ID) ── */
   } else if (n === 9) {
-    html = sipOwnerBar('YOUR LFI') + sipLogo() + sipStepper(1) +
-      '<div style="padding:20px 14px;text-align:center;">' +
-        '<div style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:16px;">Touch ID<br>Authentication</div>' +
-        '<div style="width:56px;height:56px;border-radius:50%;background:#F0FDFA;border:2px solid #00B4C8;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px;">\uD83D\uDC46</div>' +
-        '<div style="font-size:13px;font-weight:600;color:#0F172A;margin-bottom:12px;">Face ID<br>Authentication</div>' +
-        '<div style="width:56px;height:56px;border-radius:50%;background:#F5F3FF;border:2px solid #8B5CF6;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px;">\uD83D\uDC64</div>' +
-        '<div style="font-size:13px;font-weight:600;color:#0F172A;margin-bottom:12px;">PIN entry<br>Authentication</div>' +
-        '<div style="display:flex;justify-content:center;gap:8px;margin-bottom:8px;">' +
-          '<div style="width:12px;height:12px;border-radius:50%;background:#1C2B4A;"></div>' +
-          '<div style="width:12px;height:12px;border-radius:50%;background:#1C2B4A;"></div>' +
-          '<div style="width:12px;height:12px;border-radius:50%;border:2px solid #ccc;"></div>' +
-          '<div style="width:12px;height:12px;border-radius:50%;border:2px solid #ccc;"></div>' +
+    html = sipOwnerBar('ADCB') + sipLogo() + sipStepper(1) +
+      '<div style="padding:10px 14px 16px;background:#F8FAFC;">' +
+        /* Method tabs */
+        '<div style="display:flex;gap:6px;margin-bottom:14px;">' +
+          '<div style="flex:1;height:34px;border-radius:17px;border:1.5px solid #E31E24;background:rgba(227,30,36,0.06);color:#E31E24;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:4px;">\u261D Touch ID</div>' +
+          '<div style="flex:1;height:34px;border-radius:17px;border:1.5px solid #E2E8F0;background:#fff;color:#0F172A;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;">Face ID</div>' +
+          '<div style="flex:1;height:34px;border-radius:17px;border:1.5px solid #E2E8F0;background:#fff;color:#0F172A;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;">PIN</div>' +
+        '</div>' +
+        '<div style="text-align:center;">' +
+          '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:4px;">Touch ID Authentication</div>' +
+          '<div style="font-size:10px;color:#64748B;margin-bottom:20px;">Hold your finger on the sensor to confirm</div>' +
+          '<div style="width:140px;height:140px;border-radius:70px;background:#fff;border:2px solid #0D9488;margin:0 auto;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 10px rgba(13,148,136,0.08);">' +
+            '<svg width="72" height="72" viewBox="0 0 48 48" fill="none" stroke-linecap="round">' +
+              '<path d="M16 36c-1-3-1.5-6-1.5-9 0-5 4.5-9 9.5-9s9.5 4 9.5 9" stroke="#0D9488" stroke-width="2"/>' +
+              '<path d="M20 40c-1-3-1.5-6-1.5-9 0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5c0 2 0 4-.5 6" stroke="#0D9488" stroke-width="2"/>' +
+              '<path d="M24 42c-.5-3-.5-6-.5-9 0-1 .5-1.5 1-1.5s.5 1 .5 2c0 2-.5 5-1 7" stroke="#0D9488" stroke-width="2"/>' +
+              '<path d="M12 24a12 12 0 0122-6" stroke="#0D9488" stroke-width="2"/>' +
+              '<path d="M36 28c0 4-.5 8-2 12" stroke="#0D9488" stroke-width="2"/>' +
+            '</svg>' +
+          '</div>' +
+          '<div style="margin-top:16px;font-size:12px;font-weight:600;color:#0D9488;">Touch the sensor to authenticate</div>' +
+          '<div style="margin-top:6px;font-size:9px;color:#94A3B8;font-style:italic;">(demo \u2014 tap Next to simulate success)</div>' +
         '</div>' +
       '</div>';
 
-  /* ── SCREEN 10: Redirection back to TPP ── */
+  /* ── SCREEN 10: Redirection back to PayLink ── */
   } else if (n === 10) {
-    html = '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,#00B4C8 0%,#0D3349 100%);padding:30px 20px;text-align:center;min-height:500px;">' +
-        '<div style="font-size:12px;color:rgba(255,255,255,.7);margin-bottom:20px;">You\'ll be redirected back to</div>' +
-        '<div style="width:56px;height:56px;background:rgba(255,255,255,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:24px;">\uD83D\uDED2</div>' +
-        '<div style="color:#fff;font-size:16px;font-weight:700;margin-bottom:4px;">[Your TPP]</div>' +
-        '<div style="color:rgba(255,255,255,.6);font-size:11px;">don\'t close this window</div>' +
-        '<div style="width:48px;height:48px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sme-spin 1s linear infinite;margin:30px 0;"></div>' +
-        '<div style="margin-top:auto;color:rgba(255,255,255,.5);font-size:10px;">Powered by</div>' +
-        '<div style="color:#fff;font-size:14px;font-weight:700;letter-spacing:2px;margin-top:4px;">ALTAREQ</div>' +
+    html = '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#0D9488 0%,#1C2B4A 55%,#0B1220 100%);padding:30px 20px;text-align:center;min-height:500px;">' +
+        '<div style="font-size:12px;color:rgba(255,255,255,.85);margin-bottom:20px;">You\'ll be redirected back to</div>' +
+        '<div style="width:78px;height:78px;background:#fff;border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 12px 24px rgba(0,0,0,0.25);">' +
+          '<div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#8B5CF6,#6D28D9);display:flex;align-items:center;justify-content:center;">' +
+            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 15a4 4 0 010-6l2-2a4 4 0 016 0M15 9a4 4 0 010 6l-2 2a4 4 0 01-6 0" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>' +
+          '</div>' +
+        '</div>' +
+        '<div style="color:#fff;font-size:16px;font-weight:800;letter-spacing:0.2px;margin-bottom:4px;">PayLink</div>' +
+        '<div style="color:rgba(255,255,255,.7);font-size:11px;">don\'t close this window</div>' +
+        '<div style="width:40px;height:40px;border:3px solid rgba(255,255,255,.2);border-top-color:#0D9488;border-radius:50%;animation:sme-spin 0.9s linear infinite;margin:26px 0;"></div>' +
+        '<div style="margin-top:auto;color:rgba(255,255,255,.55);font-size:9px;letter-spacing:1px;margin-bottom:6px;">POWERED BY</div>' +
+        '<div style="display:inline-flex;align-items:center;gap:6px;">' +
+          '<svg width="16" height="16" viewBox="0 0 32 32"><defs><linearGradient id="sip-r2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0D9488"/><stop offset="1" stop-color="#1C2B4A"/></linearGradient></defs><circle cx="16" cy="16" r="15" fill="url(#sip-r2)"/><path d="M10 16a6 6 0 1011 3.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M13 15.5l2.3 2.3L21 12" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+          '<div style="color:#fff;font-weight:800;font-size:12px;">Al <span style="color:#0D9488;">Tareq</span></div>' +
+        '</div>' +
       '</div>';
 
-  /* ── SCREEN 11: TPP — Thank you / Confirmation ── */
+  /* ── SCREEN 11: PayLink — Thank you ── */
   } else if (n === 11) {
-    html = sipOwnerBar('TPP') + sipLogo() + sipStepper(2) +
-      '<div style="padding:20px 14px;text-align:center;">' +
-        '<div style="font-size:16px;font-weight:700;color:#0F172A;margin-bottom:4px;">Thank you</div>' +
-        '<div style="width:48px;height:48px;border-radius:50%;border:3px solid #15803D;display:flex;align-items:center;justify-content:center;font-size:20px;color:#15803D;margin:12px auto;">\u2713</div>' +
-        '<div style="font-size:12px;color:#475569;margin-bottom:16px;">Your Payment has been <strong style="color:#15803D;">[Authorised/Completed]</strong></div>' +
-        '<div style="text-align:left;padding:12px;background:#F8FAFC;border-radius:10px;">' +
-          sipRow('Amount', '1,000 AED') +
-          sipRow('Payee', 'Ahmed Al Maktoum') +
-          sipRow('IBAN', 'AE07 0331 2345 6789 01234') +
-          sipRow('Reference', 'INV-2026-0042') +
-          sipRow('Date', '17 Apr 2026, 10:15') +
-        '</div>' +
+    html = sipOwnerBar('PAYLINK') + sipLogo() + sipStepper(2) +
+      '<div style="padding:14px;background:#F8FAFC;">' +
+        sipCard(
+          '<div style="text-align:center;">' +
+            '<div style="font-size:17px;font-weight:800;color:#0F172A;margin-bottom:12px;">Thank you</div>' +
+            '<div style="width:60px;height:60px;border-radius:30px;margin:0 auto 14px;background:linear-gradient(135deg,#10B981,#059669);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(16,185,129,0.35);">' +
+              '<svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+            '</div>' +
+            '<div style="font-size:12px;color:#64748B;margin-bottom:14px;">Your payment has been <b style="color:#0F172A;">submitted</b></div>' +
+          '</div>' +
+          '<div style="background:#F8FAFC;border-radius:10px;padding:10px;">' +
+            sipRow('Amount', 'AED 1,000') +
+            sipRow('Payee', 'Ahmed Al Maktoum') +
+            sipRow('IBAN', 'AE07 0331 2345 6789 01234') +
+            sipRow('Reference', 'INV-2026-0042') +
+            sipRow('Date', '17 Apr 2026, 10:15', 'border-bottom:none;') +
+          '</div>',
+          'padding:20px 16px;'
+        ) +
       '</div>' +
       sipBtn('Done', 'sipCurrentScreen=1;sipRenderScreen();sipUpdateProtoUI()');
   }
@@ -792,23 +1065,32 @@ function sipRenderCopResultScreen() {
   var bannerColors = {exact:'#F0FDF4;border:1px solid #86EFAC',partial:'#FFFBEB;border:1px solid #FDE68A',none:'#FEF2F2;border:1px solid #FECACA',unavailable:'#F0F4FF;border:1px solid #BFDBFE'};
   var bannerBg = bannerColors[sc] || bannerColors.exact;
 
-  var h = sipOwnerBar('YOUR LFI') + sipLogo() + sipStepper(0) +
-    '<div style="padding:14px;">' +
-      '<div style="font-size:13px;font-weight:700;margin-bottom:10px;">Payee Verification</div>' +
-      '<div style="padding:10px 12px;background:#F8FAFC;border-radius:8px;margin-bottom:14px;">' +
-        sipRow('Payee', 'Ahmed Al Maktoum') +
-        sipRow('IBAN', 'AE21 0610 **** 1234') +
-      '</div>' +
-      '<div style="display:flex;gap:10px;padding:12px;border-radius:10px;background:' + bannerBg + ';margin-bottom:14px;"><span style="font-size:20px;flex-shrink:0;">' + cfg.icon + '</span><div><div style="font-weight:700;font-size:12px;margin-bottom:2px;">' + cfg.title + '</div><div style="font-size:11px;color:#475569;">' + cfg.desc + '</div></div></div>';
+  var h = sipOwnerBar('ADCB') + sipLogo() + sipStepper(0) +
+    '<div style="padding:12px 14px;background:#F8FAFC;">' +
+      sipCard(
+        '<div style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:10px;">Payee Verification</div>' +
+        '<div style="background:#F8FAFC;border-radius:10px;padding:10px;margin-bottom:12px;">' +
+          sipRow('Payee', 'Ahmed Al Maktoum') +
+          sipRow('IBAN', 'AE21 0610 **** 1234', 'border-bottom:none;') +
+        '</div>' +
+        '<div style="display:flex;gap:10px;padding:12px;border-radius:10px;background:' + bannerBg + ';margin-bottom:4px;">' +
+          '<span style="font-size:20px;flex-shrink:0;line-height:1;">' + cfg.icon + '</span>' +
+          '<div><div style="font-weight:700;font-size:12px;color:#0F172A;margin-bottom:4px;">' + cfg.title + '</div>' +
+            '<div style="font-size:11px;color:#475569;line-height:1.5;">' + cfg.desc + '</div>' +
+          '</div>' +
+        '</div>',
+        'margin-bottom:12px;'
+      );
 
   if (cfg.checkbox) {
-    h += '<label class="sip-confirm-checkbox' + (cfg.danger ? ' danger-bg' : '') + '">' +
-      '<input type="checkbox" onchange="sipUpdateCopProceed()"> <span>' + cfg.checkLabel + '</span></label>';
+    h += '<div style="padding:0 14px 10px;"><label class="sip-confirm-checkbox' + (cfg.danger ? ' danger-bg' : '') + '">' +
+      '<input type="checkbox" onchange="sipUpdateCopProceed()"> <span>' + cfg.checkLabel + '</span></label></div>';
   }
 
-  h += '<button id="sip-cop-proceed" style="background:linear-gradient(135deg,#00B4C8,#005f6b);color:white;border:none;border-radius:24px;padding:12px;width:100%;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;' + (cfg.canProceed ? '' : 'opacity:0.5;pointer-events:none;') + '" onclick="sipHandleCopProceed()">' + cfg.btnText + '</button>' +
-    '<button style="background:white;color:#0F172A;border:1px solid #E2E8F0;border-radius:24px;padding:11px;width:100%;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;" onclick="sipProtoPrev()">Go Back \u2014 Edit Details</button>' +
-  '</div>';
+  h += '<div style="padding:0 14px 14px;">' +
+    '<button id="sip-cop-proceed" style="background:linear-gradient(90deg,#0D9488,#1C2B4A);color:white;border:none;border-radius:24px;padding:13px;width:100%;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 6px 14px rgba(13,148,136,0.25);' + (cfg.canProceed ? '' : 'opacity:0.5;pointer-events:none;') + '" onclick="sipHandleCopProceed()">' + cfg.btnText + '</button>' +
+    '<button style="background:white;color:#0F172A;border:1.5px solid #E2E8F0;border-radius:24px;padding:11px;width:100%;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;" onclick="sipProtoPrev()">Go Back \u2014 Edit Details</button>' +
+  '</div></div>';
 
   return h;
 }
@@ -902,14 +1184,8 @@ function sipUpdateProtoUI() {
     descEl.innerHTML = '<strong style="color:var(--navy);">Screen ' + sipCurrentScreen + '/' + sipTotalScreens + ' \u2014 ' + owner + ':</strong> ' + desc;
   }
 
-  /* API panel */
-  var devBody = document.getElementById('sip-dev-body');
-  var devTitle = document.getElementById('sip-dev-title');
-  var api = SIP_SCREEN_APIS[sipCurrentScreen];
-  if (devBody && api) {
-    devBody.innerHTML = api.html;
-    if (devTitle) devTitle.textContent = api.title;
-  }
+  /* API panel \u2014 renders ordered call sequence for this screen */
+  sipRenderApiPanel(sipCurrentScreen);
 
   /* Old UI compat */
   var label = document.getElementById('sip-proto-screen-label');
