@@ -558,13 +558,19 @@ function sipRenderApiPanel(n) {
     var c = data.calls[i];
     var seq = String(i + 1).padStart(2, '0');
     var mc = SIP_METHOD_COLORS[c.method] || SIP_METHOD_COLORS.GET;
-    // Escape HTML, then syntax-colour: comments grey, strings blue
+    // Escape HTML first, then syntax-colour line-by-line so the span
+    // attributes we inject are never matched by the string regex.
     var code = (c.code || '')
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/(\/\/[^\n]*)/g, '<span style="color:#8B949E;">$1</span>')
-      .replace(/("[^"\n]*")/g, '<span style="color:#A5D6FF;">$1</span>');
+      .replace(/>/g, '&gt;');
+    code = code.split('\n').map(function(line) {
+      // Whole-line comments \u2192 grey
+      var m = line.match(/^(\s*)(\/\/.*)$/);
+      if (m) return m[1] + '<span style="color:#8B949E;">' + m[2] + '</span>';
+      // Otherwise highlight quoted strings on the line \u2192 blue
+      return line.replace(/("[^"\n]*")/g, '<span style="color:#A5D6FF;">$1</span>');
+    }).join('\n');
     html += '<div style="margin-bottom:' + (i === data.calls.length - 1 ? '0' : '14px') + ';">'
       + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
       +   '<span style="font-size:10px;font-weight:800;color:#6E7681;font-variant-numeric:tabular-nums;letter-spacing:.6px;">' + seq + '</span>'
