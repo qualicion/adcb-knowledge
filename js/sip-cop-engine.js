@@ -1160,9 +1160,10 @@ function sipSetScenario(scenario, btn) {
   var btns = document.querySelectorAll('.sip-scenario-btn');
   for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
   if (btn) btn.classList.add('active');
-  if (sipCurrentScreen === 4 || sipCurrentScreen === 5) {
-    sipRenderScreen();
-  }
+  // Always reset to screen 1 so the journey starts fresh for the new scenario
+  sipCurrentScreen = 1;
+  sipRenderScreen();
+  sipUpdateProtoUI();
 }
 
 function sipGoToScreen(n) {
