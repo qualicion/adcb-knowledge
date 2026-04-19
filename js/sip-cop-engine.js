@@ -52,65 +52,92 @@ function sipGoTab(tabId) {
 }
 
 /* ─────────────────────────────────────────────
-   2. FLOW DIAGRAM
+   2. FLOW DIAGRAM \u2014 simplified, one line per step
+   Each card shows: owner \u2022 title \u2022 one-line summary \u2022 the action
+   that triggers the next outcome. Long description and detail tables
+   are tucked behind a "See details" toggle to keep cognitive load low.
    ───────────────────────────────────────────── */
+
+/* What happens + the action that triggers the next step (short copy) */
+var SIP_FLOW_EXPLAIN = {
+  1:  { summary: 'User is on the merchant checkout and chooses how to pay.',
+        action:  'User taps \u201CPay by Bank\u201D' },
+  2:  { summary: 'TPP fetches the list of banks and shows the bank picker.',
+        action:  'User selects ADCB as their bank' },
+  3:  { summary: 'TPP asks the OF Hub whether the payee name matches the IBAN.',
+        action:  'OF Hub returns a match verdict (Exact / Partial / No Match)' },
+  4:  { summary: 'Verdict is shown on screen \u2014 required by CBUAE before consent.',
+        action:  'User acknowledges the CoP outcome' },
+  5:  { summary: 'Full payment summary is displayed for a final review.',
+        action:  'User taps \u201CConfirm\u201D' },
+  6:  { summary: 'TPP encrypts PII and posts a signed PAR request to the hub.',
+        action:  'Hub replies with a request_uri and redirects user to ADCB' },
+  7:  { summary: 'User authenticates at ADCB with SCA (biometric or OTP).',
+        action:  'ADCB redirects back to the TPP callback with an auth code' },
+  8:  { summary: 'TPP swaps the auth code for an access token (PKCE + JWT).',
+        action:  'Token received \u2192 consent marked Authorised' },
+  9:  { summary: 'TPP submits the signed payment (PI-6) in the background.',
+        action:  'Hub returns a DomesticPaymentId with status Pending' },
+  10: { summary: 'TPP polls PI-8 until a terminal status is reached.',
+        action:  'Status becomes Accepted \u2192 receipt shown to the user' }
+};
+
+function sipOwnerFromColor(color) {
+  var map = {
+    '#1E40AF': { label: 'User / Frontend', icon: '\uD83D\uDC64' },
+    '#15803D': { label: 'TPP Backend',     icon: '\uD83D\uDCE4' },
+    '#D97706': { label: 'OF API Hub',      icon: '\uD83C\uDF10' },
+    '#5B21B6': { label: 'Bank (LFI)',      icon: '\uD83C\uDFE6' },
+    '#E65100': { label: 'CoP Query',       icon: '\uD83D\uDD0D' },
+    '#C41E24': { label: 'Security',        icon: '\uD83D\uDD12' },
+    '#00695C': { label: 'Status',          icon: '\u2705' }
+  };
+  return map[color] || { label: 'Step', icon: '\u2022' };
+}
+
 function sipRenderFlow() {
   var el = document.getElementById('sip-flow-content');
   if (!el || !SIP_FLOW_STEPS || !SIP_FLOW_STEPS.length) return;
 
-  var legend = '<div class="sip-legend">' +
-    '<div class="sip-legend-item"><div class="sip-legend-dot" style="background:#DBEAFE;border-color:#1E40AF"></div> User / Frontend</div>' +
-    '<div class="sip-legend-item"><div class="sip-legend-dot" style="background:#D1FAE5;border-color:#15803D"></div> TPP Backend</div>' +
-    '<div class="sip-legend-item"><div class="sip-legend-dot" style="background:#FEF3C7;border-color:#D97706"></div> OF API Hub</div>' +
-    '<div class="sip-legend-item"><div class="sip-legend-dot" style="background:#F5F3FF;border-color:#5B21B6"></div> Bank (LFI)</div>' +
-    '<div class="sip-legend-item"><div class="sip-legend-dot" style="background:#FFF3E0;border-color:#E65100"></div> CoP Query</div>' +
-    '<div class="sip-legend-item"><div class="sip-legend-dot" style="background:#FEE2E2;border-color:#C41E24"></div> Security / Encryption</div>' +
-  '</div>';
-
   var phases = {
-    1: {label:'STEP P-0',desc:'TPP: Payment Data & Bank Selection',cop:false},
-    3: {label:'CoP QUERY',desc:'Confirmation of Payee',cop:true},
-    5: {label:'STEP P-1',desc:'Payment Review & Consent Initiation',cop:false},
-    7: {label:'STEP P-2',desc:'Bank Authorization & Token Exchange',cop:false},
-    9: {label:'STEP P-3',desc:'Payment Execution & Status',cop:false}
+    1: {label:'PHASE 1',desc:'Amazon collects payment details',cop:false},
+    3: {label:'PHASE 2',desc:'Confirmation of Payee (mandatory before consent)',cop:true},
+    5: {label:'PHASE 3',desc:'Consent review & PAR',cop:false},
+    7: {label:'PHASE 4',desc:'Bank authorisation & token exchange',cop:false},
+    9: {label:'PHASE 5',desc:'Payment execution & status',cop:false}
   };
 
-  var html = legend + '<div style="max-width:900px">';
+  var html = '<div style="max-width:860px;margin:0 auto;">' +
+    '<p style="font-size:13px;color:var(--color-text-secondary);margin:0 0 18px;line-height:1.5;">' +
+      'Ten steps, grouped into five phases. Every card shows <b>who acts</b>, <b>what happens</b>, and the <b>action that triggers the next step</b>.' +
+    '</p>';
   var copOpen = false;
 
   for (var i = 0; i < SIP_FLOW_STEPS.length; i++) {
     var step = SIP_FLOW_STEPS[i];
     var num = step.num || (i + 1);
     var color = step.color || '#1E40AF';
+    var owner = sipOwnerFromColor(color);
+    var explain = SIP_FLOW_EXPLAIN[num] || { summary: step.desc || '', action: '' };
+    var nextStep = SIP_FLOW_STEPS[i + 1];
+    var isLast = i === SIP_FLOW_STEPS.length - 1;
 
     // Phase marker
     if (phases[num]) {
       if (copOpen) { html += '</div>'; copOpen = false; }
       var ph = phases[num];
-      html += '<div class="sip-phase-marker' + (ph.cop ? ' cop-phase' : '') + '">' + ph.label + ' \u2014 ' + ph.desc + '</div>';
-      if (ph.cop) { html += '<div class="sip-cop-highlight"><div class="sip-cop-highlight-title">\uD83D\uDD0D Confirmation of Payee (CoP) \u2014 Before Payment Consent</div>'; copOpen = true; }
-    }
-
-    // Tags HTML
-    var tagsHtml = '';
-    if (step.tags && step.tags.length) {
-      tagsHtml = '<div class="sip-flow-tags">';
-      for (var t = 0; t < step.tags.length; t++) {
-        var tag = step.tags[t];
-        var tagCls = 'sip-tag';
-        if (tag.cssClass === 'tag-blue') tagCls += ' sip-tag-ui';
-        else if (tag.cssClass === 'tag-orange') tagCls += ' sip-tag-cop';
-        else if (tag.cssClass === 'tag-green') tagCls += ' sip-tag-api';
-        else if (tag.cssClass === 'tag-red') tagCls += ' sip-tag-security';
-        else if (tag.cssClass === 'tag-purple') tagCls += ' sip-tag-bank';
-        else if (tag.cssClass === 'tag-amber') tagCls += ' sip-tag-hub';
-        else tagCls += ' sip-tag-api';
-        tagsHtml += '<span class="' + tagCls + '">' + tag.label + '</span>';
+      html += '<div style="display:flex;align-items:center;gap:10px;margin:22px 0 10px;">' +
+        '<span style="font-size:10px;font-weight:800;letter-spacing:1.4px;padding:4px 10px;border-radius:99px;background:' + (ph.cop ? '#FFF3E0' : '#EEF2FF') + ';color:' + (ph.cop ? '#9A3412' : '#3730A3') + ';">' + ph.label + '</span>' +
+        '<span style="font-size:13px;font-weight:600;color:var(--navy);">' + ph.desc + '</span>' +
+      '</div>';
+      if (ph.cop) {
+        html += '<div style="border:2px dashed #F59E0B;border-radius:14px;padding:14px 14px 6px;background:#FFFBEB;">' +
+          '<div style="font-size:11px;font-weight:700;color:#9A3412;margin-bottom:8px;letter-spacing:.3px;">\uD83D\uDD0D These two steps are the mandatory CoP check \u2014 skip them and CBUAE fines 250 AED per payment.</div>';
+        copOpen = true;
       }
-      tagsHtml += '</div>';
     }
 
-    // Detail HTML
+    // Detail HTML (kept but hidden behind a toggle)
     var detailHtml = '';
     if (step.detail && step.detail.rows) {
       detailHtml = '<div class="sip-detail-panel" id="sip-detail-' + num + '">';
@@ -137,18 +164,38 @@ function sipRenderFlow() {
       detailHtml += '</div>';
     }
 
-    var isLast = i === SIP_FLOW_STEPS.length - 1;
-
-    html += '<div class="sip-flow-step">' +
-      '<div class="sip-flow-step-number">' +
-        '<div class="sip-step-circle" style="background:' + color + '">' + num + '</div>' +
-        (isLast ? '' : '<div class="sip-step-line" style="background:' + color + '"></div>') +
+    /* Simple card: number dot \u2192 title + owner \u2192 summary \u2192 Action row \u2192 Next row */
+    html += '<div style="display:flex;gap:14px;margin-bottom:' + (isLast ? '0' : '10px') + ';">' +
+      /* Left rail: number + connecting line */
+      '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;padding-top:6px;">' +
+        '<div style="width:30px;height:30px;border-radius:15px;background:' + color + ';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;box-shadow:0 2px 4px rgba(15,23,42,0.12);">' + num + '</div>' +
+        (isLast ? '' : '<div style="flex:1;width:2px;background:' + color + '33;margin-top:6px;"></div>') +
       '</div>' +
-      '<div class="sip-flow-step-content">' +
-        '<div class="sip-flow-card" style="background:' + color + '15;border-color:' + color + '" onclick="sipToggleDetail(' + num + ')">' +
-          '<h3 style="color:' + color + '">' + step.title + '</h3>' +
-          '<p>' + step.desc + '</p>' +
-          tagsHtml +
+      /* Right: card */
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="background:#fff;border:1px solid ' + color + '33;border-left:3px solid ' + color + ';border-radius:12px;padding:14px 16px;box-shadow:0 1px 2px rgba(15,23,42,0.04);">' +
+          /* Title row */
+          '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">' +
+            '<span style="font-size:15px;font-weight:700;color:var(--navy);line-height:1.3;">' + step.title + '</span>' +
+            '<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:' + color + '15;color:' + color + ';">' + owner.icon + ' ' + owner.label + '</span>' +
+          '</div>' +
+          /* One-line summary */
+          '<div style="font-size:13px;color:var(--color-text-secondary);line-height:1.5;margin-bottom:10px;">' + explain.summary + '</div>' +
+          /* Action row */
+          (explain.action ? '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:#F8FAFC;margin-bottom:6px;">' +
+            '<span style="font-size:9px;font-weight:800;letter-spacing:.8px;color:' + color + ';text-transform:uppercase;min-width:52px;">Action</span>' +
+            '<span style="font-size:12px;color:var(--navy);font-weight:500;flex:1;">' + explain.action + '</span>' +
+          '</div>' : '') +
+          /* Next row */
+          (nextStep ? '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:#F1F5F9;">' +
+            '<span style="font-size:9px;font-weight:800;letter-spacing:.8px;color:#64748B;text-transform:uppercase;min-width:52px;">Next \u2193</span>' +
+            '<span style="font-size:12px;color:var(--color-text-secondary);flex:1;">Step ' + (num + 1) + ' \u2014 ' + nextStep.title + '</span>' +
+          '</div>' : '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:#F0FDF4;">' +
+            '<span style="font-size:9px;font-weight:800;letter-spacing:.8px;color:#15803D;text-transform:uppercase;min-width:52px;">\u2713 Done</span>' +
+            '<span style="font-size:12px;color:#15803D;font-weight:500;flex:1;">Payment journey complete</span>' +
+          '</div>') +
+          /* Optional: See details toggle */
+          (detailHtml ? '<div style="text-align:right;margin-top:8px;"><button onclick="event.stopPropagation();sipToggleDetail(' + num + ')" style="background:none;border:none;color:' + color + ';font-size:11px;font-weight:600;cursor:pointer;padding:0;">See technical details \u2192</button></div>' : '') +
         '</div>' +
         detailHtml +
       '</div>' +
