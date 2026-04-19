@@ -244,12 +244,14 @@ function smeRenderPrototype() {
   window._smeProtoGroups = [
     { id:'happy', label:'\u2705 Happy Path', color:'#15803D',
       items:[
-        {key:'login',short:'1. Login'},
-        {key:'consent-details',short:'2. Consent'},
-        {key:'account-select',short:'3. Select Account'},
-        {key:'account-selected',short:'4. Confirm'},
-        {key:'pin',short:'5. PIN / EFR'},
-        {key:'redirect',short:'6. Redirect'}
+        {key:'tpp-checkout',short:'1. Noon Checkout'},
+        {key:'tpp-redirect',short:'2. Redirect to ADCB'},
+        {key:'login',short:'3. Login'},
+        {key:'consent-details',short:'4. Consent'},
+        {key:'account-select',short:'5. Select Account'},
+        {key:'account-selected',short:'6. Confirm'},
+        {key:'pin',short:'7. PIN / EFR'},
+        {key:'redirect',short:'8. Redirect back'}
       ]},
     { id:'variants', label:'\uD83D\uDD04 Account Variants', color:'#D97706',
       items:[

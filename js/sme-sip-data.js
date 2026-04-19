@@ -127,6 +127,76 @@ var SME_SIP_FLOW = {
 
 var SME_SIP_SCENARIOS = {
 
+  /* ── TPP CHECKOUT (pre-redirect) ───────────────────────── */
+  'tpp-checkout': {
+    title: 'API CALLS \u2014 TPP CHECKOUT (pre-redirect)',
+    desc: '<strong>What\'s happening:</strong> The customer is on the Noon merchant checkout. They pick \u201CPay by Bank using AlTareq\u201D and tap Continue. Nothing has hit ADCB yet \u2014 all interaction is inside the TPP. <strong>Next:</strong> The TPP backend pushes a Payment Authorisation Request (PAR) to Nebras, receives a request_uri, and the device is handed over to ADCB.',
+    screenHtml:
+      '<div style="background:linear-gradient(135deg,#232F3E,#131921);color:#fff;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;">' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<div style="width:28px;height:28px;background:#FF9900;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#131921;font-size:12px;">N</div>' +
+          '<div style="font-size:13px;font-weight:800;letter-spacing:.3px;">Noon</div>' +
+        '</div>' +
+        '<div style="font-size:10px;opacity:.7;">Secure checkout</div>' +
+      '</div>' +
+      '<div style="padding:14px;">' +
+        '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:8px;">Order Summary</div>' +
+        '<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;margin-bottom:12px;">' +
+          '<div style="display:flex;justify-content:space-between;font-size:11px;color:#475569;padding:3px 0;"><span>Subtotal</span><span style="color:#0F172A;font-weight:600;">AED 95.00</span></div>' +
+          '<div style="display:flex;justify-content:space-between;font-size:11px;color:#475569;padding:3px 0;"><span>Delivery</span><span style="color:#0F172A;font-weight:600;">AED 5.00</span></div>' +
+          '<div style="display:flex;justify-content:space-between;font-size:12px;color:#0F172A;font-weight:800;padding:6px 0 0;border-top:1px dashed #E2E8F0;margin-top:6px;"><span>Total</span><span>AED 100.00</span></div>' +
+        '</div>' +
+        '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:8px;">Choose payment method</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid #E2E8F0;border-radius:8px;margin-bottom:6px;">' +
+          '<span style="width:22px;height:14px;background:linear-gradient(90deg,#1A237E,#FFD700);border-radius:2px;"></span>' +
+          '<span style="font-size:11px;color:#0F172A;">Credit / Debit Card</span>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;padding:10px;border-radius:10px;background:linear-gradient(90deg,#1C2B4A,#0D9488);color:#fff;margin-bottom:12px;">' +
+          '<span style="width:18px;height:18px;background:rgba(255,255,255,.2);border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;">\u2713</span>' +
+          '<span style="flex:1;font-size:11px;font-weight:700;">Pay by Bank using AlTareq</span>' +
+          '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #fff;display:inline-flex;align-items:center;justify-content:center;"><span style="width:6px;height:6px;border-radius:3px;background:#fff;"></span></span>' +
+        '</div>' +
+        '<button style="background:#131921;color:#fff;border:none;border-radius:24px;padding:12px;width:100%;font-size:13px;font-weight:700;cursor:pointer;">Continue</button>' +
+        '<div style="text-align:center;font-size:9px;color:#94A3B8;margin-top:10px;">You will be redirected to your bank to authorise the payment</div>' +
+      '</div>',
+    apisHtml:
+      '<div class="sme-dev-section">' +
+        '<div style="font-size:11px;color:#8B949E;margin-bottom:10px;line-height:1.6;">No API calls to ADCB yet \u2014 this screen is entirely inside the Noon app. The moment the customer taps <b style="color:#E6EDF3;">Continue</b>, the TPP backend fires the first Open Finance call:</div>' +
+        '<div class="sme-dev-label">POST \u2014 Push Authorisation Request (PAR)</div>' +
+        '<div class="sme-api-badge sme-badge-post">POST</div>' +
+        '<code class="sme-dev-path">/as/par  (to Nebras)</code>' +
+        '<pre class="sme-code-block"><span class="sme-ck">// Signed JAR carries the payment intent\n</span><span class="sme-cv">{\n  </span><span class="sme-cs">"response_type"</span><span class="sme-cv">: </span><span class="sme-cs">"code"</span><span class="sme-cv">,\n  </span><span class="sme-cs">"client_id"</span><span class="sme-cv">:    </span><span class="sme-cs">"tpp-noon-001"</span><span class="sme-cv">,\n  </span><span class="sme-cs">"scope"</span><span class="sme-cv">:        </span><span class="sme-cs">"payments openid"</span><span class="sme-cv">,\n  </span><span class="sme-cs">"request"</span><span class="sme-cv">:      </span><span class="sme-cs">"<signed-JAR-JWT>"</span>\n<span class="sme-cv">}</span>\n\n<span class="sme-ck">// Response</span>\n<span class="sme-cv">{ </span><span class="sme-cs">"request_uri"</span><span class="sme-cv">: </span><span class="sme-cs">"urn:adcb:bwc:1234abcd"</span><span class="sme-cv">, </span><span class="sme-cs">"expires_in"</span><span class="sme-cv">: </span><span class="sme-cn">60</span><span class="sme-cv"> }</span></pre>' +
+      '</div>'
+  },
+
+  /* ── TPP REDIRECT (handover to ADCB) ───────────────────── */
+  'tpp-redirect': {
+    title: 'API CALLS \u2014 REDIRECT TO ADCB',
+    desc: '<strong>What\'s happening:</strong> Noon has the request_uri from PAR. The device opens AlTareq / ProCash via a universal link, passing the request_uri so ADCB can look up the pending consent. <strong>Next:</strong> ProCash launches (or the browser continues) \u2014 the customer lands on the ADCB login screen.',
+    screenHtml:
+      '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#0D9488 0%,#1C2B4A 55%,#0B1220 100%);padding:60px 20px 30px;text-align:center;min-height:500px;">' +
+        '<div style="font-size:12px;color:rgba(255,255,255,.85);margin-bottom:20px;">You\'ll be redirected to</div>' +
+        '<div style="width:78px;height:78px;background:#fff;border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 12px 24px rgba(0,0,0,0.25);">' +
+          '<svg width="40" height="40" viewBox="0 0 28 28">' +
+            '<path d="M14 2L3 6v8c0 6 4.5 10.5 11 12 6.5-1.5 11-6 11-12V6L14 2z" fill="#E31E24"/>' +
+            '<path d="M8 13l6-5 6 5-6 5-6-5z" fill="#fff"/>' +
+          '</svg>' +
+        '</div>' +
+        '<div style="color:#fff;font-size:16px;font-weight:800;letter-spacing:0.5px;margin-bottom:4px;">ADCB</div>' +
+        '<div style="color:rgba(255,255,255,.7);font-size:11px;">don\'t close this window</div>' +
+        '<div style="width:40px;height:40px;border:3px solid rgba(255,255,255,.2);border-top-color:#0D9488;border-radius:50%;animation:sme-spin 0.9s linear infinite;margin:26px 0;"></div>' +
+        '<div style="color:rgba(255,255,255,.55);font-size:9px;letter-spacing:1px;margin-bottom:6px;margin-top:12px;">POWERED BY</div>' +
+        '<div style="color:#fff;font-weight:800;font-size:12px;">Al <span style="color:#0D9488;">Tareq</span></div>' +
+      '</div>',
+    apisHtml:
+      '<div class="sme-dev-section">' +
+        '<div style="font-size:11px;color:#8B949E;margin-bottom:10px;line-height:1.6;">The handover uses a universal link so ProCash opens if installed, otherwise the browser opens the AlTareq hosted page. No ADCB backend call fires during this redirect \u2014 the request_uri is just handed over.</div>' +
+        '<div class="sme-dev-label">Universal link handover</div>' +
+        '<pre class="sme-code-block"><span class="sme-ck">// Universal link \u2192 opens ProCash if installed\n</span><span class="sme-cs">https://altareq.adcb.ae/open-finance/authorize<br>  ?request_uri=urn:adcb:bwc:1234abcd<br>  &amp;client_id=tpp-noon-001</span>\n\n<span class="sme-ck">// Fallback deep link\n</span><span class="sme-cs">procash://open-finance/authorize<br>  ?request_uri=urn:adcb:bwc:1234abcd</span></pre>' +
+        '<div style="margin-top:12px;padding:8px 12px;background:#0B2948;border-left:3px solid #58A6FF;border-radius:4px;font-size:11px;color:#93C5FD;line-height:1.5;">Once the device lands on ProCash, ADCB resolves the consent with <b>GET /payment-consents/{ConsentId}</b> right after login \u2014 see the next step.</div>' +
+      '</div>'
+  },
+
   /* ── LOGIN ─────────────────────────────────────────────── */
   'login': {
     title: 'API CALLS — LOGIN / AUTHENTICATION',
