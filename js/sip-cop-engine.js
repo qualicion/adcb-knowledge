@@ -9,6 +9,15 @@
 var sipCurrentScreen = 1;
 var sipCurrentScenario = 'exact';
 var sipTotalScreens = 11;
+/* Interactive selections (persist across screen re-renders) */
+var sipSelectedBank = 'adcb';
+var sipSelectedAccount = 'current';
+var sipSelectedOption = 'bank';     /* account | bank   (screen 2) */
+var sipAuthMethod = 'touch';        /* touch | face | pin (screen 9) */
+function sipSelectBank(k)    { sipSelectedBank = k;    sipRenderScreen(); }
+function sipSelectAccount(k) { sipSelectedAccount = k; sipRenderScreen(); }
+function sipSelectOption(k)  { sipSelectedOption = k;  sipRenderScreen(); }
+function sipSelectAuth(k)    { sipAuthMethod = k;      sipRenderScreen(); }
 
 var SIP_SCREEN_NAMES = ['',
   'TPP: Fill in Payment Data',
@@ -801,47 +810,57 @@ function sipRenderScreen() {
 
   /* ── SCREEN 2: Amazon — Choose bank / ADCB ── */
   } else if (n === 2) {
+    var bankList = [
+      { key: 'adcb',    label: 'Abu Dhabi Commercial Bank', tag: 'ADCB', bg: '#E31E24' },
+      { key: 'enbd',    label: 'Emirates NBD',              tag: 'ENBD', bg: '#C8102E' },
+      { key: 'fab',     label: 'First Abu Dhabi Bank',      tag: 'FAB',  bg: '#1D6FA4' },
+      { key: 'mashreq', label: 'Mashreq Bank',              tag: 'MB',   bg: '#F26522' }
+    ];
+    var banksHtml = '';
+    for (var bi = 0; bi < bankList.length; bi++) {
+      var bk = bankList[bi];
+      var bsel = sipSelectedBank === bk.key;
+      banksHtml +=
+        '<div onclick="event.stopPropagation();sipSelectBank(\'' + bk.key + '\')" ' +
+             'style="display:flex;align-items:center;gap:10px;padding:9px 2px;cursor:pointer;' +
+               (bi < bankList.length - 1 ? 'border-bottom:1px solid #F1F5F9;' : '') + '">' +
+          '<span style="width:26px;height:26px;border-radius:6px;background:' + bk.bg + ';color:#fff;font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;">' + bk.tag + '</span>' +
+          '<span style="flex:1;font-size:11px;color:' + (bsel ? '#0F172A' : '#475569') + ';font-weight:' + (bsel ? '600' : '400') + ';">' + bk.label + '</span>' +
+          (bsel
+            ? '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #0D9488;display:inline-flex;align-items:center;justify-content:center;"><span style="width:6px;height:6px;border-radius:3px;background:#0D9488;"></span></span>'
+            : '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #CBD5E1;"></span>') +
+        '</div>';
+    }
+
+    var optAccSel = sipSelectedOption === 'account';
+    var optBnkSel = sipSelectedOption === 'bank';
+    var optRow = function(key, label, selected, isLast) {
+      return '<div onclick="event.stopPropagation();sipSelectOption(\'' + key + '\')" ' +
+                  'style="display:flex;align-items:center;gap:10px;padding:8px 0;cursor:pointer;' +
+                    (isLast ? '' : 'border-bottom:1px solid #F1F5F9;') + '">' +
+        (selected
+          ? '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #0D9488;display:inline-flex;align-items:center;justify-content:center;"><span style="width:6px;height:6px;border-radius:3px;background:#0D9488;"></span></span>'
+          : '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #CBD5E1;"></span>') +
+        '<span style="font-size:11px;color:' + (selected ? '#0F172A' : '#475569') + ';font-weight:' + (selected ? '600' : '400') + ';">' + label + '</span>' +
+      '</div>';
+    };
+
     html = sipOwnerBar('AMAZON') + sipLogo() + sipStepper(0) +
       '<div style="padding:12px 14px;background:#F8FAFC;">' +
         sipCard(
           '<div style="font-size:12px;font-weight:700;color:#0F172A;margin-bottom:10px;">Choose your option</div>' +
-          '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F1F5F9;">' +
-            '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #CBD5E1;"></span>' +
-            '<span style="font-size:11px;color:#475569;">Select your account</span>' +
-          '</div>' +
-          '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;">' +
-            '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #0D9488;display:inline-flex;align-items:center;justify-content:center;"><span style="width:6px;height:6px;border-radius:3px;background:#0D9488;"></span></span>' +
-            '<span style="font-size:11px;color:#0F172A;font-weight:600;">Select your bank</span>' +
-          '</div>',
+          optRow('account', 'Select your account', optAccSel, false) +
+          optRow('bank',    'Select your bank',    optBnkSel, true),
           'margin-bottom:10px;'
         ) +
-        sipCard(
+        (optBnkSel ? sipCard(
           '<div style="font-size:12px;font-weight:700;color:#0F172A;margin-bottom:10px;">Choose your bank</div>' +
           '<div style="height:34px;border-radius:10px;background:#F8FAFC;border:1px solid #E2E8F0;display:flex;align-items:center;padding:0 10px;gap:6px;margin-bottom:4px;">' +
             '<span style="font-size:11px;color:#94A3B8;flex:1;">Enter account provider\u2026</span>' +
             '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#94A3B8" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/></svg>' +
           '</div>' +
-          '<div style="display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid #F1F5F9;">' +
-            '<span style="width:26px;height:26px;border-radius:6px;background:#E31E24;color:#fff;font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;">ADCB</span>' +
-            '<span style="flex:1;font-size:11px;font-weight:600;color:#0F172A;">Abu Dhabi Commercial Bank</span>' +
-            '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #0D9488;display:inline-flex;align-items:center;justify-content:center;"><span style="width:6px;height:6px;border-radius:3px;background:#0D9488;"></span></span>' +
-          '</div>' +
-          '<div style="display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid #F1F5F9;">' +
-            '<span style="width:26px;height:26px;border-radius:6px;background:#C8102E;color:#fff;font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;">ENBD</span>' +
-            '<span style="flex:1;font-size:11px;color:#475569;">Emirates NBD</span>' +
-            '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #CBD5E1;"></span>' +
-          '</div>' +
-          '<div style="display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid #F1F5F9;">' +
-            '<span style="width:26px;height:26px;border-radius:6px;background:#1D6FA4;color:#fff;font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;">FAB</span>' +
-            '<span style="flex:1;font-size:11px;color:#475569;">First Abu Dhabi Bank</span>' +
-            '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #CBD5E1;"></span>' +
-          '</div>' +
-          '<div style="display:flex;align-items:center;gap:10px;padding:9px 2px;">' +
-            '<span style="width:26px;height:26px;border-radius:6px;background:#F26522;color:#fff;font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;">MB</span>' +
-            '<span style="flex:1;font-size:11px;color:#475569;">Mashreq Bank</span>' +
-            '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #CBD5E1;"></span>' +
-          '</div>'
-        ) +
+          banksHtml
+        ) : '') +
       '</div>';
 
   /* ── SCREEN 3: Amazon — Permission to pay (CoP status + payee/payer) ── */
@@ -964,24 +983,38 @@ function sipRenderScreen() {
           '</div>',
           'margin-bottom:12px;'
         ) +
-        sipCard(
-          '<div style="font-size:12px;font-weight:700;color:#0F172A;margin-bottom:10px;">Select the account to pay from</div>' +
-          '<div style="padding:12px;border-radius:12px;border:1.5px solid #E31E24;background:rgba(227,30,36,0.04);margin-bottom:8px;">' +
-            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
-              '<div style="font-size:12px;font-weight:700;color:#0F172A;">Current Account</div>' +
-              '<div style="font-size:12px;font-weight:700;color:#0F172A;">AED 44,576</div>' +
-            '</div>' +
-            '<div style="font-size:10px;color:#64748B;">AE07 1234 5246 4523 4567 895</div>' +
-            '<div style="font-size:10px;color:#64748B;">Overdraft: AED 1,500</div>' +
-          '</div>' +
-          '<div style="padding:12px;border-radius:12px;border:1.5px solid #E2E8F0;background:#fff;">' +
-            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
-              '<div style="font-size:12px;font-weight:700;color:#0F172A;">Savings</div>' +
-              '<div style="font-size:12px;font-weight:700;color:#0F172A;">AED 12,034</div>' +
-            '</div>' +
-            '<div style="font-size:10px;color:#64748B;">AE07 1255 3546 4523 4567 895</div>' +
-          '</div>'
-        ) +
+        (function() {
+          var accList = [
+            { key: 'current', name: 'Current Account', iban: 'AE07 1234 5246 4523 4567 895', balance: 'AED 44,576', sub: 'Overdraft: AED 1,500' },
+            { key: 'savings', name: 'Savings',          iban: 'AE07 1255 3546 4523 4567 895', balance: 'AED 12,034', sub: '' }
+          ];
+          var accHtml = '';
+          for (var ai = 0; ai < accList.length; ai++) {
+            var a = accList[ai];
+            var asel = sipSelectedAccount === a.key;
+            accHtml +=
+              '<div onclick="event.stopPropagation();sipSelectAccount(\'' + a.key + '\')" ' +
+                   'style="padding:12px;border-radius:12px;border:1.5px solid ' + (asel ? '#E31E24' : '#E2E8F0') + ';' +
+                     'background:' + (asel ? 'rgba(227,30,36,0.04)' : '#fff') + ';' +
+                     (ai < accList.length - 1 ? 'margin-bottom:8px;' : '') + 'cursor:pointer;">' +
+                '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
+                  '<div style="display:flex;align-items:center;gap:8px;">' +
+                    (asel
+                      ? '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #E31E24;display:inline-flex;align-items:center;justify-content:center;"><span style="width:6px;height:6px;border-radius:3px;background:#E31E24;"></span></span>'
+                      : '<span style="width:14px;height:14px;border-radius:7px;border:2px solid #CBD5E1;"></span>') +
+                    '<div style="font-size:12px;font-weight:700;color:#0F172A;">' + a.name + '</div>' +
+                  '</div>' +
+                  '<div style="font-size:12px;font-weight:700;color:#0F172A;">' + a.balance + '</div>' +
+                '</div>' +
+                '<div style="font-size:10px;color:#64748B;margin-left:22px;">' + a.iban + '</div>' +
+                (a.sub ? '<div style="font-size:10px;color:#64748B;margin-left:22px;">' + a.sub + '</div>' : '') +
+              '</div>';
+          }
+          return sipCard(
+            '<div style="font-size:12px;font-weight:700;color:#0F172A;margin-bottom:10px;">Select the account to pay from</div>' +
+            accHtml
+          );
+        })() +
       '</div>' +
       sipBtn('\uD83D\uDD12 Pay using Al Tareq', 'sipProtoNext()') +
       sipBtnSec('Cancel', 'sipProtoPrev()');
