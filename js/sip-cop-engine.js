@@ -910,7 +910,7 @@ function sipRenderScreen() {
           '<div style="color:#fff;font-weight:800;font-size:12px;">Al <span style="color:#0D9488;">Tareq</span></div>' +
         '</div>' +
       '</div>';
-    setTimeout(function() { if (sipCurrentScreen === 4) { sipCurrentScreen = 5; sipRenderScreen(); sipUpdateProtoUI(); } }, 2000);
+    /* Auto-advance removed \u2014 user taps the screen to continue */
 
   /* ── SCREEN 5: ADCB Authentication splash ── */
   } else if (n === 5) {
@@ -922,7 +922,7 @@ function sipRenderScreen() {
         '<div style="font-size:11px;color:#64748B;">Securing your session\u2026</div>' +
         '<div style="width:36px;height:36px;border:3px solid #E2E8F0;border-top-color:#E31E24;border-radius:50%;animation:sme-spin 0.9s linear infinite;"></div>' +
       '</div>';
-    setTimeout(function() { if (sipCurrentScreen === 5) { sipCurrentScreen = 6; sipRenderScreen(); sipUpdateProtoUI(); } }, 1500);
+    /* Auto-advance removed \u2014 user taps the screen to continue */
 
   /* ── SCREEN 6: ADCB — CoP Verifying Payee ── */
   } else if (n === 6) {
@@ -938,7 +938,7 @@ function sipRenderScreen() {
           sipRow('IBAN', 'AE21 0610 **** 1234', 'border-bottom:none;')
         ) +
       '</div>';
-    setTimeout(function() { if (sipCurrentScreen === 6) { sipCurrentScreen = 7; sipRenderScreen(); sipUpdateProtoUI(); } }, 1500);
+    /* Auto-advance removed \u2014 user taps the screen to continue */
 
   /* ── SCREEN 7: ADCB — CoP Result (delegates to per-scenario renderer) ── */
   } else if (n === 7) {
