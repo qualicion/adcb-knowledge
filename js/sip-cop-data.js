@@ -444,11 +444,11 @@ var SIP_RST_SECTIONS = [
       },
       {
         id: 'D-04',
-        title: 'Extremely long payee name',
-        trigger: 'Payee name is 500 characters long (e.g. a company name repeated).',
-        expected: 'System either truncates to a documented max length or returns a 400 validation error. No crash, no silent truncation without logging.',
-        impact: 'Without a defined maximum, the OF Hub may reject the request with an undocumented error.',
-        risk: 'low',
+        title: 'Long legal entity name (ADNOC Distribution)',
+        trigger: 'User pays a well-known UAE entity whose registered legal name is long \u2014 e.g. \u201cAbu Dhabi National Oil Company for Distribution PJSC\u201d (52 characters).',
+        expected: 'The full name is accepted end-to-end without truncation. CoP returns Exact Match. If the OF Hub enforces a maximum (commonly 70\u2013140 chars), validation happens up-front with a clear 400 error, not a silent truncation.',
+        impact: 'Silently truncating long legal entity names causes false No Match verdicts on legitimate payments to household UAE payees.',
+        risk: 'medium',
         oracles: ['API-01', 'G-05']
       },
       {
@@ -507,10 +507,10 @@ var SIP_RST_SECTIONS = [
       },
       {
         id: 'D-11',
-        title: 'SQL / script injection in name field',
-        trigger: 'The payeeName field contains a payload such as: \'; DROP TABLE payments; --',
-        expected: 'The value is treated as a plain string, parameterised before any DB operation, and forwarded safely. No SQL execution. No 500 error.',
-        impact: 'Injection via the CoP name field is a direct security risk if inputs are not sanitised.',
+        title: 'Unicode homoglyph / invisible-character spoofing',
+        trigger: 'A fraudulent merchant submits a payee name using Unicode homoglyphs (e.g. Cyrillic \u201c\u0430\u201d instead of Latin \u201ca\u201d in \u201cEmir\u0430tes NBD\u201d) or invisible zero-width characters between letters.',
+        expected: 'The TPP backend normalises Unicode (NFKC) and strips zero-width characters before the CoP query is sent and before any audit-log write. Displayed name on the review screen is the normalised form so the user sees what the bank sees.',
+        impact: 'Homoglyph spoofing lets an attacker present a name that reads correctly to the payer but does not match at the LFI, or that matches a similar-looking real payee \u2014 a known 2024\u20132025 fraud vector.',
         risk: 'critical',
         oracles: ['API-01', 'S-04']
       },
@@ -609,10 +609,10 @@ var SIP_RST_SECTIONS = [
       },
       {
         id: 'F-09',
-        title: 'Race condition: two CoP queries for the same IBAN simultaneously',
-        trigger: 'Two browser tabs initiate CoP queries for the same payee IBAN at the same moment (e.g. user double-taps).',
-        expected: 'Both queries are processed independently. No data is mixed between the two requests. Each response is matched to its originating request via x-fapi-interaction-id.',
-        impact: 'Mixed responses could show the wrong CoP result for a given payment context.',
+        title: 'Concurrent CoP queries from mobile app and web session',
+        trigger: 'A customer is signed in on both the merchant mobile app and the web checkout in a browser. They start a payment on web, switch to the app and start a second payment for a different payee before the first finishes.',
+        expected: 'Each session has its own x-fapi-interaction-id. Responses are correlated to the originating request and never bleed across sessions. The two CoP results are displayed on their respective review screens.',
+        impact: 'Shared session state across channels could show the CoP result of one payee on the review screen of another \u2014 a direct fraud-protection failure.',
         risk: 'medium',
         oracles: ['API-01', 'P-05']
       }
@@ -666,11 +666,11 @@ var SIP_RST_SECTIONS = [
       },
       {
         id: 'T-05',
-        title: 'Payee changes their name at the bank between CoP and payment',
-        trigger: 'CoP returns Exact Match at 10:00. The payee updates their registered name at the LFI at 10:05. The payment is submitted at 10:10.',
-        expected: 'The system cannot detect the change (this is a known limitation). The CoP result remains MATCH in the payment record. The audit log reflects the CoP query timestamp.',
-        impact: 'This is an accepted limitation of CoP but must be documented so that operations teams understand the audit trail.',
-        risk: 'low',
+        title: 'Payee trade-name changes after a business restructure',
+        trigger: 'A sole establishment converts to an LLC and updates its registered name at ADCB (e.g. \u201cAhmed Trading Est.\u201d \u2192 \u201cAhmed Trading LLC\u201d). A CoP query run the previous day returned Exact Match; a payment consent initiated with that cached result is submitted the next morning.',
+        expected: 'The backend rejects cop_result older than the documented freshness window (e.g. 2 hours) with STALE_COP_RESULT, prompting a fresh CoP query. If accepted, the audit record captures both the CoP queryTimestamp and the execution timestamp.',
+        impact: 'Accepting a CoP result across a name change breaks the fraud-protection assumption and leaves the audit trail ambiguous.',
+        risk: 'medium',
         oracles: ['API-02', 'G-22']
       },
       {
@@ -750,10 +750,10 @@ var SIP_RST_SECTIONS = [
       },
       {
         id: 'O-06',
-        title: 'CoP Partial Match used as AML suspicion indicator',
-        trigger: 'An operations analyst assumes that a PARTIAL_MATCH CoP result indicates the payer intended to deceive, and flags the payment for AML review.',
-        expected: 'Documentation and training materials clearly state that PARTIAL_MATCH reflects a name discrepancy (typo, title, format) and is NOT an AML signal. AML rules must not use cop_result alone as a trigger.',
-        impact: 'Misuse of CoP data as an AML indicator causes incorrect account freezes and regulatory issues.',
+        title: 'Fraud rules engine auto-flags all No Match payments',
+        trigger: 'The TPP fraud team adds a rule that raises a SAR (Suspicious Activity Report) for every payment with cop_result.matchResult = NO_MATCH, on the assumption that No Match correlates with fraud.',
+        expected: 'Rule design explicitly combines cop_result with other signals (amount thresholds, payee history, device risk). No Match alone does not trigger a SAR, because frequent false negatives (e.g. utility billers, long legal names) would flood the fraud queue and drown real cases.',
+        impact: 'Using cop_result as a single-signal fraud trigger generates a high false-positive rate, degrades SAR quality and delays review of genuine fraud.',
         risk: 'medium',
         oracles: ['API-02']
       },
