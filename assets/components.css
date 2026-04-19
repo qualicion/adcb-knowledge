@@ -1733,10 +1733,14 @@
 }
 /* Scrollable display surface */
 .sip-proto-display{
-  position:absolute;inset:0;overflow:hidden;-webkit-overflow-scrolling:touch;
+  position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
   display:flex;flex-direction:column;
 }
-.sip-proto-display::-webkit-scrollbar{width:0;height:0;}
+.sip-proto-display::-webkit-scrollbar{width:4px;}
+.sip-proto-display::-webkit-scrollbar-track{background:transparent;}
+.sip-proto-display::-webkit-scrollbar-thumb{background:rgba(15,23,42,0.2);border-radius:2px;}
+.sip-proto-display::-webkit-scrollbar-thumb:hover{background:rgba(15,23,42,0.4);}
 .sip-proto-screen{animation:fadeIn .2s ease;}
 .sip-proto-nav-row{display:flex;align-items:center;gap:12px;margin-top:var(--space-section-gap);justify-content:center;}
 .sip-proto-nav-btn{

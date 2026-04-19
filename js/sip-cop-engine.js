@@ -674,10 +674,10 @@ function sipBadge(label, color, bg) {
   return '<span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:' + bg + ';color:' + color + ';">' + label + '</span>';
 }
 function sipBtn(label, onclick, style) {
-  return '<button style="background:linear-gradient(90deg,#0D9488,#1C2B4A);color:white;border:none;border-radius:24px;padding:12px;width:calc(100% - 28px);margin:14px 14px 8px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 6px 14px rgba(13,148,136,0.25);' + (style||'') + '" onclick="' + onclick + '">' + label + '</button>';
+  return '<button style="background:linear-gradient(90deg,#0D9488,#1C2B4A);color:white;border:none;border-radius:24px;padding:12px;width:calc(100% - 28px);margin:14px 14px 8px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 6px 14px rgba(13,148,136,0.25);' + (style||'') + '" onclick="event.stopPropagation();' + onclick + '">' + label + '</button>';
 }
 function sipBtnSec(label, onclick) {
-  return '<button style="background:white;color:#0F172A;border:1.5px solid #E2E8F0;border-radius:24px;padding:11px;width:calc(100% - 28px);margin:0 14px 12px;font-size:13px;font-weight:600;cursor:pointer;" onclick="' + onclick + '">' + label + '</button>';
+  return '<button style="background:white;color:#0F172A;border:1.5px solid #E2E8F0;border-radius:24px;padding:11px;width:calc(100% - 28px);margin:0 14px 12px;font-size:13px;font-weight:600;cursor:pointer;" onclick="event.stopPropagation();' + onclick + '">' + label + '</button>';
 }
 
 /* Al Tareq logo \u2014 gradient disc + wordmark (matches cop-prototype.html) */
@@ -1113,13 +1113,13 @@ function sipRenderCopResultScreen() {
       );
 
   if (cfg.checkbox) {
-    h += '<div style="padding:0 14px 10px;"><label class="sip-confirm-checkbox' + (cfg.danger ? ' danger-bg' : '') + '">' +
+    h += '<div style="padding:0 14px 10px;" onclick="event.stopPropagation();"><label class="sip-confirm-checkbox' + (cfg.danger ? ' danger-bg' : '') + '">' +
       '<input type="checkbox" onchange="sipUpdateCopProceed()"> <span>' + cfg.checkLabel + '</span></label></div>';
   }
 
   h += '<div style="padding:0 14px 14px;">' +
-    '<button id="sip-cop-proceed" style="background:linear-gradient(90deg,#0D9488,#1C2B4A);color:white;border:none;border-radius:24px;padding:13px;width:100%;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 6px 14px rgba(13,148,136,0.25);' + (cfg.canProceed ? '' : 'opacity:0.5;pointer-events:none;') + '" onclick="sipHandleCopProceed()">' + cfg.btnText + '</button>' +
-    '<button style="background:white;color:#0F172A;border:1.5px solid #E2E8F0;border-radius:24px;padding:11px;width:100%;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;" onclick="sipProtoPrev()">Go Back \u2014 Edit Details</button>' +
+    '<button id="sip-cop-proceed" style="background:linear-gradient(90deg,#0D9488,#1C2B4A);color:white;border:none;border-radius:24px;padding:13px;width:100%;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 6px 14px rgba(13,148,136,0.25);' + (cfg.canProceed ? '' : 'opacity:0.5;pointer-events:none;') + '" onclick="event.stopPropagation();sipHandleCopProceed()">' + cfg.btnText + '</button>' +
+    '<button style="background:white;color:#0F172A;border:1.5px solid #E2E8F0;border-radius:24px;padding:11px;width:100%;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;" onclick="event.stopPropagation();sipProtoPrev()">Go Back \u2014 Edit Details</button>' +
   '</div></div>';
 
   return h;
