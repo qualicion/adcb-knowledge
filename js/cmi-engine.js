@@ -397,10 +397,21 @@ function cmiRenderPhoneBody(scenario) {
   }
 
   if (scenario === 'ac16') {
-    html += '<div class="cmi-p-search"><div class="cmi-p-sinp"><svg width="13" height="13" fill="none" stroke="#bbb" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input placeholder="Search LFI name or Account/IBAN\u2026" oninput="cmiPhoneFilterSearch(this.value)"></div><div class="cmi-p-fbtn" onclick="cmiPhoneOpenFilter()"><svg width="13" height="13" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></div></div>' +
+    /* Pre-populate the search box with "Emirates" so the UI reflects the API query */
+    html += '<div class="cmi-p-search"><div class="cmi-p-sinp"><svg width="13" height="13" fill="none" stroke="#bbb" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input value="Emirates" placeholder="Search LFI name or Account/IBAN\u2026" oninput="cmiPhoneFilterSearch(this.value)"></div><div class="cmi-p-fbtn" onclick="cmiPhoneOpenFilter()"><svg width="13" height="13" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></div></div>' +
       '<div style="padding:7px 11px;font-size:10px;color:var(--color-text-secondary);background:#fff;border-bottom:1px solid var(--color-border);flex-shrink:0">Results appear within 500ms \u00B7 Search by LFI name or Account/IBAN</div>';
   } else if (!isHistory && scenario !== 'ac08' && scenario !== 'ac18') {
     html += cmiPhoneSearchBar();
+  }
+
+  /* Render filter chips for the AC-15/17/19/20 scenario so the UI shows the active query */
+  if (scenario === 'filter') {
+    html += '<div style="display:flex;gap:5px;flex-wrap:wrap;padding:7px 11px;background:#fff;border-bottom:1px solid var(--color-border);flex-shrink:0;align-items:center;">' +
+      '<span style="font-size:9px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.5px;margin-right:2px;">Filters:</span>' +
+      '<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;background:#EFF6FF;color:#1D4ED8;">Type: Data Sharing <span style="cursor:pointer;opacity:.6;">\u00D7</span></span>' +
+      '<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;background:#FEF2F2;color:#B91C1C;">LFI: Emirates NBD <span style="cursor:pointer;opacity:.6;">\u00D7</span></span>' +
+      '<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;background:#F0FDF4;color:#15803D;">Status: Authorized <span style="cursor:pointer;opacity:.6;">\u00D7</span></span>' +
+    '</div>';
   }
 
   if (isHistory) {
@@ -413,6 +424,36 @@ function cmiRenderPhoneBody(scenario) {
   } else if (scenario === 'ac02') {
     html += '<div style="background:var(--color-success-light);border-bottom:1px solid #86EFAC;padding:6px 11px;font-size:10px;color:var(--color-success-dark);flex-shrink:0">New consent appeared within 30 seconds</div>';
     html += '<div class="cmi-p-scroll"><div class="cmi-p-list" id="cmi-pListC">' + CMI_CONSENT_DATA.map(cmiRenderCard).join('') + '</div></div>';
+  } else if (scenario === 'ac16') {
+    /* Filter to rows whose LFI or consent ID contains "Emirates" */
+    var q16 = 'emirates';
+    var f16 = CMI_CONSENT_DATA.filter(function(c){
+      return (c.lfi||'').toLowerCase().indexOf(q16) >= 0 ||
+             (c.id||'').toLowerCase().indexOf(q16) >= 0;
+    });
+    html += '<div style="background:#EFF6FF;border-bottom:1px solid #BFDBFE;padding:6px 11px;font-size:10px;color:#1D4ED8;flex-shrink:0">' +
+      '\uD83D\uDD0D Showing ' + f16.length + ' of ' + CMI_CONSENT_DATA.length + ' consents matching "Emirates"</div>';
+    html += '<div class="cmi-p-scroll"><div class="cmi-p-list" id="cmi-pListC">' +
+      (f16.length ? f16.map(cmiRenderCard).join('') : '<div style="padding:30px 14px;text-align:center;color:var(--color-text-secondary);font-size:12px;">No consents match your search</div>') +
+      '</div></div>';
+  } else if (scenario === 'ac18') {
+    /* Sort by consent ID descending (simulate "Consent ID \u2193") */
+    var sorted = CMI_CONSENT_DATA.slice().sort(function(a,b){
+      return (b.id||'').localeCompare(a.id||'');
+    });
+    html += '<div style="background:#F5F3FF;border-bottom:1px solid #DDD6FE;padding:6px 11px;font-size:10px;color:#5B21B6;flex-shrink:0">' +
+      '\u2193 Sorted by Consent ID (descending) \u2014 ' + sorted.length + ' consents</div>';
+    html += '<div class="cmi-p-scroll"><div class="cmi-p-list" id="cmi-pListC">' + sorted.map(cmiRenderCard).join('') + '</div></div>';
+  } else if (scenario === 'filter') {
+    /* AC-15/17/19/20 \u2014 combined filter: type=Data Sharing + LFI=Emirates NBD + status=Authorized */
+    var ff = CMI_CONSENT_DATA.filter(function(c){
+      return c.type === 'Data Sharing' && c.lfi === 'Emirates NBD' && c.st === 'Authorized';
+    });
+    html += '<div style="background:#F0FDF4;border-bottom:1px solid #86EFAC;padding:6px 11px;font-size:10px;color:#15803D;flex-shrink:0">' +
+      '\u2713 Showing ' + ff.length + ' of ' + CMI_CONSENT_DATA.length + ' consents matching all filters</div>';
+    html += '<div class="cmi-p-scroll"><div class="cmi-p-list" id="cmi-pListC">' +
+      (ff.length ? ff.map(cmiRenderCard).join('') : '<div style="padding:30px 14px;text-align:center;color:var(--color-text-secondary);font-size:12px;">No consents match the active filters</div>') +
+      '</div></div>';
   } else {
     html += '<div class="cmi-p-scroll"><div class="cmi-p-list" id="cmi-pListC">' + CMI_CONSENT_DATA.map(cmiRenderCard).join('') + '</div></div>';
   }
